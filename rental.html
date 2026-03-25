@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>비유니드 렌탈 견적 시스템</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ===== RESET & BASE ===== */
+*{box-sizing:border-box;margin:0;padding:0;}
+
+/* ===== CREDIT FOOTER ===== */
+.credit-footer {
+  position: fixed;
+  bottom: 12px;
+  left: 16px;
+  font-size: 10px;
+  color: rgba(100, 116, 139, 0.45);
+  letter-spacing: 0.3px;
+  pointer-events: none;
+  z-index: 9999;
+  user-select: none;
+}
+
+body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f8;color:#1e293b;font-size:13px;}
+:root{
+  --navy:#1a2e5a;--blue:#2563eb;--teal:#0ea5e9;--green:#10b981;--orange:#f59e0b;--red:#ef4444;
+  --bg:#f0f2f8;--card:#fff;--border:#e2e8f0;--muted:#94a3b8;--text:#1e293b;
+  --rental:#7c3aed;--rental-light:#ede9fe;
+}
+
+/* ===== LAYOUT ===== */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#1a2e5a 0%,#2563eb 100%);}
+.login-box{background:#fff;border-radius:16px;padding:40px 36px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,0.15);}
+.login-logo{text-align:center;margin-bottom:28px;}
+.login-logo img{height:44px;}
+.login-logo h2{color:var(--navy);font-size:16px;margin-top:8px;font-weight:600;}
+.login-logo p{color:var(--rental);font-size:12px;margin-top:4px;font-weight:500;}
+
+#app{display:none;height:100vh;overflow:hidden;flex-direction:column;}
+.app-header{background:var(--navy);color:#fff;padding:0 20px;height:52px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.app-header .logo{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.app-header .logo span{background:var(--rental);color:#fff;font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;}
+.app-header .spacer{flex:1;}
+.app-header .user-info{font-size:12px;color:#94a3b8;}
+
+.app-body{display:flex;flex:1;overflow:hidden;}
+
+/* ===== SIDEBAR (카탈로그) ===== */
+.sidebar{width:280px;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;}
+.sidebar-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.sidebar-head h3{font-size:13px;font-weight:700;color:var(--navy);}
+.cat-tabs{display:flex;flex-wrap:wrap;gap:4px;padding:10px 12px;border-bottom:1px solid var(--border);}
+.cat-tab{padding:4px 10px;border-radius:99px;border:1px solid var(--border);background:#fff;font-size:11px;cursor:pointer;color:var(--muted);transition:all .15s;}
+.cat-tab.active{background:var(--rental);color:#fff;border-color:var(--rental);}
+.product-list{flex:1;overflow-y:auto;padding:10px;}
+.product-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:all .15s;}
+.product-card:hover{border-color:var(--rental);box-shadow:0 2px 8px rgba(124,58,237,0.1);}
+.pc-name{font-size:12px;font-weight:600;color:var(--navy);margin-bottom:3px;}
+.pc-meta{font-size:10px;color:var(--muted);margin-bottom:5px;}
+.pc-spec{font-size:10px;color:#64748b;line-height:1.4;margin-bottom:6px;}
+.pc-prices{display:flex;gap:8px;}
+.pc-price-item{font-size:10px;background:#f8fafc;border:1px solid var(--border);border-radius:4px;padding:3px 7px;color:#374151;}
+.pc-price-item strong{color:var(--rental);font-size:11px;}
+.no-products{text-align:center;color:var(--muted);padding:30px 10px;font-size:12px;}
+
+/* ===== MAIN (견적 작성) ===== */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.app-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);background:var(--card);flex-shrink:0;}
+.app-tab{padding:12px 20px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;}
+.app-tab.active{color:var(--rental);border-bottom-color:var(--rental);font-weight:600;}
+
+.tab-content{display:none;flex:1;overflow-y:auto;padding:16px;}
+.tab-content.active{display:flex;flex-direction:column;gap:12px;}
+
+/* ===== CARDS ===== */
+.card{background:var(--card);border-radius:10px;border:1px solid var(--border);padding:16px;}
+.card-title{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;}
+.rental-badge{background:var(--rental-light);color:var(--rental);font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;}
+
+/* ===== FORM ===== */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.form-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.form-group{display:flex;flex-direction:column;gap:4px;}
+.form-group label{font-size:11px;font-weight:600;color:#475569;}
+.field-input{border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--text);background:#fff;transition:border .15s;outline:none;}
+.field-input:focus{border-color:var(--rental);}
+.field-input.small{padding:5px 8px;font-size:12px;}
+select.field-input{cursor:pointer;}
+
+/* ===== RENTAL TYPE TOGGLE ===== */
+.rental-type-toggle{display:flex;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+.rtt-btn{flex:1;padding:7px 0;text-align:center;font-size:12px;font-weight:500;cursor:pointer;color:var(--muted);background:#fff;border:none;transition:all .15s;}
+.rtt-btn.active{background:var(--rental);color:#fff;font-weight:600;}
+
+/* ===== QUOTE ITEMS ===== */
+.quote-items-table{width:100%;border-collapse:collapse;font-size:12px;}
+.quote-items-table th{background:#f8fafc;padding:7px 10px;text-align:left;font-weight:600;color:#475569;border-bottom:1px solid var(--border);}
+.quote-items-table td{padding:7px 10px;border-bottom:1px solid #f1f5f9;vertical-align:middle;}
+.quote-items-table tr:last-child td{border-bottom:none;}
+.qty-input{width:52px;text-align:center;}
+.del-btn{background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;}
+.del-btn:hover{background:#fef2f2;}
+.type-badge{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;}
+.type-badge.daily{background:#fef3c7;color:#d97706;}
+.type-badge.monthly{background:var(--rental-light);color:var(--rental);}
+
+/* ===== PRICE SUMMARY ===== */
+.price-summary{background:#f8fafc;border-radius:8px;padding:12px 14px;border:1px solid var(--border);}
+.ps-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px;}
+.ps-row.total{font-weight:700;font-size:14px;color:var(--navy);border-top:1px solid var(--border);margin-top:6px;padding-top:8px;}
+.ps-row .label{color:#475569;}
+.ps-row .val{font-weight:500;}
+.ps-editable{display:flex;align-items:center;gap:6px;}
+.ps-editable input{width:110px;text-align:right;}
+
+/* ===== BUTTONS ===== */
+.btn{padding:8px 16px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:none;transition:all .15s;}
+.btn-primary{background:var(--rental);color:#fff;}
+.btn-primary:hover{background:#6d28d9;}
+.btn-secondary{background:#f1f5f9;color:#475569;border:1px solid var(--border);}
+.btn-secondary:hover{background:#e2e8f0;}
+.btn-danger{background:#fef2f2;color:var(--red);border:1px solid #fecaca;}
+.btn-sm{padding:5px 10px;font-size:11px;}
+.btn-ghost{background:none;border:1px solid var(--border);color:#475569;}
+
+/* ===== HISTORY ===== */
+.history-list{display:flex;flex-direction:column;gap:8px;}
+.history-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:12px;}
+.history-card:hover{border-color:var(--rental);}
+.hc-num{font-size:11px;font-weight:700;color:var(--rental);background:var(--rental-light);padding:3px 8px;border-radius:99px;}
+.hc-info{flex:1;}
+.hc-company{font-size:13px;font-weight:600;color:var(--navy);}
+.hc-meta{font-size:11px;color:var(--muted);margin-top:2px;}
+.hc-total{font-size:13px;font-weight:700;color:var(--navy);text-align:right;}
+.hc-actions{display:flex;gap:6px;}
+
+/* ===== ADMIN ===== */
+.admin-sub-tabs{display:flex;gap:4px;padding:12px;border-bottom:1px solid var(--border);background:var(--card);}
+.admin-sub-tab{padding:6px 14px;border-radius:6px;border:1px solid var(--border);font-size:12px;cursor:pointer;background:#fff;color:var(--muted);}
+.admin-sub-tab.active{background:var(--rental);color:#fff;border-color:var(--rental);}
+.admin-sub-panel{display:none;padding:16px;overflow-y:auto;}
+.admin-sub-panel.active{display:flex;flex-direction:column;gap:12px;}
+.admin-card{background:var(--card);border-radius:10px;border:1px solid var(--border);padding:16px;}
+.admin-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.admin-card-header h2{font-size:13px;font-weight:700;color:var(--navy);}
+.data-table{width:100%;border-collapse:collapse;font-size:12px;}
+.data-table th{background:#f8fafc;padding:8px 10px;text-align:left;font-weight:600;color:#475569;border-bottom:1px solid var(--border);}
+.data-table td{padding:8px 10px;border-bottom:1px solid #f1f5f9;vertical-align:middle;}
+
+/* ===== MODAL ===== */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:#fff;border-radius:12px;width:520px;max-width:95vw;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.modal-box.wide{width:700px;}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.modal-header h2{font-size:14px;font-weight:700;color:var(--navy);}
+.modal-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);padding:2px 6px;border-radius:4px;}
+.modal-close:hover{background:#f1f5f9;}
+.modal-body{padding:16px 20px;overflow-y:auto;flex:1;}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0;}
+
+/* ===== ADD TO QUOTE MODAL ===== */
+.atq-product-info{background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:14px;border:1px solid var(--border);}
+.atq-name{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.atq-spec{font-size:11px;color:#64748b;line-height:1.5;}
+.atq-prices{display:flex;gap:10px;margin-top:8px;}
+.atq-price-item{flex:1;background:#fff;border:1px solid var(--border);border-radius:6px;padding:8px 10px;text-align:center;}
+.atq-price-item .pt{font-size:10px;color:var(--muted);margin-bottom:2px;}
+.atq-price-item .pv{font-size:14px;font-weight:700;}
+.atq-price-item.daily .pv{color:#d97706;}
+.atq-price-item.monthly .pv{color:var(--rental);}
+.atq-controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
+.atq-calc{background:var(--rental-light);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;}
+.atq-calc .label{font-size:12px;color:var(--rental);}
+.atq-calc .value{font-size:16px;font-weight:700;color:var(--rental);}
+
+/* ===== PREVIEW ===== */
+.qdoc{font-family:'Pretendard','Apple SD Gothic Neo',sans-serif;padding:32px;background:#fff;color:#1a2e5a;font-size:13px;}
+.qdoc .q-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;}
+.qdoc .q-logo-area img{height:44px;}
+.qdoc .q-logo-area .q-tel{font-size:10px;color:#6b7a99;margin-top:4px;}
+.qdoc h1{font-size:22px;font-weight:800;color:#1a2e5a;text-align:center;margin-bottom:18px;letter-spacing:0.05em;}
+.qdoc .q-rental-badge{display:inline-block;background:#ede9fe;color:#7c3aed;font-size:11px;padding:3px 10px;border-radius:99px;font-weight:700;margin-left:8px;}
+.qdoc .q-meta{display:flex;gap:6px;justify-content:flex-end;margin-bottom:18px;font-size:11px;color:#64748b;}
+.qdoc .q-meta span{background:#f8fafc;padding:3px 10px;border-radius:99px;border:1px solid #e2e8f0;}
+.qdoc .q-section{margin-bottom:18px;}
+.qdoc .q-section-title{font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;}
+.qdoc table{width:100%;border-collapse:collapse;font-size:12px;}
+.qdoc table th{background:#f1f5f9;padding:7px 10px;font-weight:600;color:#475569;border-bottom:2px solid #e2e8f0;text-align:left;}
+.qdoc table td{padding:7px 10px;border-bottom:1px solid #f1f5f9;}
+.qdoc .q-info-table td:first-child{font-weight:600;color:#475569;width:30%;}
+.qdoc .q-rental-info{background:#faf5ff;border:1px solid #ddd6fe;border-radius:8px;padding:12px 16px;margin-bottom:18px;}
+.qdoc .q-rental-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.qdoc .q-rental-info-item .label{font-size:10px;color:#7c3aed;font-weight:600;margin-bottom:2px;}
+.qdoc .q-rental-info-item .value{font-size:13px;font-weight:700;color:#1a2e5a;}
+.qdoc .q-summary{margin-top:16px;}
+.qdoc .q-summary table{width:340px;margin-left:auto;}
+.qdoc .q-summary td{padding:5px 10px;}
+.qdoc .q-summary .total-row td{font-weight:800;font-size:15px;color:#1a2e5a;border-top:2px solid #1a2e5a;padding-top:8px;}
+.qdoc .q-footer{margin-top:24px;border-top:1px solid #e2e8f0;padding-top:14px;text-align:center;font-size:10px;color:#94a3b8;}
+.qdoc .q-party-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.qdoc .q-party-box{border:1px solid #e2e8f0;border-radius:8px;padding:12px;}
+.qdoc .q-party-box h4{font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:8px;}
+
+/* ===== TOAST ===== */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:6px;}
+.toast-msg{background:#1e293b;color:#fff;padding:10px 16px;border-radius:8px;font-size:12px;animation:slideIn .2s ease;box-shadow:0 4px 12px rgba(0,0,0,.2);}
+.toast-msg.success{background:#10b981;}
+.toast-msg.error{background:#ef4444;}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+
+/* ===== MISC ===== */
+.badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;}
+.badge-purple{background:var(--rental-light);color:var(--rental);}
+.badge-gray{background:#f1f5f9;color:#475569;}
+.badge-blue{background:#dbeafe;color:#1d4ed8;}
+.empty-state{text-align:center;padding:40px;color:var(--muted);}
+.empty-state .icon{font-size:36px;margin-bottom:8px;}
+
+@media print{
+  #toast,#toast *,.no-print{display:none!important;}
+  body{background:#fff;}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== 로그인 화면 ===== -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <svg width="140" height="40" viewBox="0 0 140 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="36" height="36" rx="8" fill="#1a2e5a" y="2"/>
+        <text x="18" y="26" text-anchor="middle" font-size="20" font-weight="800" fill="#fff" font-family="Arial">B</text>
+        <text x="50" y="24" font-size="16" font-weight="700" fill="#1a2e5a" font-family="Arial">b.u.need</text>
+        <text x="50" y="36" font-size="9" fill="#94a3b8" font-family="Arial">BEYOND YOUR NEEDS</text>
+      </svg>
+      <h2>비유니드 견적 시스템</h2>
+      <p>🖥️ 렌탈 견적</p>
+    </div>
+    <div class="form-group" style="margin-bottom:10px;">
+      <label>이메일</label>
+      <input class="field-input" type="email" id="login-email" placeholder="이메일 입력">
+    </div>
+    <div class="form-group" style="margin-bottom:18px;">
+      <label>비밀번호</label>
+      <input class="field-input" type="password" id="login-pw" placeholder="비밀번호 입력" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn btn-primary" style="width:100%;padding:10px;" onclick="doLogin()">로그인</button>
+    <p id="login-err" style="color:#ef4444;font-size:11px;margin-top:10px;text-align:center;display:none;"></p>
+    <p style="text-align:center;margin-top:14px;font-size:11px;color:#94a3b8;">
+      <a href="index.html" style="color:#7c3aed;text-decoration:none;">← 시스템 선택으로 돌아가기</a>
+    </p>
+  </div>
+</div>
+
+<!-- ===== 앱 화면 ===== -->
+<div id="app">
+  <div class="app-header">
+    <div class="logo">
+      🖥️ 비유니드 <span>렌탈</span> 견적
+    </div>
+    <div class="spacer"></div>
+    <button class="btn btn-ghost btn-sm" style="color:#94a3b8;border-color:#334155;font-size:11px;" onclick="window.location.href='index.html'">← 메인</button>
+    <span class="user-info" id="user-email-display" style="margin-left:8px;"></span>
+    <button class="btn btn-ghost btn-sm" style="color:#94a3b8;border-color:#334155;font-size:11px;margin-left:8px;" onclick="doLogout()">로그아웃</button>
+  </div>
+
+  <div class="app-body">
+    <!-- 사이드바: 렌탈 제품 카탈로그 -->
+    <div class="sidebar">
+      <div class="sidebar-head">
+        <h3>📦 렌탈 제품 카탈로그</h3>
+      </div>
+      <div class="cat-tabs" id="cat-tabs">
+        <button class="cat-tab active" data-cat="" onclick="filterCat('',this)">전체</button>
+        <button class="cat-tab" data-cat="노트북" onclick="filterCat('노트북',this)">노트북</button>
+        <button class="cat-tab" data-cat="데스크탑" onclick="filterCat('데스크탑',this)">데스크탑</button>
+        <button class="cat-tab" data-cat="모니터" onclick="filterCat('모니터',this)">모니터</button>
+        <button class="cat-tab" data-cat="프린터(복합기)" onclick="filterCat('프린터(복합기)',this)">프린터</button>
+        <button class="cat-tab" data-cat="기타" onclick="filterCat('기타',this)">기타</button>
+      </div>
+      <div class="product-list" id="rental-product-list">
+        <div class="no-products">로딩 중...</div>
+      </div>
+    </div>
+
+    <!-- 메인 콘텐츠 -->
+    <div class="main">
+      <div class="app-tabs">
+        <button class="app-tab active" onclick="switchTab('quote',this)">📋 견적 작성</button>
+        <button class="app-tab" onclick="switchTab('history',this)">🗂️ 견적 이력</button>
+        <button class="app-tab" onclick="switchTab('admin',this)">⚙️ 관리자</button>
+      </div>
+
+      <!-- ===== 견적 작성 탭 ===== -->
+      <div class="tab-content active" id="tab-quote">
+
+        <!-- 견적 번호 + 액션 -->
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:12px;color:var(--muted);">견적번호</span>
+            <input class="field-input" id="f-quote-num" style="width:160px;font-weight:700;" readonly>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-secondary btn-sm" onclick="resetQuote()">🔄 초기화</button>
+            <button class="btn btn-secondary btn-sm" onclick="previewQuote()">👁️ 미리보기</button>
+            <button class="btn btn-primary btn-sm" onclick="saveQuote()">💾 저장</button>
+          </div>
+        </div>
+
+        <!-- 담당 영업 정보 -->
+        <div class="card">
+          <div class="card-title">👤 담당 영업 정보</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>담당자명</label>
+              <input class="field-input" id="f-sales-name" placeholder="홍길동">
+            </div>
+            <div class="form-group">
+              <label>연락처</label>
+              <input class="field-input" id="f-sales-phone" placeholder="010-0000-0000">
+            </div>
+          </div>
+          <div class="form-row" style="margin-top:8px;">
+            <div class="form-group">
+              <label>이메일</label>
+              <input class="field-input" id="f-sales-email" placeholder="sales@buneed.co.kr">
+            </div>
+            <div class="form-group">
+              <label>부서</label>
+              <input class="field-input" id="f-sales-dept" placeholder="영업1팀 / 대리">
+            </div>
+          </div>
+        </div>
+
+        <!-- 고객 정보 -->
+        <div class="card">
+          <div class="card-title">🏢 고객 정보</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>회사명 *</label>
+              <input class="field-input" id="f-company" placeholder="(주)비유니드">
+            </div>
+            <div class="form-group">
+              <label>담당자명</label>
+              <input class="field-input" id="f-contact" placeholder="홍길동">
+            </div>
+          </div>
+          <div class="form-row" style="margin-top:8px;">
+            <div class="form-group">
+              <label>연락처</label>
+              <input class="field-input" id="f-phone" placeholder="010-0000-0000">
+            </div>
+            <div class="form-group">
+              <label>이메일</label>
+              <input class="field-input" id="f-email" placeholder="contact@company.com">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:8px;">
+            <label>사용용도</label>
+            <input class="field-input" id="f-purpose" placeholder="예) 신입사원 교육용, 전시회 부스 운영 등">
+          </div>
+        </div>
+
+        <!-- 렌탈 조건 -->
+        <div class="card">
+          <div class="card-title">📅 렌탈 조건 <span class="rental-badge">렌탈 전용</span></div>
+          <div class="form-row3">
+            <div class="form-group">
+              <label>렌탈 단위</label>
+              <div class="rental-type-toggle" id="rental-type-toggle">
+                <button class="rtt-btn active" data-type="일" onclick="setRentalType('일',this)">일 단위</button>
+                <button class="rtt-btn" data-type="월" onclick="setRentalType('월',this)">월 단위</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label id="duration-label">렌탈 기간 (일)</label>
+              <input class="field-input" type="number" id="f-duration" placeholder="30" min="1" oninput="recalcAll()">
+            </div>
+            <div class="form-group">
+              <label>렌탈 시작일</label>
+              <input class="field-input" type="date" id="f-start-date">
+            </div>
+          </div>
+          <div class="form-row" style="margin-top:8px;">
+            <div class="form-group">
+              <label>설치/납품 장소</label>
+              <input class="field-input" id="f-delivery-loc" placeholder="서울시 강남구 테헤란로 123">
+            </div>
+            <div class="form-group">
+              <label>반납/회수 방법</label>
+              <select class="field-input" id="f-return-method">
+                <option value="">선택</option>
+                <option value="방문 회수">방문 회수</option>
+                <option value="직접 반납">직접 반납</option>
+                <option value="택배 반납">택배 반납</option>
+                <option value="협의">협의</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 렌탈 제품 목록 -->
+        <div class="card">
+          <div class="card-title">📦 렌탈 제품 목록
+            <span id="item-count-badge" style="background:#f1f5f9;color:#475569;font-size:10px;padding:2px 8px;border-radius:99px;margin-left:4px;">0건</span>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="quote-items-table" id="quote-items-table">
+              <thead>
+                <tr>
+                  <th>제품명 / 사양</th>
+                  <th style="text-align:center;width:70px;">단위</th>
+                  <th style="text-align:right;width:100px;">단가</th>
+                  <th style="text-align:center;width:60px;">수량</th>
+                  <th style="text-align:right;width:110px;">소계</th>
+                  <th style="width:36px;"></th>
+                </tr>
+              </thead>
+              <tbody id="quote-items-body">
+                <tr id="empty-row">
+                  <td colspan="6" class="empty-state">
+                    <div class="icon">📋</div>
+                    좌측 카탈로그에서 제품을 선택하세요
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 금액 요약 -->
+        <div class="card">
+          <div class="card-title">💰 금액 요약</div>
+          <div class="price-summary">
+            <div class="ps-row">
+              <span class="label">소계 (렌탈료 합계)</span>
+              <span class="val" id="ps-subtotal">0 원</span>
+            </div>
+            <div class="ps-row">
+              <span class="label">할인 금액</span>
+              <span class="ps-editable">
+                <span style="color:var(--muted);font-size:11px;">-</span>
+                <input class="field-input small" type="number" id="f-discount" value="0" style="width:110px;text-align:right;" oninput="calcPrice()">
+                <span style="font-size:11px;">원</span>
+              </span>
+            </div>
+            <div class="ps-row">
+              <span class="label">설치비</span>
+              <span class="ps-editable">
+                <input class="field-input small" type="number" id="f-install-fee" value="0" style="width:110px;text-align:right;" oninput="calcPrice()">
+                <span style="font-size:11px;">원</span>
+              </span>
+            </div>
+            <div class="ps-row">
+              <span class="label">보증금</span>
+              <span class="ps-editable">
+                <input class="field-input small" type="number" id="f-deposit" value="0" style="width:110px;text-align:right;" oninput="calcPrice()">
+                <span style="font-size:11px;">원</span>
+              </span>
+            </div>
+            <div class="ps-row" style="border-top:1px dashed var(--border);margin-top:6px;padding-top:8px;">
+              <span class="label">공급가액</span>
+              <span class="val" id="ps-supply">0 원</span>
+            </div>
+            <div class="ps-row">
+              <span class="label">부가세 (10%)</span>
+              <span class="val" id="ps-vat">0 원</span>
+            </div>
+            <div class="ps-row total">
+              <span class="label">최종 합계</span>
+              <span id="ps-total" style="color:var(--rental);">0 원</span>
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:10px;">
+            <label>메모 / 특이사항</label>
+            <textarea class="field-input" id="f-memo" rows="2" placeholder="설치 특이사항, 반납 조건, 기타 문의 등"></textarea>
+          </div>
+          <div class="form-row" style="margin-top:8px;">
+            <div class="form-group">
+              <label>견적 유효기간</label>
+              <input class="field-input" id="f-valid" value="견적일로부터 30일">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 견적 이력 탭 ===== -->
+      <div class="tab-content" id="tab-history">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <h2 style="font-size:14px;font-weight:700;color:var(--navy);">렌탈 견적 이력</h2>
+          <button class="btn btn-secondary btn-sm" onclick="loadHistory()">🔄 새로고침</button>
+        </div>
+        <div id="history-list" class="history-list">
+          <div class="empty-state"><div class="icon">📂</div>저장된 견적이 없습니다</div>
+        </div>
+      </div>
+
+      <!-- ===== 관리자 탭 ===== -->
+      <div class="tab-content" id="tab-admin" style="padding:0;overflow:hidden;">
+        <div class="admin-sub-tabs">
+          <button class="admin-sub-tab active" onclick="switchAdminTab('products',this)">📦 제품 관리</button>
+          <button class="admin-sub-tab" onclick="switchAdminTab('company',this)">🏢 회사 설정</button>
+        </div>
+
+        <!-- 제품 관리 -->
+        <div class="admin-sub-panel active" id="admin-panel-products">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h2>📦 렌탈 제품 관리</h2>
+              <button class="btn btn-sm btn-primary" onclick="openProductModal()">+ 제품 추가</button>
+            </div>
+            <div style="overflow-x:auto;max-height:calc(100vh - 220px);overflow-y:auto;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>제품명</th>
+                    <th>브랜드</th>
+                    <th>카테고리</th>
+                    <th>사양</th>
+                    <th style="text-align:right;">일 렌탈료</th>
+                    <th style="text-align:right;">월 렌탈료</th>
+                    <th>관리</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-product-body">
+                  <tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">로딩 중...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 회사 설정 -->
+        <div class="admin-sub-panel" id="admin-panel-company">
+          <div class="admin-card">
+            <div class="admin-card-header"><h2>🏢 회사 설정</h2></div>
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>회사 소개서 링크 (PDF or 외부 링크)</label>
+              <input class="field-input" id="company-intro-link" placeholder="https://...">
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="saveCompanySettings()">저장</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- .main -->
+  </div><!-- .app-body -->
+</div><!-- #app -->
+
+<!-- ===== 견적 추가 모달 ===== -->
+<div class="modal-overlay" id="modal-atq">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="atq-title">렌탈 견적 추가</h2>
+      <button class="modal-close" onclick="closeModal('modal-atq')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="atq-product-info" id="atq-info"></div>
+      <div class="atq-controls">
+        <div class="form-group">
+          <label>렌탈 단위</label>
+          <div class="rental-type-toggle">
+            <button class="rtt-btn active" id="atq-daily-btn" onclick="setAtqType('일')">일</button>
+            <button class="rtt-btn" id="atq-monthly-btn" onclick="setAtqType('월')">월</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>수량</label>
+          <input class="field-input" type="number" id="atq-qty" value="1" min="1" oninput="updateAtqCalc()">
+        </div>
+        <div class="form-group">
+          <label>단가 (직접 수정)</label>
+          <input class="field-input" type="number" id="atq-unit" oninput="updateAtqCalc()">
+        </div>
+      </div>
+      <div class="atq-calc">
+        <span class="label">소계 (단가 × 수량)</span>
+        <span class="value" id="atq-total-val">0 원</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-atq')">취소</button>
+      <button class="btn btn-primary" onclick="addToQuote()">견적에 추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 미리보기 모달 ===== -->
+<div class="modal-overlay" id="modal-preview">
+  <div class="modal-box wide">
+    <div class="modal-header">
+      <h2>📄 렌탈 견적서 미리보기</h2>
+      <button class="modal-close" onclick="closeModal('modal-preview')">✕</button>
+    </div>
+    <div class="modal-body" id="preview-content"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-preview')">닫기</button>
+      <button class="btn btn-secondary" id="btn-copy-link" onclick="copyShareLink()" style="background:#10b981;color:#fff;border:none;">🔗 고객 링크 복사</button>
+      <button class="btn btn-primary" onclick="printQuote()">🖨️ 인쇄 / PDF 저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 제품 추가/수정 모달 ===== -->
+<div class="modal-overlay" id="modal-product">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="pm-title">렌탈 제품 추가</h2>
+      <button class="modal-close" onclick="closeModal('modal-product')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group" style="margin-bottom:10px;">
+        <label>제품명 *</label>
+        <input class="field-input" id="pm-name" placeholder="제품명">
+      </div>
+      <div class="form-row" style="margin-bottom:10px;">
+        <div class="form-group">
+          <label>브랜드</label>
+          <select class="field-input" id="pm-brand">
+            <option>LG</option><option>Samsung</option><option>HP</option>
+            <option>Lenovo</option><option>Dell</option><option>Apple</option>
+            <option>Canon</option><option>Sindoh</option><option>기타</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>카테고리</label>
+          <select class="field-input" id="pm-category">
+            <option>노트북</option><option>데스크탑</option><option>모니터</option>
+            <option>프린터(복합기)</option><option>기타</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row" style="margin-bottom:10px;">
+        <div class="form-group">
+          <label>일 렌탈료 (원) *</label>
+          <input class="field-input" type="number" id="pm-daily-price" placeholder="5000">
+        </div>
+        <div class="form-group">
+          <label>월 렌탈료 (원) *</label>
+          <input class="field-input" type="number" id="pm-monthly-price" placeholder="80000">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:10px;">
+        <label>사양 설명</label>
+        <textarea class="field-input" id="pm-spec" rows="3" placeholder="CPU, RAM, SSD 등 기본 사양"></textarea>
+      </div>
+      <div class="form-group">
+        <label>제품 특징</label>
+        <textarea class="field-input" id="pm-feature" rows="2" placeholder="주요 특징"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-product')">취소</button>
+      <button class="btn btn-primary" onclick="saveProduct()">저장</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ===== SUPABASE 설정 =====
+// ⚠️ 아래 두 값을 기존 index.html에서 복사해서 붙여넣으세요
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ===== 상태 변수 =====
+let rentalProducts = [];
+let quoteItems = [];
+let currentRentalType = '일'; // '일' or '월'
+let currentQuoteId = null;
+let currentShareToken = null;
+let currentProductId = null; // modal용
+let atqType = '일'; // 모달 내 선택
+let editingProductId = null;
+let currentFilterCat = '';
+
+// ===== 초기화 =====
+window.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) {
+    document.getElementById('login-screen').style.display = 'flex';
+    return;
+  }
+  showApp(session.user.email);
+});
+
+async function showApp(email) {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('user-email-display').textContent = email;
+  initQuoteNum();
+  await loadRentalProducts();
+  loadCompanySettings();
+}
+
+// ===== 로그인 =====
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pw = document.getElementById('login-pw').value;
+  const errEl = document.getElementById('login-err');
+  if (!email || !pw) { showLoginErr('이메일과 비밀번호를 입력하세요'); return; }
+  const { data, error } = await db.auth.signInWithPassword({ email, password: pw });
+  if (error) { showLoginErr('로그인 실패: ' + error.message); return; }
+  errEl.style.display = 'none';
+  showApp(data.user.email);
+}
+function showLoginErr(msg) {
+  const el = document.getElementById('login-err');
+  el.textContent = msg; el.style.display = 'block';
+}
+
+// ===== 로그아웃 =====
+async function doLogout() {
+  await db.auth.signOut();
+  window.location.href = 'index.html';
+}
+
+// ===== 견적 번호 =====
+function initQuoteNum() {
+  const now = new Date();
+  const y = now.getFullYear().toString().slice(2);
+  const m = String(now.getMonth()+1).padStart(2,'0');
+  const d = String(now.getDate()).padStart(2,'0');
+  const r = String(Math.floor(Math.random()*10000)).padStart(4,'0');
+  document.getElementById('f-quote-num').value = `R${y}${m}${d}-${r}`;
+}
+
+// ===== 렌탈 단위 설정 =====
+function setRentalType(type, el) {
+  currentRentalType = type;
+  document.querySelectorAll('#rental-type-toggle .rtt-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const label = document.getElementById('duration-label');
+  label.textContent = type === '일' ? '렌탈 기간 (일)' : '렌탈 기간 (개월)';
+  recalcAll();
+}
+
+// ===== 제품 로드 =====
+async function loadRentalProducts() {
+  const { data, error } = await db.from('rental_products').select('*').eq('is_active', true).order('category').order('name');
+  if (error) { console.error(error); return; }
+  rentalProducts = data || [];
+  renderProductList();
+  renderAdminProducts();
+}
+
+function filterCat(cat, el) {
+  currentFilterCat = cat;
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderProductList();
+}
+
+function renderProductList() {
+  const list = document.getElementById('rental-product-list');
+  const filtered = currentFilterCat
+    ? rentalProducts.filter(p => p.category === currentFilterCat)
+    : rentalProducts;
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="no-products">제품이 없습니다.<br>관리자 탭에서 추가하세요.</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(p => `
+    <div class="product-card" onclick="openAtqModal('${p.id}')">
+      <div class="pc-name">${p.name}</div>
+      <div class="pc-meta">${p.brand} · <span class="badge badge-gray">${p.category}</span></div>
+      ${p.spec ? `<div class="pc-spec">${p.spec}</div>` : ''}
+      <div class="pc-prices">
+        <div class="pc-price-item">일 <strong>${fmt(p.daily_price)}원</strong></div>
+        <div class="pc-price-item">월 <strong>${fmt(p.monthly_price)}원</strong></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== 견적 추가 모달 =====
+function openAtqModal(productId) {
+  const p = rentalProducts.find(x => x.id === productId);
+  if (!p) return;
+  currentProductId = productId;
+  atqType = currentRentalType;
+
+  document.getElementById('atq-title').textContent = p.name + ' 추가';
+  document.getElementById('atq-info').innerHTML = `
+    <div class="atq-name">${p.name}</div>
+    <div class="atq-spec">${p.spec || ''}</div>
+    <div class="atq-prices">
+      <div class="atq-price-item daily">
+        <div class="pt">일 렌탈료</div>
+        <div class="pv">${fmt(p.daily_price)}원</div>
+      </div>
+      <div class="atq-price-item monthly">
+        <div class="pt">월 렌탈료</div>
+        <div class="pv">${fmt(p.monthly_price)}원</div>
+      </div>
+    </div>
+  `;
+
+  // 단위 버튼 동기화
+  const isDailyActive = atqType === '일';
+  document.getElementById('atq-daily-btn').classList.toggle('active', isDailyActive);
+  document.getElementById('atq-monthly-btn').classList.toggle('active', !isDailyActive);
+
+  document.getElementById('atq-qty').value = 1;
+  document.getElementById('atq-unit').value = atqType === '일' ? p.daily_price : p.monthly_price;
+  updateAtqCalc();
+  openModal('modal-atq');
+}
+
+function setAtqType(type) {
+  atqType = type;
+  const p = rentalProducts.find(x => x.id === currentProductId);
+  if (!p) return;
+  document.getElementById('atq-daily-btn').classList.toggle('active', type === '일');
+  document.getElementById('atq-monthly-btn').classList.toggle('active', type === '월');
+  document.getElementById('atq-unit').value = type === '일' ? p.daily_price : p.monthly_price;
+  updateAtqCalc();
+}
+
+function updateAtqCalc() {
+  const qty = parseInt(document.getElementById('atq-qty').value) || 1;
+  const unit = parseInt(document.getElementById('atq-unit').value) || 0;
+  const total = qty * unit;
+  document.getElementById('atq-total-val').textContent = fmt(total) + ' 원';
+}
+
+function addToQuote() {
+  const p = rentalProducts.find(x => x.id === currentProductId);
+  if (!p) return;
+  const qty = parseInt(document.getElementById('atq-qty').value) || 1;
+  const unit = parseInt(document.getElementById('atq-unit').value) || 0;
+  quoteItems.push({
+    product_id: p.id,
+    product_name: p.name,
+    product_spec: p.spec || '',
+    rental_type: atqType,
+    unit_price: unit,
+    quantity: qty,
+    total_price: qty * unit,
+  });
+  closeModal('modal-atq');
+  renderQuoteItems();
+  calcPrice();
+  showToast(p.name + ' 추가됨', 'success');
+}
+
+// ===== 견적 아이템 렌더 =====
+function renderQuoteItems() {
+  const tbody = document.getElementById('quote-items-body');
+  document.getElementById('item-count-badge').textContent = quoteItems.length + '건';
+  if (quoteItems.length === 0) {
+    tbody.innerHTML = `<tr id="empty-row"><td colspan="6" class="empty-state"><div class="icon">📋</div>좌측 카탈로그에서 제품을 선택하세요</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = quoteItems.map((item, i) => `
+    <tr>
+      <td>
+        <strong>${item.product_name}</strong>
+        ${item.product_spec ? `<div style="font-size:10px;color:var(--muted);margin-top:2px;">${item.product_spec}</div>` : ''}
+      </td>
+      <td style="text-align:center;">
+        <span class="type-badge ${item.rental_type === '일' ? 'daily' : 'monthly'}">${item.rental_type}</span>
+      </td>
+      <td style="text-align:right;">
+        <input class="field-input small qty-input" type="number" value="${item.unit_price}" style="width:80px;text-align:right;"
+          onchange="updateItemUnit(${i}, this.value)">
+      </td>
+      <td style="text-align:center;">
+        <input class="field-input small qty-input" type="number" value="${item.quantity}" min="1"
+          onchange="updateItemQty(${i}, this.value)">
+      </td>
+      <td style="text-align:right;font-weight:600;color:var(--navy);">${fmt(item.total_price)}원</td>
+      <td><button class="del-btn" onclick="removeItem(${i})">✕</button></td>
+    </tr>
+  `).join('');
+}
+
+function updateItemQty(i, v) {
+  quoteItems[i].quantity = parseInt(v) || 1;
+  quoteItems[i].total_price = quoteItems[i].unit_price * quoteItems[i].quantity;
+  renderQuoteItems(); calcPrice();
+}
+function updateItemUnit(i, v) {
+  quoteItems[i].unit_price = parseInt(v) || 0;
+  quoteItems[i].total_price = quoteItems[i].unit_price * quoteItems[i].quantity;
+  renderQuoteItems(); calcPrice();
+}
+function removeItem(i) {
+  quoteItems.splice(i, 1);
+  renderQuoteItems(); calcPrice();
+}
+function recalcAll() { calcPrice(); }
+
+// ===== 금액 계산 =====
+function calcPrice() {
+  const subtotal = quoteItems.reduce((s, i) => s + i.total_price, 0);
+  const discount = parseInt(document.getElementById('f-discount').value) || 0;
+  const installFee = parseInt(document.getElementById('f-install-fee').value) || 0;
+  const deposit = parseInt(document.getElementById('f-deposit').value) || 0;
+  const supply = subtotal - discount + installFee;
+  const vat = Math.round(supply * 0.1);
+  const total = supply + vat + deposit;
+
+  document.getElementById('ps-subtotal').textContent = fmt(subtotal) + ' 원';
+  document.getElementById('ps-supply').textContent = fmt(supply) + ' 원';
+  document.getElementById('ps-vat').textContent = fmt(vat) + ' 원';
+  document.getElementById('ps-total').textContent = fmt(total) + ' 원';
+}
+
+// ===== 미리보기 =====
+function previewQuote() {
+  const company = document.getElementById('f-company').value || '(미입력)';
+  const contact = document.getElementById('f-contact').value || '';
+  const phone = document.getElementById('f-phone').value || '';
+  const email = document.getElementById('f-email').value || '';
+  const purpose = document.getElementById('f-purpose').value || '';
+  const salesName = document.getElementById('f-sales-name').value || '-';
+  const salesPhone = document.getElementById('f-sales-phone').value || '';
+  const salesEmail = document.getElementById('f-sales-email').value || '';
+  const salesDept = document.getElementById('f-sales-dept').value || '';
+  const quoteNum = document.getElementById('f-quote-num').value;
+  const rentalType = currentRentalType;
+  const duration = document.getElementById('f-duration').value || '-';
+  const startDate = document.getElementById('f-start-date').value || '-';
+  const deliveryLoc = document.getElementById('f-delivery-loc').value || '-';
+  const returnMethod = document.getElementById('f-return-method').value || '-';
+  const memo = document.getElementById('f-memo').value || '';
+  const validUntil = document.getElementById('f-valid').value || '';
+
+  const subtotal = quoteItems.reduce((s, i) => s + i.total_price, 0);
+  const discount = parseInt(document.getElementById('f-discount').value) || 0;
+  const installFee = parseInt(document.getElementById('f-install-fee').value) || 0;
+  const deposit = parseInt(document.getElementById('f-deposit').value) || 0;
+  const supply = subtotal - discount + installFee;
+  const vat = Math.round(supply * 0.1);
+  const total = supply + vat + deposit;
+
+  const today = new Date().toLocaleDateString('ko-KR');
+  const durationLabel = rentalType === '일' ? `${duration}일` : `${duration}개월`;
+
+  const itemsHtml = quoteItems.map((item, i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td><strong>${item.product_name}</strong>${item.product_spec ? `<br><span style="font-size:10px;color:#64748b;">${item.product_spec}</span>` : ''}</td>
+      <td style="text-align:center;"><span style="background:${item.rental_type==='일'?'#fef3c7':'#ede9fe'};color:${item.rental_type==='일'?'#d97706':'#7c3aed'};padding:1px 6px;border-radius:99px;font-size:10px;font-weight:600;">${item.rental_type}</span></td>
+      <td style="text-align:right;">${fmt(item.unit_price)}원</td>
+      <td style="text-align:center;">${item.quantity}</td>
+      <td style="text-align:right;font-weight:600;">${fmt(item.total_price)}원</td>
+    </tr>
+  `).join('');
+
+  const html = `
+  <div class="qdoc">
+    <div class="q-header">
+      <div class="q-logo-area">
+        <svg width="120" height="34" viewBox="0 0 140 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="36" height="36" rx="8" fill="#1a2e5a" y="2"/>
+          <text x="18" y="26" text-anchor="middle" font-size="20" font-weight="800" fill="#fff" font-family="Arial">B</text>
+          <text x="50" y="24" font-size="16" font-weight="700" fill="#1a2e5a" font-family="Arial">b.u.need</text>
+          <text x="50" y="36" font-size="9" fill="#94a3b8" font-family="Arial">BEYOND YOUR NEEDS</text>
+        </svg>
+        <div class="q-tel">031.8028.0464 · sales@buneed.co.kr</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:11px;color:#94a3b8;">견적번호</div>
+        <div style="font-size:14px;font-weight:800;color:#1a2e5a;">${quoteNum}</div>
+        <div style="font-size:10px;color:#94a3b8;margin-top:2px;">${today}</div>
+      </div>
+    </div>
+
+    <h1>렌 탈 견 적 서 <span class="q-rental-badge">RENTAL</span></h1>
+
+    <div class="q-rental-info">
+      <div style="font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:8px;">📅 렌탈 조건</div>
+      <div class="q-rental-info-grid">
+        <div class="q-rental-info-item">
+          <div class="label">렌탈 단위</div>
+          <div class="value">${rentalType} 단위</div>
+        </div>
+        <div class="q-rental-info-item">
+          <div class="label">렌탈 기간</div>
+          <div class="value">${durationLabel}</div>
+        </div>
+        <div class="q-rental-info-item">
+          <div class="label">시작일</div>
+          <div class="value">${startDate}</div>
+        </div>
+        <div class="q-rental-info-item">
+          <div class="label">설치/납품 장소</div>
+          <div class="value">${deliveryLoc}</div>
+        </div>
+        <div class="q-rental-info-item">
+          <div class="label">반납/회수</div>
+          <div class="value">${returnMethod}</div>
+        </div>
+        ${purpose ? `<div class="q-rental-info-item"><div class="label">사용용도</div><div class="value">${purpose}</div></div>` : ''}
+      </div>
+    </div>
+
+    <div class="q-section">
+      <div class="q-section-title">고객 및 공급사 정보</div>
+      <div class="q-party-grid">
+        <div class="q-party-box">
+          <h4>고객사 (수요자)</h4>
+          <table style="font-size:12px;width:100%;">
+            <tr><td style="color:#475569;padding:3px 0;width:35%;">회사명</td><td style="font-weight:600;">${company}</td></tr>
+            <tr><td style="color:#475569;padding:3px 0;">담당자</td><td>${contact}</td></tr>
+            <tr><td style="color:#475569;padding:3px 0;">연락처</td><td>${phone}</td></tr>
+            <tr><td style="color:#475569;padding:3px 0;">이메일</td><td>${email}</td></tr>
+          </table>
+        </div>
+        <div class="q-party-box">
+          <h4>공급사 (비유니드)</h4>
+          <table style="font-size:12px;width:100%;">
+            <tr><td style="color:#475569;padding:3px 0;width:35%;">회사명</td><td style="font-weight:600;">(주)비유니드</td></tr>
+            <tr><td style="color:#475569;padding:3px 0;">담당자</td><td>${salesName} ${salesDept ? `(${salesDept})` : ''}</td></tr>
+            <tr><td style="color:#475569;padding:3px 0;">연락처</td><td>${salesPhone || '031.8028.0464'}</td></tr>
+            <tr><td style="color:#475569;padding:3px 0;">이메일</td><td>${salesEmail || 'sales@buneed.co.kr'}</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="q-section">
+      <div class="q-section-title">렌탈 제품 목록</div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:28px;">No</th>
+            <th>제품명 / 사양</th>
+            <th style="text-align:center;width:48px;">단위</th>
+            <th style="text-align:right;width:90px;">단가</th>
+            <th style="text-align:center;width:40px;">수량</th>
+            <th style="text-align:right;width:100px;">소계</th>
+          </tr>
+        </thead>
+        <tbody>${itemsHtml}</tbody>
+      </table>
+    </div>
+
+    <div class="q-summary">
+      <table>
+        <tr><td style="color:#64748b;">소계</td><td style="text-align:right;">${fmt(subtotal)} 원</td></tr>
+        ${discount > 0 ? `<tr><td style="color:#ef4444;">할인</td><td style="text-align:right;color:#ef4444;">- ${fmt(discount)} 원</td></tr>` : ''}
+        ${installFee > 0 ? `<tr><td style="color:#64748b;">설치비</td><td style="text-align:right;">${fmt(installFee)} 원</td></tr>` : ''}
+        <tr><td style="color:#64748b;">공급가액</td><td style="text-align:right;font-weight:600;">${fmt(supply)} 원</td></tr>
+        <tr><td style="color:#64748b;">부가세 (10%)</td><td style="text-align:right;">${fmt(vat)} 원</td></tr>
+        ${deposit > 0 ? `<tr><td style="color:#7c3aed;">보증금</td><td style="text-align:right;color:#7c3aed;">${fmt(deposit)} 원</td></tr>` : ''}
+        <tr class="total-row"><td>최종 합계</td><td style="text-align:right;color:#7c3aed;">${fmt(total)} 원</td></tr>
+      </table>
+    </div>
+
+    ${memo ? `<div style="margin-top:16px;background:#faf5ff;border:1px solid #ddd6fe;border-radius:8px;padding:12px;font-size:12px;"><strong style="color:#7c3aed;">📝 메모</strong><div style="margin-top:6px;color:#374151;">${memo}</div></div>` : ''}
+    ${validUntil ? `<div style="margin-top:8px;font-size:11px;color:#94a3b8;text-align:right;">유효기간: ${validUntil}</div>` : ''}
+
+    <div class="q-footer">
+      경기도 광주시 오포읍 능평로 93, 302호 | www.buneed.co.kr | 031.8028.0464
+    </div>
+  </div>
+  `;
+
+  document.getElementById('preview-content').innerHTML = html;
+  openModal('modal-preview');
+}
+
+// ===== 인쇄 =====
+function printQuote() {
+  const content = document.getElementById('preview-content').innerHTML;
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>렌탈 견적서</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Pretendard','Apple SD Gothic Neo',sans-serif;background:#fff;color:#1a2e5a;}
+    .qdoc{padding:28px 32px;max-width:820px;margin:0 auto;}
+    .qdoc .q-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;}
+    .qdoc h1{font-size:22px;font-weight:800;text-align:center;margin-bottom:18px;letter-spacing:.05em;}
+    .q-rental-badge{background:#ede9fe;color:#7c3aed;font-size:11px;padding:3px 10px;border-radius:99px;font-weight:700;}
+    .q-tel{font-size:10px;color:#6b7a99;margin-top:4px;}
+    .q-rental-info{background:#faf5ff;border:1px solid #ddd6fe;border-radius:8px;padding:12px 16px;margin-bottom:18px;}
+    .q-rental-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+    .q-rental-info-item .label{font-size:10px;color:#7c3aed;font-weight:600;margin-bottom:2px;}
+    .q-rental-info-item .value{font-size:13px;font-weight:700;}
+    .q-section{margin-bottom:18px;}
+    .q-section-title{font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;}
+    table{width:100%;border-collapse:collapse;font-size:12px;}
+    th{background:#f1f5f9;padding:7px 10px;font-weight:600;color:#475569;border-bottom:2px solid #e2e8f0;text-align:left;}
+    td{padding:7px 10px;border-bottom:1px solid #f1f5f9;}
+    .q-party-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .q-party-box{border:1px solid #e2e8f0;border-radius:8px;padding:12px;}
+    .q-party-box h4{font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:8px;}
+    .q-summary table{width:340px;margin-left:auto;}
+    .q-summary td{padding:5px 10px;}
+    .total-row td{font-weight:800;font-size:15px;border-top:2px solid #1a2e5a;padding-top:8px;}
+    .q-footer{margin-top:24px;border-top:1px solid #e2e8f0;padding-top:14px;text-align:center;font-size:10px;color:#94a3b8;}
+    @page{margin:15mm;}
+  </style></head><body><div class="qdoc">${content}</div>
+  <script>setTimeout(()=>{window.print();},400);<\/script>
+<!-- Credit Footer -->
+<div class="credit-footer">2026 Created by Mia, All rights reserved.</div>
+</body></html>`);
+  win.document.close();
+}
+
+// ===== 저장 =====
+async function saveQuote() {
+  const company = document.getElementById('f-company').value.trim();
+  if (!company) { showToast('회사명을 입력하세요', 'error'); return; }
+  if (quoteItems.length === 0) { showToast('제품을 1개 이상 추가하세요', 'error'); return; }
+
+  const subtotal = quoteItems.reduce((s, i) => s + i.total_price, 0);
+  const discount = parseInt(document.getElementById('f-discount').value) || 0;
+  const installFee = parseInt(document.getElementById('f-install-fee').value) || 0;
+  const deposit = parseInt(document.getElementById('f-deposit').value) || 0;
+  const supply = subtotal - discount + installFee;
+  const vat = Math.round(supply * 0.1);
+  const total = supply + vat + deposit;
+
+  if (!currentShareToken) currentShareToken = crypto.randomUUID();
+
+  const payload = {
+    quote_number: document.getElementById('f-quote-num').value,
+    share_token: currentShareToken,
+    company_name: company,
+    contact_name: document.getElementById('f-contact').value,
+    contact_tel: document.getElementById('f-phone').value,
+    contact_email: document.getElementById('f-email').value,
+    usage_purpose: document.getElementById('f-purpose').value,
+    rental_type: currentRentalType,
+    rental_duration: parseInt(document.getElementById('f-duration').value) || null,
+    rental_start_date: document.getElementById('f-start-date').value || null,
+    delivery_location: document.getElementById('f-delivery-loc').value,
+    return_method: document.getElementById('f-return-method').value,
+    subtotal, discount_amount: discount, installation_fee: installFee,
+    deposit, supply_price: supply, vat, total,
+    memo: document.getElementById('f-memo').value,
+    valid_until: document.getElementById('f-valid').value,
+    sales_name: document.getElementById('f-sales-name').value,
+    sales_phone: document.getElementById('f-sales-phone').value,
+    sales_email: document.getElementById('f-sales-email').value,
+    sales_dept: document.getElementById('f-sales-dept').value,
+    status: 'draft',
+  };
+
+  let quoteId = currentQuoteId;
+  if (quoteId) {
+    const { error } = await db.from('rental_quotes').update(payload).eq('id', quoteId);
+    if (error) { showToast('저장 실패: ' + error.message, 'error'); return; }
+  } else {
+    const { data, error } = await db.from('rental_quotes').insert(payload).select().single();
+    if (error) { showToast('저장 실패: ' + error.message, 'error'); return; }
+    quoteId = data.id;
+    currentQuoteId = quoteId;
+  }
+
+  // 아이템 저장
+  await db.from('rental_quote_items').delete().eq('quote_id', quoteId);
+  const itemsPayload = quoteItems.map((item, i) => ({
+    quote_id: quoteId,
+    product_id: item.product_id || null,
+    product_name: item.product_name,
+    product_spec: item.product_spec,
+    rental_type: item.rental_type,
+    unit_price: item.unit_price,
+    quantity: item.quantity,
+    total_price: item.total_price,
+    sort_order: i,
+  }));
+  const { error: itemsErr } = await db.from('rental_quote_items').insert(itemsPayload);
+  if (itemsErr) { showToast('아이템 저장 실패', 'error'); return; }
+  showToast('견적이 저장되었습니다 ✅', 'success');
+}
+
+// ===== 링크 복사 =====
+async function copyShareLink() {
+  if (!currentQuoteId) { showToast('먼저 저장하세요', 'error'); return; }
+  if (!currentShareToken) { showToast('공유 토큰이 없습니다', 'error'); return; }
+  const url = `${location.origin}/rental-view.html?token=${currentShareToken}`;
+  await navigator.clipboard.writeText(url);
+  showToast('공유 링크가 복사되었습니다 🔗', 'success');
+}
+
+// ===== 이력 =====
+async function loadHistory() {
+  const { data, error } = await db.from('rental_quotes').select('*').order('created_at', { ascending: false });
+  if (error) { console.error(error); return; }
+  const list = document.getElementById('history-list');
+  if (!data || data.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">📂</div>저장된 견적이 없습니다</div>';
+    return;
+  }
+  const typeLabel = (t) => t === '일' ? '일 단위' : '월 단위';
+  list.innerHTML = data.map(q => `
+    <div class="history-card">
+      <span class="hc-num">${q.quote_number}</span>
+      <div class="hc-info">
+        <div class="hc-company">${q.company_name}</div>
+        <div class="hc-meta">${q.contact_name || ''} · ${typeLabel(q.rental_type)} ${q.rental_duration || ''}${q.rental_type === '일' ? '일' : '개월'} · ${new Date(q.created_at).toLocaleDateString('ko-KR')}</div>
+      </div>
+      <div class="hc-total">${fmt(q.total)}원</div>
+      <div class="hc-actions">
+        <button class="btn btn-secondary btn-sm" onclick="loadQuote('${q.id}')">불러오기</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteQuote('${q.id}')">삭제</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function loadQuote(quoteId) {
+  const { data: q, error } = await db.from('rental_quotes').select('*').eq('id', quoteId).single();
+  if (error || !q) { showToast('불러오기 실패', 'error'); return; }
+  const { data: items } = await db.from('rental_quote_items').select('*').eq('quote_id', quoteId).order('sort_order');
+
+  currentQuoteId = quoteId;
+  currentShareToken = q.share_token;
+  currentRentalType = q.rental_type || '일';
+
+  document.getElementById('f-quote-num').value = q.quote_number;
+  document.getElementById('f-company').value = q.company_name || '';
+  document.getElementById('f-contact').value = q.contact_name || '';
+  document.getElementById('f-phone').value = q.contact_tel || '';
+  document.getElementById('f-email').value = q.contact_email || '';
+  document.getElementById('f-purpose').value = q.usage_purpose || '';
+  document.getElementById('f-duration').value = q.rental_duration || '';
+  document.getElementById('f-start-date').value = q.rental_start_date || '';
+  document.getElementById('f-delivery-loc').value = q.delivery_location || '';
+  document.getElementById('f-return-method').value = q.return_method || '';
+  document.getElementById('f-discount').value = q.discount_amount || 0;
+  document.getElementById('f-install-fee').value = q.installation_fee || 0;
+  document.getElementById('f-deposit').value = q.deposit || 0;
+  document.getElementById('f-memo').value = q.memo || '';
+  document.getElementById('f-valid').value = q.valid_until || '견적일로부터 30일';
+  document.getElementById('f-sales-name').value = q.sales_name || '';
+  document.getElementById('f-sales-phone').value = q.sales_phone || '';
+  document.getElementById('f-sales-email').value = q.sales_email || '';
+  document.getElementById('f-sales-dept').value = q.sales_dept || '';
+
+  // 렌탈 단위 토글
+  document.querySelectorAll('#rental-type-toggle .rtt-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.type === currentRentalType);
+  });
+  document.getElementById('duration-label').textContent = currentRentalType === '일' ? '렌탈 기간 (일)' : '렌탈 기간 (개월)';
+
+  quoteItems = (items || []).map(i => ({
+    product_id: i.product_id,
+    product_name: i.product_name,
+    product_spec: i.product_spec,
+    rental_type: i.rental_type,
+    unit_price: i.unit_price,
+    quantity: i.quantity,
+    total_price: i.total_price,
+  }));
+
+  renderQuoteItems();
+  calcPrice();
+  switchTab('quote', document.querySelector('.app-tab'));
+  document.querySelectorAll('.app-tab').forEach((t,i)=>{t.classList.toggle('active',i===0);});
+  document.querySelectorAll('.tab-content').forEach((t,i)=>{t.classList.toggle('active',i===0);});
+  showToast('견적을 불러왔습니다', 'success');
+}
+
+async function deleteQuote(quoteId) {
+  if (!confirm('견적을 삭제하시겠습니까?')) return;
+  await db.from('rental_quote_items').delete().eq('quote_id', quoteId);
+  await db.from('rental_quotes').delete().eq('id', quoteId);
+  showToast('삭제되었습니다', 'success');
+  loadHistory();
+}
+
+// ===== 초기화 =====
+function resetQuote() {
+  if (!confirm('견적을 초기화하시겠습니까?')) return;
+  quoteItems = [];
+  currentQuoteId = null;
+  currentShareToken = null;
+  renderQuoteItems();
+  calcPrice();
+  ['f-company','f-contact','f-phone','f-email','f-purpose','f-duration','f-start-date',
+   'f-delivery-loc','f-memo'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-return-method').value = '';
+  document.getElementById('f-discount').value = 0;
+  document.getElementById('f-install-fee').value = 0;
+  document.getElementById('f-deposit').value = 0;
+  document.getElementById('f-valid').value = '견적일로부터 30일';
+  initQuoteNum();
+  showToast('초기화되었습니다', 'success');
+}
+
+// ===== 관리자 탭 =====
+function switchAdminTab(tab, el) {
+  document.querySelectorAll('.admin-sub-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.admin-sub-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('admin-panel-' + tab).classList.add('active');
+}
+
+function renderAdminProducts() {
+  const tbody = document.getElementById('admin-product-body');
+  if (!rentalProducts.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">제품이 없습니다</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rentalProducts.map(p => `
+    <tr>
+      <td><strong>${p.name}</strong></td>
+      <td><span class="badge badge-blue">${p.brand || '-'}</span></td>
+      <td><span class="badge badge-gray">${p.category}</span></td>
+      <td style="font-size:11px;color:#64748b;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.spec || '-'}</td>
+      <td style="text-align:right;">${fmt(p.daily_price)} 원</td>
+      <td style="text-align:right;">${fmt(p.monthly_price)} 원</td>
+      <td>
+        <button class="btn btn-sm btn-secondary" onclick="openProductModal('${p.id}')">수정</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteProduct('${p.id}')">삭제</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openProductModal(productId = null) {
+  editingProductId = productId;
+  document.getElementById('pm-title').textContent = productId ? '렌탈 제품 수정' : '렌탈 제품 추가';
+  if (productId) {
+    const p = rentalProducts.find(x => x.id === productId);
+    if (p) {
+      document.getElementById('pm-name').value = p.name;
+      document.getElementById('pm-brand').value = p.brand || 'LG';
+      document.getElementById('pm-category').value = p.category;
+      document.getElementById('pm-daily-price').value = p.daily_price;
+      document.getElementById('pm-monthly-price').value = p.monthly_price;
+      document.getElementById('pm-spec').value = p.spec || '';
+      document.getElementById('pm-feature').value = p.feature || '';
+    }
+  } else {
+    ['pm-name','pm-spec','pm-feature'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('pm-daily-price').value = '';
+    document.getElementById('pm-monthly-price').value = '';
+  }
+  openModal('modal-product');
+}
+
+async function saveProduct() {
+  const name = document.getElementById('pm-name').value.trim();
+  if (!name) { showToast('제품명을 입력하세요', 'error'); return; }
+  const payload = {
+    name,
+    brand: document.getElementById('pm-brand').value,
+    category: document.getElementById('pm-category').value,
+    daily_price: parseInt(document.getElementById('pm-daily-price').value) || 0,
+    monthly_price: parseInt(document.getElementById('pm-monthly-price').value) || 0,
+    spec: document.getElementById('pm-spec').value,
+    feature: document.getElementById('pm-feature').value,
+    is_active: true,
+  };
+  if (editingProductId) {
+    await db.from('rental_products').update(payload).eq('id', editingProductId);
+  } else {
+    await db.from('rental_products').insert(payload);
+  }
+  await loadRentalProducts();
+  closeModal('modal-product');
+  showToast('저장되었습니다', 'success');
+}
+
+async function deleteProduct(productId) {
+  if (!confirm('제품을 삭제하시겠습니까?')) return;
+  await db.from('rental_products').update({ is_active: false }).eq('id', productId);
+  await loadRentalProducts();
+  showToast('삭제되었습니다', 'success');
+}
+
+// ===== 회사 설정 =====
+function loadCompanySettings() {
+  const link = localStorage.getItem('rental_intro_link') || '';
+  document.getElementById('company-intro-link').value = link;
+}
+function saveCompanySettings() {
+  localStorage.setItem('rental_intro_link', document.getElementById('company-intro-link').value);
+  showToast('저장되었습니다', 'success');
+}
+
+// ===== 탭 전환 =====
+function switchTab(tab, el) {
+  document.querySelectorAll('.app-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (tab === 'history') loadHistory();
+}
+
+// ===== 모달 =====
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ===== 유틸 =====
+function fmt(n) { return Number(n || 0).toLocaleString('ko-KR'); }
+function showToast(msg, type = 'info') {
+  const el = document.createElement('div');
+  el.className = `toast-msg ${type}`;
+  el.textContent = msg;
+  document.getElementById('toast').appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+</script>
+</body>
+</html>
