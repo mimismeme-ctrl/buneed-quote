@@ -1075,57 +1075,41 @@ const SAMPLE_PRODUCTS = [
 ];
 
 let db;
-window.addEventListener('DOMContentLoaded', () => {
-  async function start() {
-    try {
-      // Supabase CDN 로드 대기 (최대 6초)
-      let waited = 0;
-      while (!window.supabase && waited < 6000) {
-        await new Promise(r => setTimeout(r, 100));
-        waited += 100;
-      }
-      if (!window.supabase) return; // CDN 실패 → 로그인 화면 그대로 표시
-
-      const { createClient } = window.supabase;
-      db = createClient(SUPA_URL, SUPA_KEY, {
-        auth: { persistSession: true, autoRefreshToken: true }
-      });
-
-      // 세션 확인 (최대 4초)
-      const sessionPromise = db.auth.getSession();
-      const timeoutPromise = new Promise(resolve =>
-        setTimeout(() => resolve({ data: { session: null } }), 4000)
-      );
-      const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]);
-
-      if (session) showApp(session.user.email);
-      // 세션 없으면 → 로그인 화면 그대로 표시 (이미 display:flex)
-
-    } catch(e) {
-      console.warn('초기화 오류:', e.message);
-      // 오류 시 → 로그인 화면 그대로 표시
-    }
+// ===== Supabase 초기화 (load 이벤트: async CDN 완전 로드 보장) =====
+window.addEventListener('load', () => {
+  if (!window.supabase) {
+    console.warn('Supabase CDN 로드 실패');
+    return;
   }
-  start();
+  try {
+    const { createClient } = window.supabase;
+    db = createClient(SUPA_URL, SUPA_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true }
+    });
+    // 기존 세션 확인 → 있으면 바로 앱으로
+    db.auth.getSession().then(({ data: { session } }) => {
+      if (session) showApp(session.user.email);
+    }).catch(() => {});
+    // 인증 상태 변경 감지
+    db.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') showLoginScreen();
+      if (event === 'TOKEN_REFRESHED' && session) {
+        const el = document.getElementById('user-email-display');
+        if (el) el.textContent = session.user.email;
+      }
+    });
+  } catch(e) {
+    console.error('Supabase 초기화 오류:', e);
+  }
 });
 
-
-// ===== 초기화 =====
+// ===== 초기화 (하위 호환) =====
 async function initApp() {
   try {
     const { data: { session } } = await db.auth.getSession();
     if (session) showApp(session.user.email);
     else showLoginScreen();
-  } catch(e) {
-    showLoginScreen();
-  }
-  db.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_OUT') { showLoginScreen(); }
-    if (event === 'TOKEN_REFRESHED' && session) {
-      const el = document.getElementById('user-email-display');
-      if (el) el.textContent = session.user.email;
-    }
-  });
+  } catch(e) { showLoginScreen(); }
 }
 
 
@@ -1135,6 +1119,11 @@ async function doLogin() {
   const pw = document.getElementById('login-pw').value;
   const btn = document.getElementById('btn-login');
   const err = document.getElementById('login-err');
+  if (!db) {
+    err.style.display='block';
+    err.textContent='⚠️ 서버 연결 중입니다. 잠시 후 다시 시도해주세요.';
+    return;
+  }
   if (!email || !pw) { err.style.display='block'; err.textContent='이메일과 비밀번호를 입력하세요.'; return; }
   btn.textContent = '로그인 중...'; btn.disabled = true;
   err.style.display = 'none';
