@@ -804,17 +804,47 @@ const SUPA_URL = 'https://emvczjswzyxlwqhymfmh.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtdmN6anN3enl4bHdxaHltZm1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTcxNDAsImV4cCI6MjA4OTg3MzE0MH0.hOLthetdToPnxLoU7wW8nW9DUC5JtN4j4LOPF8vaS6Y';
 let db;
 window.addEventListener('load', () => {
-  if (window.supabase) {
-    const {createClient} = window.supabase;
-    db = createClient(SUPA_URL, SUPA_KEY, {auth:{persistSession:true,autoRefreshToken:true}});
-    initApp();
-  } else {
-    setTimeout(() => {
-      const {createClient} = window.supabase;
-      db = createClient(SUPA_URL, SUPA_KEY, {auth:{persistSession:true,autoRefreshToken:true}});
-      initApp();
-    }, 800);
+  function tryInit() {
+    if (window.supabase) {
+      try {
+        const {createClient} = window.supabase;
+        db = createClient(SUPA_URL, SUPA_KEY, {auth:{persistSession:true,autoRefreshToken:true}});
+        initApp();
+      } catch(e) {
+        console.error('Supabase 초기화 실패:', e);
+        document.getElementById('loading-overlay').style.display = 'none';
+        document.getElementById('login-screen').classList.add('show');
+        document.getElementById('app').style.display = 'none';
+      }
+    } else {
+      // CDN 로드 재시도 (최대 10초)
+      let attempts = 0;
+      const retry = setInterval(() => {
+        attempts++;
+        if (window.supabase) {
+          clearInterval(retry);
+          try {
+            const {createClient} = window.supabase;
+            db = createClient(SUPA_URL, SUPA_KEY, {auth:{persistSession:true,autoRefreshToken:true}});
+            initApp();
+          } catch(e) {
+            document.getElementById('loading-overlay').style.display = 'none';
+            document.getElementById('login-screen').classList.add('show');
+          }
+        } else if (attempts >= 20) {
+          clearInterval(retry);
+          document.getElementById('loading-overlay').style.display = 'none';
+          document.getElementById('login-screen').classList.add('show');
+          const errEl = document.getElementById('login-err');
+          if (errEl) {
+            errEl.style.display = 'block';
+            errEl.textContent = '⚠️ 네트워크 오류: 인터넷 연결을 확인하고 새로고침하세요.';
+          }
+        }
+      }, 500);
+    }
   }
+  tryInit();
 });
 
 // ===== 초기화 =====
