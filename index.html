@@ -1315,7 +1315,7 @@ function previewQuote() {
           ${quoteItems.map((it, i) => `
             <tr>
               <td class="cen-cell">${i+1}</td>
-              <td class="name-cell"><strong>${it.intro_link ? `<a href="${it.intro_link}" target="_blank" style="color:#0d2d6b;text-decoration:underline">${it.product_name}</a>` : it.product_name}</strong><br><span style="color:#6b7a99">${it.brand}</span></td>
+              <td class="name-cell"><strong>${it.intro_link ? `<a href="${it.intro_link}" target="_blank" style="color:#0d2d6b;text-decoration:underline">${it.product_name}</a>` : it.product_name}</strong><br><span style="color:#6b7a99">${it.brand}${it.category ? ' · ' + it.category : ''}</span></td>
               <td style="font-size:10px;color:#6b7a99">${it.spec_summary}</td>
               <td class="num-cell">${fmt(it.unit_price)}</td>
               <td class="cen-cell">${it.qty}</td>
