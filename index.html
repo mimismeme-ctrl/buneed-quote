@@ -612,7 +612,6 @@ a{text-decoration:none;color:inherit;}
     <!-- 관리자 서브탭 -->
     <div class="admin-sub-tabs">
       <button class="admin-sub-tab active" onclick="switchAdminTab('products', this)">📦 제품 관리</button>
-      <button class="admin-sub-tab" onclick="switchAdminTab('specs', this)">🔧 스펙 옵션 관리</button>
       <button class="admin-sub-tab" onclick="switchAdminTab('company', this)">🏢 회사 설정</button>
     </div>
 
@@ -625,7 +624,7 @@ a{text-decoration:none;color:inherit;}
         </div>
         <div style="overflow-x:auto;overflow-y:auto;max-height:calc(100vh - 200px);">
           <table class="data-table">
-            <thead><tr><th>제품명</th><th>브랜드</th><th>카테고리</th><th>기본가격</th><th>관리</th></tr></thead>
+            <thead><tr><th>제품명</th><th>브랜드</th><th>카테고리</th><th>기본가격</th><th>사양</th><th>관리</th></tr></thead>
             <tbody id="admin-product-body">
               <tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted)">로딩 중...</td></tr>
             </tbody>
@@ -634,8 +633,8 @@ a{text-decoration:none;color:inherit;}
       </div>
     </div>
 
-    <!-- 스펙 옵션 관리 패널 -->
-    <div class="admin-sub-panel" id="admin-panel-specs">
+    <!-- 스펙 옵션 관리 패널 (A버전에서 미사용) -->
+    <div class="admin-sub-panel" id="admin-panel-specs" style="display:none!important;">
       <div class="admin-card" style="flex-shrink:0;">
         <div class="admin-card-header">
           <h2>🔧 스펙 옵션 관리</h2>
@@ -694,32 +693,55 @@ a{text-decoration:none;color:inherit;}
   </div>
 </div>
 
-<!-- 스펙 선택 모달 -->
+<!-- 제품 견적 추가 모달 (A버전: 카탈로그형) -->
 <div class="modal-overlay" id="modal-spec">
-  <div class="modal-box" style="width:560px;max-width:95vw;">
+  <div class="modal-box" style="width:480px;max-width:95vw;">
     <div class="modal-header">
-      <h2 id="spec-modal-title">사양 선택</h2>
+      <h2 id="spec-modal-title">견적 추가</h2>
       <button class="modal-close" onclick="closeModal('modal-spec')">✕</button>
     </div>
-    <div class="modal-body" id="spec-modal-body" style="overflow-y:auto;max-height:55vh;">
-      <!-- 동적으로 섹션 렌더링 -->
-    </div>
-    <!-- 하단 가격/수량/추가 바 -->
-    <div class="mpb-bar">
-      <div class="mpb-auto-wrap">
-        <span class="mpb-auto-label">자동 계산 단가</span>
-        <span class="mpb-auto-val" id="mpb-auto">0원</span>
+    <div class="modal-body" style="padding:16px 20px;">
+      <!-- 제품 정보 카드 -->
+      <div id="aq-product-info" style="background:#f5f7fc;border-radius:10px;padding:14px 16px;margin-bottom:16px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div id="aq-product-img" style="flex-shrink:0;"></div>
+          <div style="flex:1;min-width:0;">
+            <div id="aq-product-name" style="font-weight:700;font-size:15px;color:#0d2d6b;margin-bottom:4px;"></div>
+            <div id="aq-product-meta" style="font-size:11px;color:var(--muted);margin-bottom:6px;"></div>
+            <div id="aq-product-spec" style="font-size:12px;color:#444;line-height:1.5;white-space:pre-wrap;"></div>
+          </div>
+        </div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:12px;color:var(--muted);">기준 단가</span>
+          <span id="aq-base-price" style="font-weight:700;font-size:16px;color:#0d2d6b;"></span>
+        </div>
       </div>
-      <div class="mpb-controls">
-        <label>단가 수정</label>
-        <input type="number" class="mpb-manual-input" id="sm-unit" oninput="onManualPrice()" placeholder="직접입력">
-        <button class="mpb-reset-btn" onclick="resetManualPrice()">자동</button>
-        <label>수량</label>
-        <input type="number" class="mpb-qty-input" id="sm-qty" value="1" min="1" oninput="updateModalCalc()">
-        <button class="btn btn-primary" onclick="addToQuote()">+ 견적 추가</button>
+
+      <!-- 수량 & 단가 조정 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:12px;font-weight:600;">수량</label>
+          <input type="number" class="field-input" id="sm-qty" value="1" min="1" oninput="updateAQCalc()" style="text-align:center;font-size:16px;font-weight:700;">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:12px;font-weight:600;">단가 직접 수정 <span style="font-weight:400;color:var(--muted);">(선택)</span></label>
+          <div style="display:flex;gap:4px;">
+            <input type="number" class="field-input" id="sm-unit" oninput="updateAQCalc()" placeholder="기준가 사용">
+            <button class="btn btn-sm btn-secondary" onclick="resetAQPrice()" style="white-space:nowrap;flex-shrink:0;">초기화</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 합계 -->
+      <div style="background:var(--navy);border-radius:8px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="color:rgba(255,255,255,0.8);font-size:13px;">합 계</span>
+        <strong id="aq-total" style="color:#fff;font-size:20px;">0원</strong>
       </div>
     </div>
-    <div class="mpb-total">합계: <strong id="mpb-total" style="color:var(--navy);font-size:14px;">0원</strong></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-spec')">취소</button>
+      <button class="btn btn-primary" style="min-width:120px;" onclick="addToQuote()">+ 견적에 추가</button>
+    </div>
   </div>
 </div>
 
@@ -730,14 +752,17 @@ a{text-decoration:none;color:inherit;}
       <h2 id="pm-title">제품 추가</h2>
       <button class="modal-close" onclick="closeModal('modal-product')">✕</button>
     </div>
-    <div class="modal-body">
-      <div class="form-group"><label>제품명 *</label><input class="field-input" id="pm-name" placeholder="제품명"></div>
+    <div class="modal-body" style="overflow-y:auto;max-height:70vh;">
+      <!-- 기본 정보 -->
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">기본 정보</div>
+      <div class="form-group"><label>제품명 *</label><input class="field-input" id="pm-name" placeholder="예) HP EliteBook 840 G11"></div>
       <div class="form-row">
         <div class="form-group">
           <label>브랜드</label>
           <select class="field-input" id="pm-brand">
             <option>HP</option><option>Samsung</option><option>LG</option>
-            <option>Lenovo</option><option>Dell</option><option>Apple</option><option>기타</option>
+            <option>Lenovo</option><option>Dell</option><option>Apple</option>
+            <option>ASUS</option><option>MSI</option><option>기타</option>
           </select>
         </div>
         <div class="form-group">
@@ -748,12 +773,31 @@ a{text-decoration:none;color:inherit;}
           </select>
         </div>
       </div>
-      <div class="form-group"><label>기본가격 (원) *</label><input class="field-input" type="number" id="pm-price" placeholder="0"></div>
-      <div class="form-group"><label>사양 설명</label><textarea class="field-input" id="pm-spec" rows="3" placeholder="CPU, RAM, SSD 등 기본 사양"></textarea></div>
-      <div class="form-group"><label>제품 특징</label><textarea class="field-input" id="pm-feature" rows="2" placeholder="주요 특징"></textarea></div>
+      <div class="form-group">
+        <label>판매 가격 (원) *</label>
+        <input class="field-input" type="number" id="pm-price" placeholder="0" style="font-size:16px;font-weight:700;">
+      </div>
+
+      <div style="height:1px;background:var(--border);margin:12px 0;"></div>
+
+      <!-- 사양 정보 -->
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">사양 및 설명</div>
+      <div class="form-group">
+        <label>사양 <span style="font-weight:400;color:var(--muted)">(견적서에 표시)</span></label>
+        <textarea class="field-input" id="pm-spec" rows="4" placeholder="예) Intel Core i5-1345U / 16GB RAM / 512GB SSD / Windows 11 Pro"></textarea>
+      </div>
+      <div class="form-group">
+        <label>제품 특징 <span style="font-weight:400;color:var(--muted)">(내부용 메모)</span></label>
+        <textarea class="field-input" id="pm-feature" rows="2" placeholder="주요 특징, 용도 등"></textarea>
+      </div>
+
+      <div style="height:1px;background:var(--border);margin:12px 0;"></div>
+
+      <!-- 링크/이미지 -->
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">소개서 & 이미지</div>
       <div class="form-group">
         <label>제품 소개서 링크 <span style="font-weight:400;color:var(--muted)">(URL 또는 PDF 링크)</span></label>
-        <input class="field-input" id="pm-link" placeholder="https://... (제품 상세페이지 또는 소개서 PDF)">
+        <input class="field-input" id="pm-link" placeholder="https://...">
       </div>
       <div class="form-group">
         <label>제품 이미지 <span style="font-weight:400;color:var(--muted)">(최대 3장, 각 2MB 이하)</span></label>
@@ -792,6 +836,7 @@ let editingProductId = null;
 let editingQuoteId = null;
 let currentQuoteNum = null;
 let currentShareToken = null; // 고객 공유용 토큰 // 현재 견적번호 (미리보기/저장 공유)
+let _lastPreviewHtml = ''; // 인쇄용 HTML 캐시
 
 // ===== AUTH =====
 async function doLogin() {
@@ -928,105 +973,58 @@ let currentSpecsData = {};
 
 function openSpecModal(productId) {
   currentProductId = productId;
-  selectedSpecs = {};
-  currentSpecsData = {};
   const p = products.find(x => x.id === productId);
   if (!p) return;
+
+  // 제품 정보 표시
   document.getElementById('spec-modal-title').textContent = p.name;
+  document.getElementById('aq-product-name').textContent = p.name;
+  document.getElementById('aq-product-meta').textContent = p.brand + ' · ' + p.category;
+  document.getElementById('aq-product-spec').textContent = p.base_spec || '사양 정보 없음';
+  document.getElementById('aq-base-price').textContent = fmtNum(p.base_price) + ' 원';
+
+  // 이미지
+  const imgEl = document.getElementById('aq-product-img');
+  if (p.intro_images && p.intro_images.length > 0) {
+    imgEl.innerHTML = `<img src="${p.intro_images[0]}" style="width:80px;height:80px;object-fit:contain;border-radius:8px;background:#fff;border:1px solid var(--border);">`;
+  } else {
+    imgEl.innerHTML = '';
+  }
+
+  // 입력 초기화
   document.getElementById('sm-unit').value = '';
   document.getElementById('sm-qty').value = 1;
-  renderSpecModalBody(p);
-  updateModalCalc(p);
+  updateAQCalc();
   openModal('modal-spec');
 }
 
-function renderSpecModalBody(p) {
-  const enabledOpts = p.enabled_spec_options || {};
-  let html = '';
-  // specCategories에서 각 카테고리별 섹션 렌더링
-  specCategories.forEach(cat => {
-    // 제품 카테고리 필터링: cat.product_categories 배열이 있으면 해당 제품 카테고리만 허용
-    const applicable = cat.product_categories;
-    if (applicable && applicable.length > 0 && !applicable.includes(p.category)) return;
-
-    const enabledIds = enabledOpts[cat.key];
-    let opts = specOptions.filter(o => o.category_key === cat.key);
-    if (enabledIds && enabledIds.length > 0) {
-      opts = opts.filter(o => enabledIds.includes(o.id));
-    }
-    if (!opts.length) return;
-    // 첫 옵션 자동 선택
-    if (!selectedSpecs[cat.key] && opts.length > 0) {
-      selectedSpecs[cat.key] = opts[0].id;
-      currentSpecsData[cat.key] = {label: opts[0].label, diff: opts[0].price_diff || 0};
-    }
-    html += `<div class="spec-section">
-      <h4>${cat.label}</h4>
-      <div class="spec-opts">
-        ${opts.map(o => `
-          <button class="spec-opt ${selectedSpecs[cat.key]===o.id?'sel':''}"
-            onclick="selectSpec2('${cat.key}','${o.id}','${o.label.replace(/'/g,"\'")}',${o.price_diff||0},this)">
-            ${o.label}
-            ${(o.price_diff||0)!==0?`<span class="pdiff">(${(o.price_diff||0)>0?'+':''}${fmtNum(o.price_diff||0)})</span>`:''}
-          </button>`).join('')}
-      </div>
-    </div>`;
-  });
-  if (!html) {
-    html = '<div style="color:var(--muted);font-size:13px;padding:12px 0;">이 제품에 등록된 사양 옵션이 없습니다.<br>기본가격으로 견적에 추가됩니다.</div>';
-  }
-  document.getElementById('spec-modal-body').innerHTML = html;
-}
+// A버전: renderSpecModalBody 미사용 (openSpecModal에서 직접 처리)
 
 function fmtNum(n) {
   return Number(n).toLocaleString('ko-KR');
 }
 
-function selectSpec2(catKey, optId, label, diff, el) {
-  selectedSpecs[catKey] = optId;
-  currentSpecsData[catKey] = {label, diff: diff||0};
-  // 해당 섹션 버튼만 sel 토글
-  const section = el.closest('.spec-section');
-  if (section) section.querySelectorAll('.spec-opt').forEach(b => b.classList.remove('sel'));
-  el.classList.add('sel');
-  document.getElementById('sm-unit').value = '';
-  updateModalCalc(products.find(x => x.id === currentProductId));
-}
-
-function calcAutoPrice() {
+// A버전: 견적 추가 모달 계산 함수
+function updateAQCalc() {
   const p = products.find(x => x.id === currentProductId);
-  if (!p) return 0;
-  let price = p.base_price;
-  Object.values(currentSpecsData).forEach(s => price += (s.diff||0));
-  return Math.max(price, 0);
-}
-
-function updateModalCalc(p) {
-  const auto = calcAutoPrice();
+  if (!p) return;
   const manualVal = document.getElementById('sm-unit').value;
-  const price = manualVal ? parseInt(manualVal) : auto;
-  const qty = parseInt(document.getElementById('sm-qty').value)||1;
-  document.getElementById('mpb-auto').textContent = fmtNum(auto) + '원';
-  document.getElementById('mpb-total').textContent = fmtNum(price * qty) + '원';
+  const unitPrice = manualVal ? parseInt(manualVal) : p.base_price;
+  const qty = parseInt(document.getElementById('sm-qty').value) || 1;
+  document.getElementById('aq-total').textContent = fmtNum(unitPrice * qty) + '원';
 }
 
-function onManualPrice() { updateModalCalc(); }
-
-function resetManualPrice() {
+function resetAQPrice() {
   document.getElementById('sm-unit').value = '';
-  updateModalCalc();
+  updateAQCalc();
 }
 
 function addToQuote() {
   const p = products.find(x => x.id === currentProductId);
   if (!p) return;
   const qty = parseInt(document.getElementById('sm-qty').value) || 1;
-  const autoPrice = calcAutoPrice();
   const manualVal = document.getElementById('sm-unit').value;
-  const unitPrice = manualVal ? parseInt(manualVal) : autoPrice;
-
-  // 스펙 요약 (currentSpecsData 사용)
-  const specSummary = Object.values(currentSpecsData).map(s => s.label).filter(Boolean).join(' / ');
+  const unitPrice = manualVal ? parseInt(manualVal) : p.base_price;
 
   quoteItems.push({
     product_id: p.id,
@@ -1034,17 +1032,17 @@ function addToQuote() {
     brand: p.brand,
     category: p.category,
     intro_link: p.intro_link || null,
-    spec_summary: specSummary || p.base_spec || '',
+    spec_summary: p.base_spec || '',
     unit_price: unitPrice,
     qty,
     total_price: unitPrice * qty,
-    selectedSpecs: {...selectedSpecs}
+    selectedSpecs: {}
   });
 
   renderQuoteItems();
   calcPrice();
   closeModal('modal-spec');
-  showToast('견적에 추가되었습니다!', 'success');
+  showToast(p.name + ' 견적에 추가되었습니다!', 'success');
 }
 
 // ===== QUOTE ITEMS =====
@@ -1338,6 +1336,8 @@ function previewQuote() {
       ${companyIntroHtml}
     </div>`;
   document.getElementById('preview-content').innerHTML = html;
+  // 인쇄용 HTML 캐시 (printQuote가 Blob URL로 안전하게 사용)
+  _lastPreviewHtml = html;
   // 영업자 정보로 담당자 영역 업데이트
   const telEl = document.getElementById('q-tel-line');
   const footerEl = document.getElementById('q-footer-line');
@@ -1372,45 +1372,70 @@ function copyTokenLink(token) {
 }
 
 function printQuote() {
-  const content = document.getElementById('preview-content').innerHTML;
-  const w = window.open('', '_blank');
-  w.document.write(`
-    <html><head><title>견적서</title>
-    <style>
-      :root{--navy:#0d2d6b;--blue:#1a6fd8;--muted:#6b7a99;}
-      *{box-sizing:border-box;margin:0;padding:0;font-family:'Noto Sans KR',sans-serif;}
-      body{padding:20px;}
-      .qdoc{max-width:780px;margin:0 auto;font-size:12px;}
-      .q-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;}
-      .q-logo-area img{height:44px;margin-bottom:4px;}
-      .q-tel{font-size:10px;color:#6b7a99;}
-      .q-title{font-size:24px;font-weight:700;color:#0d2d6b;letter-spacing:2px;text-align:right;}
-      .q-num{font-size:11px;color:#6b7a99;text-align:right;margin-top:4px;}
-      .q-parties{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
-      .q-party{border:1px solid #d0d8ee;border-radius:8px;overflow:hidden;}
-      .q-party-header{background:#0d2d6b;color:#fff;padding:6px 14px;font-size:11px;font-weight:600;}
-      .q-party-header.sup{background:#e8f0fd;color:#0d2d6b;}
-      .q-party-body{padding:10px 14px;}
-      .q-field{display:flex;gap:8px;padding:3px 0;font-size:11px;}
-      .q-field .lbl{color:#6b7a99;width:50px;}
-      .q-field .val{font-weight:600;}
-      .items-title{font-size:11px;font-weight:700;color:#0d2d6b;letter-spacing:1px;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid #c2d4f0;}
-      .items-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:16px;}
-      .items-table th{background:#0d2d6b;color:#fff;padding:7px 10px;text-align:center;}
-      .items-table td{padding:7px 10px;border-bottom:1px solid #d0d8ee;}
-      .name-cell{text-align:left;}.num-cell{text-align:right;}.cen-cell{text-align:center;}
-      .price-table{width:280px;margin-left:auto;border-collapse:collapse;font-size:12px;margin-bottom:16px;}
-      .price-table td{padding:5px 10px;}
-      .price-table .lbl{color:#6b7a99;}.price-table .val{text-align:right;font-weight:600;}
-      .total-row td{border-top:2px solid #0d2d6b;font-weight:700;color:#0d2d6b;font-size:14px;padding-top:8px;}
-      .q-footer{text-align:center;font-size:11px;color:#6b7a99;border-top:1px solid #d0d8ee;padding-top:12px;margin-top:8px;line-height:1.8;}
-      /* .q-tel 표시 유지 */
-      @media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}@page{size:A4;margin:15mm;}.q-footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #d0d8ee;}}
-    </style></head>
-    <body>${content}</body></html>
-  `);
-  w.document.close();
-  setTimeout(() => w.print(), 500);
+  // 미리보기 캐시가 없으면 preview-content에서 가져오기
+  const content = _lastPreviewHtml || document.getElementById('preview-content').innerHTML;
+  if (!content || content.trim() === '') {
+    showToast('먼저 미리보기를 실행하세요', 'error');
+    return;
+  }
+
+  const printCSS = `
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap');
+    :root{--navy:#0d2d6b;--blue:#1a6fd8;--muted:#6b7a99;}
+    *{box-sizing:border-box;margin:0;padding:0;font-family:'Noto Sans KR',sans-serif;}
+    body{padding:20px;background:#fff;}
+    .qdoc{max-width:780px;margin:0 auto;font-size:12px;}
+    .q-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;}
+    .q-logo-area img{height:44px;margin-bottom:4px;}
+    .q-tel{font-size:10px;color:#6b7a99;display:block;}
+    .q-title{font-size:24px;font-weight:700;color:#0d2d6b;letter-spacing:2px;text-align:right;}
+    .q-num{font-size:11px;color:#6b7a99;text-align:right;margin-top:4px;}
+    .q-parties{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+    .q-party{border:1px solid #d0d8ee;border-radius:8px;overflow:hidden;}
+    .q-party-header{background:#0d2d6b;color:#fff;padding:6px 14px;font-size:11px;font-weight:600;}
+    .q-party-header.sup{background:#e8f0fd;color:#0d2d6b;}
+    .q-party-body{padding:10px 14px;}
+    .q-field{display:flex;gap:8px;padding:3px 0;font-size:11px;}
+    .q-field .lbl{color:#6b7a99;width:50px;flex-shrink:0;}
+    .q-field .val{font-weight:600;word-break:break-all;}
+    .items-title{font-size:11px;font-weight:700;color:#0d2d6b;letter-spacing:1px;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid #c2d4f0;}
+    .items-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:16px;}
+    .items-table th{background:#0d2d6b;color:#fff;padding:7px 10px;text-align:center;}
+    .items-table td{padding:7px 10px;border-bottom:1px solid #d0d8ee;vertical-align:top;}
+    .name-cell{text-align:left;font-weight:600;}
+    .num-cell{text-align:right;}
+    .cen-cell{text-align:center;}
+    .price-table{width:280px;margin-left:auto;border-collapse:collapse;font-size:12px;margin-bottom:16px;}
+    .price-table td{padding:5px 10px;}
+    .price-table .lbl{color:#6b7a99;}
+    .price-table .val{text-align:right;font-weight:600;}
+    .total-row td{border-top:2px solid #0d2d6b;font-weight:700;color:#0d2d6b;font-size:14px;padding-top:8px;}
+    .q-footer{text-align:center;font-size:11px;color:#6b7a99;border-top:1px solid #d0d8ee;padding-top:12px;margin-top:8px;line-height:1.8;}
+    @media print{
+      *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}
+      @page{size:A4;margin:15mm;}
+      body{padding:0;}
+      .q-footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #d0d8ee;padding:8px 0;}
+    }
+  `;
+
+  const fullHtml = '<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>견적서</title><style>' + printCSS + '</style></head><body>' + content + '</body></html>';
+
+  // Blob URL 방식 — document.write 특수문자 문제 없음
+  const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
+  const blobUrl = URL.createObjectURL(blob);
+  const w = window.open(blobUrl, '_blank');
+  if (!w) {
+    showToast('팝업이 차단되었습니다. 팝업을 허용해주세요.', 'error');
+    URL.revokeObjectURL(blobUrl);
+    return;
+  }
+  w.addEventListener('load', () => {
+    setTimeout(() => {
+      w.print();
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+    }, 300);
+  });
 }
 
 // ===== RESET =====
@@ -1558,18 +1583,22 @@ async function deleteQuote(quoteId) {
 function renderAdminProducts() {
   const tbody = document.getElementById('admin-product-body');
   if (products.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted)">제품이 없습니다</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted)">제품이 없습니다. + 제품 추가 버튼으로 등록하세요.</td></tr>';
     return;
   }
   tbody.innerHTML = products.map(p => `
     <tr>
-      <td><strong>${p.name}</strong></td>
+      <td>
+        <strong>${p.name}</strong>
+        ${p.intro_link ? `<a href="${p.intro_link}" target="_blank" style="font-size:10px;color:var(--blue);margin-left:6px;">📄</a>` : ''}
+      </td>
       <td><span class="badge badge-blue">${p.brand}</span></td>
       <td><span class="badge badge-gray">${p.category}</span></td>
-      <td style="text-align:right">${fmt(p.base_price)} 원</td>
-      <td>
-        <button class="btn btn-sm btn-secondary" onclick="openProductModal('${p.id}')">수정</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteProduct('${p.id}')">삭제</button>
+      <td style="text-align:right;white-space:nowrap;">${fmt(p.base_price)} 원</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--muted);" title="${(p.base_spec||'').replace(/"/g,'&quot;')}">${p.base_spec || '-'}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-sm btn-secondary" onclick="openProductModal('${p.id}')">✏️ 수정</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteProduct('${p.id}')">🗑️ 삭제</button>
       </td>
     </tr>
   `).join('');
