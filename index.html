@@ -1861,7 +1861,7 @@ function rInitQuoteNum() {
   return num;
 }
 
-async async function rLoadRentalProducts() {
+async function rLoadRentalProducts() {
   try {
     const { data, error } = await db.from('rental_products').select('*').eq('is_active',true).order('category');
     if (error || !data || data.length === 0) {
