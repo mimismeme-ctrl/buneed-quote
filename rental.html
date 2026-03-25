@@ -21,6 +21,9 @@
   z-index: 9999;
   user-select: none;
 }
+@media print {
+  .credit-footer { display: none !important; }
+}
 
 body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f8;color:#1e293b;font-size:13px;}
 :root{
@@ -227,33 +230,7 @@ select.field-input{cursor:pointer;}
 <body>
 
 <!-- ===== 로그인 화면 ===== -->
-<div id="login-screen">
-  <div class="login-box">
-    <div class="login-logo">
-      <svg width="140" height="40" viewBox="0 0 140 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="36" height="36" rx="8" fill="#1a2e5a" y="2"/>
-        <text x="18" y="26" text-anchor="middle" font-size="20" font-weight="800" fill="#fff" font-family="Arial">B</text>
-        <text x="50" y="24" font-size="16" font-weight="700" fill="#1a2e5a" font-family="Arial">b.u.need</text>
-        <text x="50" y="36" font-size="9" fill="#94a3b8" font-family="Arial">BEYOND YOUR NEEDS</text>
-      </svg>
-      <h2>비유니드 견적 시스템</h2>
-      <p>🖥️ 렌탈 견적</p>
-    </div>
-    <div class="form-group" style="margin-bottom:10px;">
-      <label>이메일</label>
-      <input class="field-input" type="email" id="login-email" placeholder="이메일 입력">
-    </div>
-    <div class="form-group" style="margin-bottom:18px;">
-      <label>비밀번호</label>
-      <input class="field-input" type="password" id="login-pw" placeholder="비밀번호 입력" onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <button class="btn btn-primary" style="width:100%;padding:10px;" onclick="doLogin()">로그인</button>
-    <p id="login-err" style="color:#ef4444;font-size:11px;margin-top:10px;text-align:center;display:none;"></p>
-    <p style="text-align:center;margin-top:14px;font-size:11px;color:#94a3b8;">
-      <a href="index.html" style="color:#7c3aed;text-decoration:none;">← 시스템 선택으로 돌아가기</a>
-    </p>
-  </div>
-</div>
+
 
 <!-- ===== 앱 화면 ===== -->
 <div id="app">
@@ -664,8 +641,8 @@ select.field-input{cursor:pointer;}
 <script>
 // ===== SUPABASE 설정 =====
 // ⚠️ 아래 두 값을 기존 index.html에서 복사해서 붙여넣으세요
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_URL = 'https://emvczjswzyxlwqhymfmh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtdmN6anN3enl4bHdxaHltZm1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTcxNDAsImV4cCI6MjA4OTg3MzE0MH0.hOLthetdToPnxLoU7wW8nW9DUC5JtN4j4LOPF8vaS6Y';
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ===== 상태 변수 =====
@@ -681,16 +658,19 @@ let currentFilterCat = '';
 
 // ===== 초기화 =====
 window.addEventListener('DOMContentLoaded', async () => {
-  const { data: { session } } = await db.auth.getSession();
-  if (!session) {
-    document.getElementById('login-screen').style.display = 'flex';
-    return;
+  try {
+    const { data: { session } } = await db.auth.getSession();
+    if (!session) {
+      window.location.href = 'index.html';
+      return;
+    }
+    showApp(session.user.email);
+  } catch(e) {
+    window.location.href = 'index.html';
   }
-  showApp(session.user.email);
 });
 
 async function showApp(email) {
-  document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
   document.getElementById('user-email-display').textContent = email;
   initQuoteNum();
