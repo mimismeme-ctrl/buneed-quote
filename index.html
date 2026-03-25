@@ -414,7 +414,7 @@ a{text-decoration:none;color:inherit;}
     </div>
     <div class="form-group">
       <label>이메일</label>
-      <input type="email" id="login-email" placeholder="이메일 입력" value="dotmim@naver.com">
+      <input type="email" id="login-email" placeholder="이메일 입력">
     </div>
     <div class="form-group">
       <label>비밀번호</label>
@@ -1182,6 +1182,10 @@ async function saveQuote() {
     subtotal, discount_amount: discAmt,
     supply_price: supply, vat, total: total,
     status: 'draft',
+    sales_name: salesName || null,
+    sales_phone: salesPhone || null,
+    sales_email: salesEmail || null,
+    sales_dept: salesDept || null,
   };
 
   let quoteId;
@@ -1400,7 +1404,7 @@ function printQuote() {
       .price-table .lbl{color:#6b7a99;}.price-table .val{text-align:right;font-weight:600;}
       .total-row td{border-top:2px solid #0d2d6b;font-weight:700;color:#0d2d6b;font-size:14px;padding-top:8px;}
       .q-footer{text-align:center;font-size:11px;color:#6b7a99;border-top:1px solid #d0d8ee;padding-top:12px;margin-top:8px;line-height:1.8;}
-      .q-tel{display:none;}
+      /* .q-tel 표시 유지 */
       @media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}@page{size:A4;margin:15mm;}.q-footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #d0d8ee;}}
     </style></head>
     <body>${content}</body></html>
@@ -1460,8 +1464,13 @@ async function loadQuote(quoteId) {
   if (!q) return;
   document.getElementById('f-company').value = q.company_name || '';
   document.getElementById('f-contact').value = q.contact_name || '';
-  document.getElementById('f-phone').value = q.contact_phone || '';
+  document.getElementById('f-phone').value = q.contact_tel || q.contact_phone || '';
   document.getElementById('f-email').value = q.contact_email || '';
+  // 영업자 정보 복원
+  document.getElementById('f-sales-name').value = q.sales_name || '';
+  document.getElementById('f-sales-phone').value = q.sales_phone || '';
+  document.getElementById('f-sales-email').value = q.sales_email || '';
+  document.getElementById('f-sales-dept').value = q.sales_dept || '';
   document.getElementById('f-memo').value = q.memo || '';
   document.getElementById('f-delivery').value = q.delivery_date || '';
   document.getElementById('f-validity').value = q.valid_until || '';
