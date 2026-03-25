@@ -128,6 +128,7 @@
 .product-card .pc-name{font-size:12px;font-weight:700;color:var(--p-navy);margin-bottom:2px;}
 .product-card.r-card .pc-name{color:var(--r-primary);}
 .product-card .pc-brand{font-size:10px;color:var(--muted);}
+.pc-spec{font-size:10px;color:var(--muted);margin:3px 0 2px;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
 .product-card .pc-price{font-size:12px;font-weight:700;color:var(--p-blue);margin-top:4px;}
 .product-card.r-card .pc-price{color:var(--r-blue);}
 .no-products{font-size:11px;color:var(--muted);text-align:center;padding:20px 0;}
@@ -922,6 +923,7 @@ textarea.field-input{resize:vertical;min-height:52px;}
       </div>
       <div class="form-group"><label>기본 단가 (원) *</label><input class="field-input" type="number" id="pm-price" placeholder="1000000"></div>
       <div class="form-group"><label>사양 설명</label><textarea class="field-input" id="pm-spec" rows="3" placeholder="CPU, RAM, SSD 등"></textarea></div>
+      <div class="form-group"><label>제품 특징/설명</label><textarea class="field-input" id="pm-feature" rows="2" placeholder="주요 특징, 용도, 추가 정보 등"></textarea></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modal-product')">취소</button>
@@ -1031,47 +1033,47 @@ textarea.field-input{resize:vertical;min-height:52px;}
 const SUPA_URL = 'https://emvczjswzyxlwqhymfmh.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtdmN6anN3enl4bHdxaHltZm1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTcxNDAsImV4cCI6MjA4OTg3MzE0MH0.hOLthetdToPnxLoU7wW8nW9DUC5JtN4j4LOPF8vaS6Y';
 const SAMPLE_PRODUCTS = [
-  {brand:'HP',category:'데스크탑',name:'Pro Tower 280 G9',spec_summary:'CPU: Intel i3,i5,i7 14세대, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 350w~500w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'데스크탑',name:'Pro Tower 400 G9',spec_summary:'CPU: Intel i3,i5,i7 14세대, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 350w~500w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'데스크탑',name:'Elite Tower 800 G9',spec_summary:'CPU: Intel i5,i7,i9 14세대, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 550w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'데스크탑',name:'ProDesk 4 G1i Tower',spec_summary:'CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 400w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'데스크탑',name:'ProDesk 8 G1i Tower',spec_summary:'CPU: Intel Ultra 2 / U5,U7,U9, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 500w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'워크스테이션',name:'Z1 G1i Tower',spec_summary:'CPU: Intel Ultra 2 / U5,U7,U9, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 500w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'워크스테이션',name:'Z2 G1i Tower',spec_summary:'CPU: Intel Ultra 2 / U5,U7,U9, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 500w~1200w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'워크스테이션',name:'Z2 G9 Tower',spec_summary:'CPU: Intel i7,i9 14세대, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 500w~700w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'워크스테이션',name:'Z4 G5 Tower',spec_summary:'CPU: Intel Xeon W3,W5,W7, RAM: DDR5 ECC 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 525w~1125w, OS: Windows 11 Pro 64 for Workstations',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'워크스테이션',name:'Z6 G5 Tower',spec_summary:'CPU: Intel Xeon W3,W5,W7, RAM: DDR5 ECC 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 775w~1450w, OS: Windows 11 Pro 64 for Workstations',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'워크스테이션',name:'Z8 G5 Tower',spec_summary:'CPU: Intel Xeon 4410Y~, RAM: DDR5 ECC 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 1125w~1700w, OS: Windows 11 Pro 64 for Workstations',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'워크스테이션',name:'Z8 Fury G5 Tower',spec_summary:'CPU: Intel Xeon W5,W7,W9, RAM: DDR5 ECC 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 1125w~2250w, OS: Windows 11 Pro 64 for Workstations',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'모니터',name:'ZBook 8 G1i 16',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'모니터',name:'ZBook X G1i 16',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'모니터',name:'ZBook Fury G1i 16',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'노트북',name:'ProBook 4 G1i',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'노트북',name:'ProBook 8 G1i',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'노트북',name:'EliteBook X G1i',spec_summary:'크기: 14 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB,32GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'노트북',name:'EliteBook Ultra G1i AI',spec_summary:'크기: 14 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB,32GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'모니터',name:'324pe',spec_summary:'크기: 24 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(1), DP(1), VGA(1), 스탠드: 높낮이, 틸트, 피벗',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'모니터',name:'524pf',spec_summary:'크기: 24 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 350nits, 연결단자: DP(1), HDMI(1), 스탠드: 높낮이, 틸트, 피벗, 스위블',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'모니터',name:'327pf',spec_summary:'크기: 27 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(1), DP(1), VGA(1), 스탠드: 틸트',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'모니터',name:'327ph',spec_summary:'크기: 27 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(1), DP(1), VGA(1), 스탠드: 높낮이, 틸트',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'HP',category:'모니터',name:'527pq',spec_summary:'크기: 27 inch, 해상도: QHD / 2560*1440, 패널: IPS, 밝기: 350nits, 연결단자: DP(1), HDMI(1), 스탠드: 높낮이, 틸트, 피벗, 스위블',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'삼성',category:'데스크탑',name:'DM501THA',spec_summary:'CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: Non, POWER: 500w, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'삼성',category:'노트북',name:'NT751XHD',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'삼성',category:'노트북',name:'NT751XGK',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 1 / U5,U7, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'삼성',category:'노트북',name:'NT941XHA',spec_summary:'크기: 16 inch, CPU: Intel Ultra 2 - U5, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'삼성',category:'노트북',name:'NT961XHA',spec_summary:'크기: 16 inch, CPU: Intel Ultra 2 - U5, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'삼성',category:'모니터',name:'LS24D408GAKXKR',spec_summary:'크기: 24 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(2), DP(1), 스탠드: 높낮이, 틸트, 피벗',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'삼성',category:'모니터',name:'LS27D304GAKXKR',spec_summary:'크기: 27 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(1), VGA(1), 스탠드: 높낮이, 틸트, 피벗, 스위블',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'레노버',category:'데스크탑',name:'ThinkCentre neo 50t',spec_summary:'CPU: Intel Ultra 2 / U3,U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 200w~400w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'레노버',category:'데스크탑',name:'ThinkCentre M70t',spec_summary:'CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 260w~400w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'레노버',category:'데스크탑',name:'ThinkCentre M90t',spec_summary:'CPU: Intel Ultra 2 / U5,U7,U9, RAM: DDR5 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 310w~500w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'레노버',category:'노트북',name:'ThinkPad E16 Gen 3',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'레노버',category:'노트북',name:'ThinkPad T16 Gen 4',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'LG',category:'노트북',name:'15U55T-GAP50ML',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 2 / U5, RAM: DDR5 16GB, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'LG',category:'노트북',name:'15Z90T-GAP5AL',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'LG',category:'노트북',name:'15Z90T-GAP7HL',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 2 - U7, RAM: DDR5 32GB (On BD), SSD: NVMe DDS 512GB, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'LG',category:'모니터',name:'24BA450',spec_summary:'크기: 24 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(2), DP(1), 스탠드: 높낮이, 틸트, 피벗, 스위블',base_price:0,daily_price:0,monthly_price:0,is_active:true},
-  {brand:'LG',category:'모니터',name:'27BA450',spec_summary:'크기: 27 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(1), VGA(1), 스탠드: 높낮이, 틸트, 피벗, 스위블',base_price:0,daily_price:0,monthly_price:0,is_active:true}
+  {brand:'HP',category:'데스크탑',name:'Pro Tower 280 G9',spec_summary:'CPU: Intel i3,i5,i7 14세대, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 350w~500w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'데스크탑',name:'Pro Tower 400 G9',spec_summary:'CPU: Intel i3,i5,i7 14세대, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 350w~500w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'데스크탑',name:'Elite Tower 800 G9',spec_summary:'CPU: Intel i5,i7,i9 14세대, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 550w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'데스크탑',name:'ProDesk 4 G1i Tower',spec_summary:'CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 400w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'데스크탑',name:'ProDesk 8 G1i Tower',spec_summary:'CPU: Intel Ultra 2 / U5,U7,U9, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 500w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z1 G1i Tower',spec_summary:'CPU: Intel Ultra 2 / U5,U7,U9, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 500w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z2 G1i Tower',spec_summary:'CPU: Intel Ultra 2 / U5,U7,U9, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 500w~1200w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z2 G9 Tower',spec_summary:'CPU: Intel i7,i9 14세대, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 500w~700w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z4 G5 Tower',spec_summary:'CPU: Intel Xeon W3,W5,W7, RAM: DDR5 ECC 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 525w~1125w, OS: Windows 11 Pro 64 for Workstations',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z6 G5 Tower',spec_summary:'CPU: Intel Xeon W3,W5,W7, RAM: DDR5 ECC 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 775w~1450w, OS: Windows 11 Pro 64 for Workstations',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z8 G5 Tower',spec_summary:'CPU: Intel Xeon 4410Y~, RAM: DDR5 ECC 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 1125w~1700w, OS: Windows 11 Pro 64 for Workstations',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z8 Fury G5 Tower',spec_summary:'CPU: Intel Xeon W5,W7,W9, RAM: DDR5 ECC 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 1125w~2250w, OS: Windows 11 Pro 64 for Workstations',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'모니터',name:'ZBook 8 G1i 16',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'모니터',name:'ZBook X G1i 16',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'모니터',name:'ZBook Fury G1i 16',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'노트북',name:'ProBook 4 G1i',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'노트북',name:'ProBook 8 G1i',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'노트북',name:'EliteBook X G1i',spec_summary:'크기: 14 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB,32GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'노트북',name:'EliteBook Ultra G1i AI',spec_summary:'크기: 14 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB,32GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'모니터',name:'324pe',spec_summary:'크기: 24 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(1), DP(1), VGA(1), 스탠드: 높낮이, 틸트, 피벗',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'모니터',name:'524pf',spec_summary:'크기: 24 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 350nits, 연결단자: DP(1), HDMI(1), 스탠드: 높낮이, 틸트, 피벗, 스위블',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'모니터',name:'327pf',spec_summary:'크기: 27 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(1), DP(1), VGA(1), 스탠드: 틸트',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'모니터',name:'327ph',spec_summary:'크기: 27 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(1), DP(1), VGA(1), 스탠드: 높낮이, 틸트',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'HP',category:'모니터',name:'527pq',spec_summary:'크기: 27 inch, 해상도: QHD / 2560*1440, 패널: IPS, 밝기: 350nits, 연결단자: DP(1), HDMI(1), 스탠드: 높낮이, 틸트, 피벗, 스위블',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'삼성',category:'데스크탑',name:'DM501THA',spec_summary:'CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: Non, POWER: 500w, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'삼성',category:'노트북',name:'NT751XHD',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'삼성',category:'노트북',name:'NT751XGK',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 1 / U5,U7, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'삼성',category:'노트북',name:'NT941XHA',spec_summary:'크기: 16 inch, CPU: Intel Ultra 2 - U5, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'삼성',category:'노트북',name:'NT961XHA',spec_summary:'크기: 16 inch, CPU: Intel Ultra 2 - U5, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'삼성',category:'모니터',name:'LS24D408GAKXKR',spec_summary:'크기: 24 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(2), DP(1), 스탠드: 높낮이, 틸트, 피벗',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'삼성',category:'모니터',name:'LS27D304GAKXKR',spec_summary:'크기: 27 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(1), VGA(1), 스탠드: 높낮이, 틸트, 피벗, 스위블',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'레노버',category:'데스크탑',name:'ThinkCentre neo 50t',spec_summary:'CPU: Intel Ultra 2 / U3,U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 200w~400w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'레노버',category:'데스크탑',name:'ThinkCentre M70t',spec_summary:'CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 260w~400w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'레노버',category:'데스크탑',name:'ThinkCentre M90t',spec_summary:'CPU: Intel Ultra 2 / U5,U7,U9, RAM: DDR5 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 310w~500w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'레노버',category:'노트북',name:'ThinkPad E16 Gen 3',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'레노버',category:'노트북',name:'ThinkPad T16 Gen 4',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'LG',category:'노트북',name:'15U55T-GAP50ML',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 2 / U5, RAM: DDR5 16GB, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'LG',category:'노트북',name:'15Z90T-GAP5AL',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'LG',category:'노트북',name:'15Z90T-GAP7HL',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 2 - U7, RAM: DDR5 32GB (On BD), SSD: NVMe DDS 512GB, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'LG',category:'모니터',name:'24BA450',spec_summary:'크기: 24 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(2), DP(1), 스탠드: 높낮이, 틸트, 피벗, 스위블',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'LG',category:'모니터',name:'27BA450',spec_summary:'크기: 27 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(1), VGA(1), 스탠드: 높낮이, 틸트, 피벗, 스위블',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true}
 ];
 
 let db;
@@ -1278,7 +1280,7 @@ async function loadProducts() {
       // DB 데이터 없을 때 샘플 데이터 사용
       products = (typeof SAMPLE_PRODUCTS !== 'undefined') ? SAMPLE_PRODUCTS.map((p,i)=>({...p,id:i+1})) : [];
     } else {
-      products = data;
+      products = data.map(p=>({...p, _fromDB:true}));
     }
   } catch(e) {
     products = (typeof SAMPLE_PRODUCTS !== 'undefined') ? SAMPLE_PRODUCTS.map((p,i)=>({...p,id:i+1})) : [];
@@ -1306,7 +1308,8 @@ function renderProducts() {
     <div class="product-card" onclick="openSpecModal('${p.id}')">
       <div class="pc-name">${p.name}</div>
       <div class="pc-brand">${p.brand} · ${p.category}</div>
-      <div class="pc-price">${fmt(p.base_price)}원</div>
+      ${p.spec_summary ? `<div class="pc-spec">${p.spec_summary}</div>` : ''}
+      <div class="pc-price">${p.base_price > 0 ? fmt(p.base_price)+'원' : '가격 문의'}</div>
     </div>`).join('');
 }
 
@@ -1316,8 +1319,9 @@ function openSpecModal(productId) {
   currentSpecProductId = productId;
   selectedSpecOpts = {};
   document.getElementById('aq-title').textContent = p.name;
-  const specSummaryHtml = p.spec_summary ? '<br><span style="color:#64748b;font-size:11px;">'+p.spec_summary+'</span>' : '';
-  document.getElementById('aq-product-info').innerHTML = `<strong>${p.name}</strong> | ${p.brand} | ${p.category}${specSummaryHtml}`;
+  const specSummaryHtml = p.spec_summary ? '<div style="color:#64748b;font-size:11px;margin-top:4px;line-height:1.5;">'+p.spec_summary+'</div>' : '';
+  const featureHtml = p.feature ? '<div style="color:#475569;font-size:11px;margin-top:4px;padding:6px 8px;background:#f8fafc;border-radius:4px;line-height:1.5;">'+p.feature+'</div>' : '';
+  document.getElementById('aq-product-info').innerHTML = `<strong>${p.name}</strong> <span style="color:#94a3b8;font-size:11px;">${p.brand} · ${p.category}</span>${specSummaryHtml}${featureHtml}`;
   const cats = specCategories.filter(c=>c.product_categories?.includes(p.category)||!c.product_categories?.length);
   let optsHtml = '';
   for (const cat of cats) {
@@ -1377,7 +1381,8 @@ function addToQuote() {
   const specSummary = specs.join(', ');
   quoteItems.push({
     product_id: p.id, product_name: p.name, brand: p.brand, category: p.category,
-    spec_summary: specSummary || p.spec_summary, unit_price: unit, qty, total_price: unit*qty
+    spec_summary: specSummary || p.spec_summary, unit_price: unit, qty, total_price: unit*qty,
+    _fromDB: !!p._fromDB
   });
   renderQuoteItems(); calcPrice(); closeModal('modal-aq');
   showToast(p.name+' 추가됨', 'success');
@@ -1436,44 +1441,65 @@ async function saveQuote() {
   const company = document.getElementById('f-company').value.trim();
   if (!company) { showToast('회사명을 입력하세요', 'error'); return; }
   if (!quoteItems.length) { showToast('견적 품목을 추가하세요', 'error'); return; }
-  const sub = quoteItems.reduce((s,it)=>s+it.total_price,0);
-  const discAmt = parseInt(document.getElementById('discount-amt').value)||0;
-  const supply = sub - discAmt;
-  const vat = Math.round(supply*0.1);
-  if (!currentShareToken) currentShareToken = Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,10);
-  const payload = {
-    quote_number: currentQuoteNum, share_token: currentShareToken,
-    company_name: company,
-    contact_name: document.getElementById('f-contact').value,
-    contact_tel: document.getElementById('f-phone').value,
-    contact_email: document.getElementById('f-email').value,
-    delivery_date: document.getElementById('f-delivery').value||null,
-    valid_until: document.getElementById('f-validity').value||'견적일로부터 30일',
-    memo: document.getElementById('f-memo').value,
-    subtotal:sub, discount_amount:discAmt, supply_price:supply, vat, total:supply+vat,
-    status:'draft',
-    sales_name: document.getElementById('f-sales-name').value||null,
-    sales_phone: document.getElementById('f-sales-phone').value||null,
-    sales_email: document.getElementById('f-sales-email').value||null,
-    sales_dept: document.getElementById('f-sales-dept').value||null,
-  };
-  let qId;
-  if (editingQuoteId) {
-    const {error} = await db.from('quotes').update(payload).eq('id',editingQuoteId);
-    if (error) { showToast('저장 실패: '+error.message,'error'); return; }
-    await db.from('quote_items').delete().eq('quote_id',editingQuoteId);
-    qId = editingQuoteId;
-  } else {
-    const {data,error} = await db.from('quotes').insert(payload).select().single();
-    if (error) { showToast('저장 실패: '+error.message,'error'); return; }
-    qId = data.id; editingQuoteId = qId;
+  if (!db) { showToast('DB 연결이 준비되지 않았습니다. 잠시 후 다시 시도해주세요.', 'error'); return; }
+  const btn = document.getElementById('btn-save-quote');
+  if (btn) { btn.disabled = true; btn.textContent = '저장 중...'; }
+  try {
+    const sub = quoteItems.reduce((s,it)=>s+it.total_price,0);
+    const discAmt = parseInt(document.getElementById('discount-amt').value)||0;
+    const supply = sub - discAmt;
+    const vat = Math.round(supply*0.1);
+    if (!currentShareToken) currentShareToken = Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,10);
+    const payload = {
+      quote_number: currentQuoteNum, share_token: currentShareToken,
+      company_name: company,
+      contact_name: document.getElementById('f-contact').value,
+      contact_tel: document.getElementById('f-phone').value,
+      contact_email: document.getElementById('f-email').value,
+      delivery_date: document.getElementById('f-delivery').value||null,
+      valid_until: document.getElementById('f-validity').value||'견적일로부터 30일',
+      memo: document.getElementById('f-memo').value,
+      subtotal:sub, discount_amount:discAmt, supply_price:supply, vat, total:supply+vat,
+      status:'draft',
+      sales_name: document.getElementById('f-sales-name').value||null,
+      sales_phone: document.getElementById('f-sales-phone').value||null,
+      sales_email: document.getElementById('f-sales-email').value||null,
+      sales_dept: document.getElementById('f-sales-dept').value||null,
+    };
+    let qId;
+    if (editingQuoteId) {
+      const {error} = await db.from('quotes').update(payload).eq('id',editingQuoteId);
+      if (error) throw new Error('견적 업데이트 실패: '+error.message);
+      const {error:delErr} = await db.from('quote_items').delete().eq('quote_id',editingQuoteId);
+      if (delErr) throw new Error('기존 품목 삭제 실패: '+delErr.message);
+      qId = editingQuoteId;
+    } else {
+      const {data,error} = await db.from('quotes').insert(payload).select().single();
+      if (error) throw new Error('견적 생성 실패: '+error.message);
+      qId = data.id; editingQuoteId = qId;
+    }
+    // product_id: DB 제품은 실제 id, 샘플 제품은 null로 처리 (FK 오류 방지)
+    const itemsPayload = quoteItems.map((it,i)=>({
+      quote_id: qId,
+      product_id: (it._fromDB && it.product_id) ? it.product_id : null,
+      product_name: it.product_name,
+      brand: it.brand,
+      category: it.category,
+      spec_summary: it.spec_summary||'',
+      unit_price: it.unit_price,
+      qty: it.qty,
+      total_price: it.total_price,
+      sort_order: i
+    }));
+    const {error:itemErr} = await db.from('quote_items').insert(itemsPayload);
+    if (itemErr) throw new Error('품목 저장 실패: '+itemErr.message);
+    showToast('견적이 저장되었습니다! ('+currentQuoteNum+')', 'success');
+  } catch(e) {
+    console.error('saveQuote 오류:', e);
+    showToast('저장 실패: '+e.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '💾 저장'; }
   }
-  await db.from('quote_items').insert(quoteItems.map((it,i)=>({
-    quote_id:qId, product_id:it.product_id, product_name:it.product_name,
-    brand:it.brand, category:it.category, spec_summary:it.spec_summary,
-    unit_price:it.unit_price, qty:it.qty, total_price:it.total_price, sort_order:i
-  })));
-  showToast('견적이 저장되었습니다! ('+currentQuoteNum+')', 'success');
 }
 
 function previewQuote() {
@@ -1809,6 +1835,7 @@ function openProductModal(pid) {
     document.getElementById('pm-category').value = p.category||'노트북';
     document.getElementById('pm-price').value = p.base_price||'';
     document.getElementById('pm-spec').value = p.spec_summary||'';
+    const pmFeature = document.getElementById('pm-feature'); if(pmFeature) pmFeature.value = p.feature||'';
   } else {
     ['pm-name','pm-price','pm-spec'].forEach(id=>{document.getElementById(id).value='';});
   }
@@ -1821,7 +1848,9 @@ async function saveProduct() {
     name, brand: document.getElementById('pm-brand').value,
     category: document.getElementById('pm-category').value,
     base_price: parseInt(document.getElementById('pm-price').value)||0,
-    spec_summary: document.getElementById('pm-spec').value, is_active: true
+    spec_summary: document.getElementById('pm-spec').value,
+    feature: document.getElementById('pm-feature')?.value || '',
+    is_active: true
   };
   if (editingProductId) {
     await db.from('products').update(payload).eq('id',editingProductId);
@@ -1995,52 +2024,64 @@ async function rSaveQuote() {
   const company = document.getElementById('r-company').value.trim();
   if (!company) { showToast('회사명을 입력하세요','error'); return; }
   if (!rQuoteItems.length) { showToast('제품을 1개 이상 추가하세요','error'); return; }
-  const sub = rQuoteItems.reduce((s,i)=>s+i.total_price,0);
-  const discount = parseInt(document.getElementById('r-discount').value)||0;
-  const installFee = parseInt(document.getElementById('r-install-fee').value)||0;
-  const deposit = parseInt(document.getElementById('r-deposit').value)||0;
-  const supply = sub - discount + installFee;
-  const vat = Math.round(supply*0.1);
-  const total = supply + vat + deposit;
-  if (!rCurrentShareToken) rCurrentShareToken = crypto.randomUUID();
-  const qNum = document.getElementById('r-quote-num').value || rInitQuoteNum();
-  const payload = {
-    quote_number: qNum, share_token: rCurrentShareToken,
-    company_name: company,
-    contact_name: document.getElementById('r-contact').value,
-    contact_tel: document.getElementById('r-phone').value,
-    contact_email: document.getElementById('r-email').value,
-    usage_purpose: document.getElementById('r-purpose').value,
-    rental_type: rCurrentType,
-    rental_duration: parseInt(document.getElementById('r-duration').value)||null,
-    rental_start_date: document.getElementById('r-start-date').value||null,
-    delivery_location: document.getElementById('r-delivery-loc').value,
-    return_method: document.getElementById('r-return-method').value,
-    subtotal:sub, discount_amount:discount, installation_fee:installFee,
-    deposit, supply_price:supply, vat, total, status:'draft',
-    memo: document.getElementById('r-memo').value,
-    valid_until: document.getElementById('r-valid').value,
-    sales_name: document.getElementById('r-sales-name').value,
-    sales_phone: document.getElementById('r-sales-phone').value,
-    sales_email: document.getElementById('r-sales-email').value,
-    sales_dept: document.getElementById('r-sales-dept').value,
-  };
-  let qId = rCurrentQuoteId;
-  if (qId) {
-    const {error} = await db.from('rental_quotes').update(payload).eq('id',qId);
-    if (error) { showToast('저장 실패: '+error.message,'error'); return; }
-  } else {
-    const {data,error} = await db.from('rental_quotes').insert(payload).select().single();
-    if (error) { showToast('저장 실패: '+error.message,'error'); return; }
-    qId = data.id; rCurrentQuoteId = qId;
+  if (!db) { showToast('DB 연결이 준비되지 않았습니다. 잠시 후 다시 시도해주세요.','error'); return; }
+  const btn = document.querySelector('[onclick="rSaveQuote()"]');
+  if (btn) { btn.disabled = true; btn.textContent = '저장 중...'; }
+  try {
+    const sub = rQuoteItems.reduce((s,i)=>s+i.total_price,0);
+    const discount = parseInt(document.getElementById('r-discount').value)||0;
+    const installFee = parseInt(document.getElementById('r-install-fee').value)||0;
+    const deposit = parseInt(document.getElementById('r-deposit').value)||0;
+    const supply = sub - discount + installFee;
+    const vat = Math.round(supply*0.1);
+    const total = supply + vat + deposit;
+    if (!rCurrentShareToken) rCurrentShareToken = crypto.randomUUID();
+    const qNum = document.getElementById('r-quote-num').value || rInitQuoteNum();
+    const payload = {
+      quote_number: qNum, share_token: rCurrentShareToken,
+      company_name: company,
+      contact_name: document.getElementById('r-contact').value,
+      contact_tel: document.getElementById('r-phone').value,
+      contact_email: document.getElementById('r-email').value,
+      usage_purpose: document.getElementById('r-purpose').value,
+      rental_type: rCurrentType,
+      rental_duration: parseInt(document.getElementById('r-duration').value)||null,
+      rental_start_date: document.getElementById('r-start-date').value||null,
+      delivery_location: document.getElementById('r-delivery-loc').value,
+      return_method: document.getElementById('r-return-method').value,
+      subtotal:sub, discount_amount:discount, installation_fee:installFee,
+      deposit, supply_price:supply, vat, total, status:'draft',
+      memo: document.getElementById('r-memo').value,
+      valid_until: document.getElementById('r-valid').value,
+      sales_name: document.getElementById('r-sales-name').value,
+      sales_phone: document.getElementById('r-sales-phone').value,
+      sales_email: document.getElementById('r-sales-email').value,
+      sales_dept: document.getElementById('r-sales-dept').value,
+    };
+    let qId = rCurrentQuoteId;
+    if (qId) {
+      const {error} = await db.from('rental_quotes').update(payload).eq('id',qId);
+      if (error) throw new Error('렌탈 견적 업데이트 실패: '+error.message);
+    } else {
+      const {data,error} = await db.from('rental_quotes').insert(payload).select().single();
+      if (error) throw new Error('렌탈 견적 생성 실패: '+error.message);
+      qId = data.id; rCurrentQuoteId = qId;
+    }
+    const {error:delErr} = await db.from('rental_quote_items').delete().eq('quote_id',qId);
+    if (delErr) throw new Error('기존 품목 삭제 실패: '+delErr.message);
+    const {error:itemErr} = await db.from('rental_quote_items').insert(rQuoteItems.map((it,i)=>({
+      quote_id:qId, product_id:it.product_id||null, product_name:it.product_name,
+      product_spec:it.product_spec, rental_type:it.rental_type,
+      unit_price:it.unit_price, quantity:it.quantity, total_price:it.total_price, sort_order:i
+    })));
+    if (itemErr) throw new Error('렌탈 품목 저장 실패: '+itemErr.message);
+    showToast('렌탈 견적이 저장되었습니다 ✅','success');
+  } catch(e) {
+    console.error('rSaveQuote 오류:', e);
+    showToast('저장 실패: '+e.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '💾 저장'; }
   }
-  await db.from('rental_quote_items').delete().eq('quote_id',qId);
-  await db.from('rental_quote_items').insert(rQuoteItems.map((it,i)=>({
-    quote_id:qId, product_id:it.product_id||null, product_name:it.product_name,
-    product_spec:it.product_spec, rental_type:it.rental_type,
-    unit_price:it.unit_price, quantity:it.quantity, total_price:it.total_price, sort_order:i
-  })));
-  showToast('렌탈 견적이 저장되었습니다 ✅','success');
 }
 
 function rPreviewQuote() {
