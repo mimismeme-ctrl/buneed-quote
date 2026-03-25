@@ -1730,10 +1730,11 @@ function renderAdminSpecOptions(catKey) {
       <thead><tr><th>옵션명</th><th>가격차이</th><th>관리</th></tr></thead>
       <tbody>
         ${opts.map(o => `
-          <tr>
+          <tr id="spec-row-${o.id}">
             <td>${o.label}</td>
             <td style="text-align:right">${o.price_diff >= 0 ? '+' : ''}${fmt(o.price_diff)} 원</td>
-            <td>
+            <td style="white-space:nowrap">
+              <button class="btn btn-sm btn-secondary" onclick="editSpecOption('${o.id}','${o.label.replace(/'/g,"\\'").replace(/"/g,'&quot;')}',${o.price_diff})">수정</button>
               <button class="btn btn-sm btn-danger" onclick="deleteSpecOption('${o.id}')">삭제</button>
             </td>
           </tr>
@@ -1785,6 +1786,43 @@ async function deleteSpecOption(optId) {
     if (catKey) renderAdminSpecOptions(catKey);
   }
   showToast('삭제되었습니다', 'success');
+}
+
+// ===== 스펙 옵션 인라인 수정 =====
+function editSpecOption(optId, label, priceDiff) {
+  const row = document.getElementById('spec-row-' + optId);
+  if (!row) return;
+  row.innerHTML = `
+    <td><input id="edit-label-${optId}" class="field-input" value="${label}" style="width:100%;min-width:160px;font-size:12px;padding:4px 8px;"></td>
+    <td><input id="edit-diff-${optId}" class="field-input" type="number" value="${priceDiff}" style="width:100px;font-size:12px;padding:4px 8px;text-align:right;"></td>
+    <td style="white-space:nowrap">
+      <button class="btn btn-sm btn-primary" onclick="saveSpecOption('${optId}')">저장</button>
+      <button class="btn btn-sm btn-secondary" onclick="cancelSpecEdit()">취소</button>
+    </td>`;
+}
+
+async function saveSpecOption(optId) {
+  const labelEl = document.getElementById('edit-label-' + optId);
+  const diffEl  = document.getElementById('edit-diff-'  + optId);
+  if (!labelEl || !diffEl) return;
+  const newLabel = labelEl.value.trim();
+  const newDiff  = parseInt(diffEl.value) || 0;
+  if (!newLabel) { showToast('옵션명을 입력하세요', 'error'); return; }
+  const { error } = await db.from('spec_options')
+    .update({ label: newLabel, price_diff: newDiff })
+    .eq('id', optId);
+  if (error) { showToast('저장 실패: ' + error.message, 'error'); return; }
+  // 로컬 배열 업데이트
+  const opt = specOptions.find(o => o.id === optId);
+  if (opt) { opt.label = newLabel; opt.price_diff = newDiff; }
+  const activeTab = document.querySelector('#spec-cat-tabs .spec-cat-tab.active');
+  if (activeTab) renderAdminSpecOptions(activeTab.dataset.key);
+  showToast('수정되었습니다', 'success');
+}
+
+function cancelSpecEdit() {
+  const activeTab = document.querySelector('#spec-cat-tabs .spec-cat-tab.active');
+  if (activeTab) renderAdminSpecOptions(activeTab.dataset.key);
 }
 
 // ===== MODAL HELPERS =====
