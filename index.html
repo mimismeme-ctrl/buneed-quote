@@ -1145,13 +1145,16 @@ async function showApp(email) {
   const app = document.getElementById('app');
   if (loginScreen) loginScreen.style.display = 'none';
   if (app) app.style.display = 'flex';
-  // 초기 패널: 구매 패널만 표시
+  // 초기 패널: CSS 클래스만 사용 (inline style 제거해야 switchTopTab이 동작함)
   document.querySelectorAll('.top-panel').forEach(p => {
-    p.style.display = 'none';
+    p.style.display = '';   // inline style 제거
     p.classList.remove('active');
   });
   const initPanel = document.getElementById('panel-purchase');
-  if (initPanel) { initPanel.style.display = 'flex'; initPanel.classList.add('active'); }
+  if (initPanel) {
+    initPanel.style.display = '';  // inline style 제거
+    initPanel.classList.add('active');
+  }
   const emailEl = document.getElementById('user-email-display');
   if (emailEl) emailEl.textContent = email;
   await Promise.all([loadAllData(), rLoadRentalProducts(), rInitQuoteNum()]);
@@ -1166,13 +1169,17 @@ async function showApp(email) {
 
 // ===== 탭 전환 =====
 function switchTopTab(tab, el) {
-  // 모든 top-panel 숨기기
+  // 모든 top-panel: inline style 제거 후 class 방식으로 숨기기
   document.querySelectorAll('.top-panel').forEach(p=>{
+    p.style.display = '';  // inline style 완전 제거
     p.classList.remove('active');
   });
-  // 선택된 panel 표시
+  // 선택된 panel 표시 (CSS .top-panel.active{display:flex} 적용됨)
   const panel = document.getElementById('panel-'+tab);
-  if (panel) panel.classList.add('active');
+  if (panel) {
+    panel.style.display = '';  // inline style 완전 제거
+    panel.classList.add('active');
+  }
   // h-nav-tab 활성화
   document.querySelectorAll('.h-nav-tab').forEach(t=>t.classList.remove('active'));
   const activeTab = document.getElementById('ttab-' + tab);
@@ -1814,7 +1821,7 @@ function openProductModal(pid) {
   editingProductId = pid || null;
   document.getElementById('pm-title').textContent = pid ? '구매 제품 수정' : '구매 제품 추가';
   if (pid) {
-    const p = products.find(x=>x.id===pid) || {};
+    const p = products.find(x=>String(x.id)===String(pid)) || {};
     document.getElementById('pm-name').value = p.name||'';
     document.getElementById('pm-brand').value = p.brand||'HP';
     document.getElementById('pm-category').value = p.category||'노트북';
@@ -1843,13 +1850,13 @@ async function saveProduct() {
     await db.from('products').insert(payload);
   }
   closeModal('modal-product');
-  await loadProducts(); renderAdminProducts();
+  await loadProducts(); renderAdminProducts(); renderProducts();
   showToast('저장되었습니다','success');
 }
 async function deleteProduct(pid) {
   if (!confirm('제품을 삭제하시겠습니까?')) return;
   await db.from('products').delete().eq('id',pid);
-  await loadProducts(); renderAdminProducts();
+  await loadProducts(); renderAdminProducts(); renderProducts();
   showToast('삭제되었습니다','success');
 }
 
@@ -2436,7 +2443,7 @@ function rOpenProductModal(pid) {
   rEditingProductId = pid||null;
   document.getElementById('r-pm-title').textContent = pid?'렌탈 제품 수정':'렌탈 제품 추가';
   if (pid) {
-    const p = rProducts.find(x=>x.id===pid)||{};
+    const p = rProducts.find(x=>String(x.id)===String(pid))||{};
     document.getElementById('r-pm-name').value=p.name||'';
     document.getElementById('r-pm-brand').value=p.brand||'LG';
     document.getElementById('r-pm-category').value=p.category||'노트북';
@@ -2464,13 +2471,13 @@ async function rSaveProduct() {
     await db.from('rental_products').insert(payload);
   }
   closeModal('r-modal-product');
-  await rLoadRentalProducts(); rRenderAdminProducts();
+  await rLoadRentalProducts(); rRenderAdminProducts(); rRenderProductList();
   showToast('저장되었습니다','success');
 }
 async function rDeleteProduct(pid) {
   if (!confirm('렌탈 제품을 삭제하시겠습니까?')) return;
   await db.from('rental_products').delete().eq('id',pid);
-  await rLoadRentalProducts(); rRenderAdminProducts();
+  await rLoadRentalProducts(); rRenderAdminProducts(); rRenderProductList();
   showToast('삭제되었습니다','success');
 }
 
