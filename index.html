@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>비유니드 구매 · 렌탈 견적시스템</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif;}
@@ -78,18 +78,16 @@
 .h-logo .name{ font-size:16px;font-weight:800;color:#1B3A6B;letter-spacing:-0.5px; }
 .h-divider{ width:1px;height:20px;background:#e2e8f0;margin:0 4px; }
 
-.h-badge
-.h-badge
 .h-badge.admin-badge{ background:#f5f5f5;color:#6b7280; }
 .h-spacer{ flex:1; }
 .h-email{ font-size:12px;color:#94a3b8;display:none; }
 @media(min-width:640px){ .h-email{ display:block; } }
-.btn-logout{
-  padding:5px 12px;font-size:12px;font-weight:600;
-  background:transparent;border:1.5px solid #e2e8f0;border-radius:6px;
-  color:#64748b;cursor:pointer;transition:all .15s;
+.app-header.rental-theme .btn-logout, .app-header.admin-theme .btn-logout{
+  border-color:#e2e8f0;color:#64748b;
 }
-.btn-logout:hover{ background:#f1f5f9;border-color:#cbd5e1;color:#334155; }
+.app-header.rental-theme .btn-logout:hover, .app-header.admin-theme .btn-logout:hover{
+  background:#f1f5f9;border-color:#cbd5e1;color:#334155;
+}
 
 /* ===== 최상위 탭 (구매/렌탈/관리자) ===== */
 /* .top-tabs 제거됨 - 옵션B 적용 (h-nav-tab으로 통합) */
@@ -327,75 +325,17 @@ textarea.field-input{resize:vertical;min-height:52px;}
   .history-wrap{padding:8px;}
   .btn{font-size:12px;padding:7px 12px;}
 }
+
 @media (max-width: 480px) {
   .top-tab{padding:0 8px;font-size:11px;}
   .split-layout{gap:0;}
-/* ===== 미리보기 모바일 최적화 ===== */
-@media (max-width: 768px) {
-  .qdoc { padding: 20px 16px; font-size: 12px; }
-  .qdoc .q-header { flex-direction: column; gap: 10px; }
-  .qdoc .q-logo-area img { height: 38px; }
-  .q-party-grid { grid-template-columns: 1fr; gap: 10px; }
-  .q-table th, .q-table td { padding: 6px 8px; font-size: 11px; }
-  .q-table { font-size: 11px; }
-  .q-summary-table td { font-size: 12px; }
-  .modal-box { width: 98vw !important; max-width: 98vw !important; padding: 12px 8px !important; }
-  .form-row { flex-direction: column; gap: 8px; }
-  .form-row > div { width: 100% !important; }
-  .split-layout { flex-direction: column; }
-  .catalog-panel { height: 260px; min-width: unset; }
-  .price-summary { font-size: 12px; }
-  .discount-row { flex-wrap: wrap; gap: 4px; }
-  .ps-row { font-size: 12px; }
-  .ps-editable { flex-wrap: wrap; justify-content: flex-end; }
-  .action-bar { flex-wrap: wrap; gap: 6px; padding: 10px 12px; }
-  .action-bar button { flex: 1 1 auto; min-width: 80px; font-size: 12px; }
-  .items-table { font-size: 11px; }
-  .items-table th, .items-table td { padding: 5px 6px; }
-  .r-hc-num, .hc-company { font-size: 12px; }
-  .history-card { flex-wrap: wrap; gap: 6px; padding: 10px 12px; }
-}
-@media (max-width: 480px) {
-  .qdoc { padding: 14px 10px; }
-  .top-tab { padding: 0 8px; font-size: 11px; gap: 2px; }
-  .h-logo-label { display: none; }
-  .sub-tab { padding: 0 10px; font-size: 11.5px; }
-  .form-section { padding: 10px; }
-  .q-table th, .q-table td { padding: 5px 6px; font-size: 10.5px; }
-  .qty-input { width: 42px; }
-}
-
   .catalog-panel{height:240px;}
   .form-section{padding:10px 12px;}
   .q-party-grid{gap:8px;}
-}
-
-
-.h-logo-label{font-size:13px;font-weight:700;color:#1B3A6B;margin-left:8px;letter-spacing:-0.3px;white-space:nowrap;}
-
-/* ===== 모바일 반응형 강화 ===== */
-@media (max-width: 768px) {
-  .qdoc { padding: 20px 16px; font-size: 12px; }
-  .qdoc .q-header { flex-direction: column; gap: 10px; }
-  .qdoc .q-logo-area img { height: 38px; }
-  .q-party-grid { grid-template-columns: 1fr; gap: 10px; }
-  .q-table th, .q-table td { padding: 6px 8px; font-size: 11px; }
-  .form-row { flex-direction: column; gap: 8px; }
-  .price-summary { font-size: 12px; }
-  .discount-row { flex-wrap: wrap; gap: 4px; }
-  .ps-row { font-size: 12px; }
-  .ps-editable { flex-wrap: wrap; justify-content: flex-end; gap: 4px; }
-  .action-bar { flex-wrap: wrap; gap: 6px; padding: 10px 12px; }
-  .action-bar button { flex: 1 1 auto; min-width: 80px; font-size: 12px; }
-  .items-table th, .items-table td { padding: 5px 6px; font-size: 11px; }
-  .history-card { flex-wrap: wrap; gap: 6px; padding: 10px 12px; }
-}
-@media (max-width: 480px) {
   .qdoc { padding: 14px 10px; }
   .top-tab { padding: 0 8px; font-size: 11px; gap: 2px; }
-  .h-logo-label { display: none; }
   .sub-tab { padding: 0 10px; font-size: 11.5px; }
-  .form-section { padding: 10px; }
+  .q-table th, .q-table td { padding: 5px 6px; font-size: 10.5px; }
   .qty-input { width: 42px; }
 }
 
@@ -462,6 +402,45 @@ textarea.field-input{resize:vertical;min-height:52px;}
   .h-logo img {
     height:22px !important;
   }
+}
+
+/* ===== 관리자 서브패널 ===== */
+.admin-sub-panel { display:none; flex:1; flex-direction:column; min-height:0; overflow:hidden; padding:0; }
+.admin-sub-panel.active { display:flex; flex-direction:column; }
+.admin-sub-tabs { display:flex; background:#fff; border-bottom:1.5px solid var(--border); padding:0 16px; flex-shrink:0; }
+.admin-sub-tab { padding:0 18px; height:40px; font-size:12px; font-weight:600; color:#94a3b8; cursor:pointer; border:none; background:transparent; border-bottom:2.5px solid transparent; }
+.admin-sub-tab:hover { color:#1B3A6B; }
+.admin-sub-tab.active { color:#1B3A6B; border-bottom-color:#1B3A6B; }
+.admin-card { background:#fff; border-radius:8px; border:1px solid var(--border); overflow:hidden; display:flex; flex-direction:column; flex:1; margin:12px; }
+.admin-card-header { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid var(--border); flex-shrink:0; }
+
+/* ── 렌탈 단위 토글 버튼 ─────────────────────── */
+.rental-type-toggle {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.rtt-btn {
+  flex: 1;
+  min-width: 70px;
+  padding: 7px 12px;
+  border: 1.5px solid var(--r-primary, #1B6B3A);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--r-primary, #1B6B3A);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  text-align: center;
+}
+.rtt-btn:hover {
+  background: #e8f5ee;
+}
+.rtt-btn.active {
+  background: var(--r-primary, #1B6B3A);
+  color: #fff;
+  border-color: var(--r-primary, #1B6B3A);
 }
 </style>
 </head>
@@ -643,6 +622,7 @@ textarea.field-input{resize:vertical;min-height:52px;}
 
     <!-- 렌탈 견적 작성 -->
     <div class="sub-panel active" id="r-sub-quote">
+      <input type="hidden" id="r-quote-num">
       <div class="split-layout">
         <!-- 렌탈 카탈로그 -->
         <div class="catalog-panel">
@@ -650,8 +630,8 @@ textarea.field-input{resize:vertical;min-height:52px;}
           <div class="filter-area">
             <select class="filter-select r-filter-select" id="r-f-cat" onchange="rFilterCat()">
               <option value="">전체 카테고리</option>
-              <option>노트북</option><option>데스크탑</option><option>모니터</option>
-              <option>프린터(복합기)</option><option>기타</option>
+              <option>노트북</option><option>데스크탑</option><option>워크스테이션</option>
+              <option>모니터</option><option>서버</option><option>스토리지</option><option>기타</option>
             </select>
           </div>
           <div class="product-list" id="r-product-list"><div class="no-products">로딩 중...</div></div>
@@ -670,6 +650,9 @@ textarea.field-input{resize:vertical;min-height:52px;}
               <div class="form-row">
                 <div><div class="field-label">연락처</div><input class="field-input r-field-input" id="r-sales-phone" placeholder="010-0000-0000"></div>
                 <div><div class="field-label">이메일</div><input class="field-input r-field-input" id="r-sales-email" placeholder="sales@buneed.co.kr"></div>
+              </div>
+              <div class="form-row">
+                <div><div class="field-label">부서</div><input class="field-input r-field-input" id="r-sales-dept" placeholder="예: 영업팀"></div>
               </div>
             </div>
             <!-- 고객(수신) 정보 -->
@@ -1041,18 +1024,18 @@ const SAMPLE_PRODUCTS = [
   {brand:'HP',category:'모니터',name:'327pf',spec_summary:'크기: 27 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(1), DP(1), VGA(1), 스탠드: 틸트',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
   {brand:'HP',category:'모니터',name:'327ph',spec_summary:'크기: 27 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(1), DP(1), VGA(1), 스탠드: 높낮이, 틸트',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
   {brand:'HP',category:'모니터',name:'527pq',spec_summary:'크기: 27 inch, 해상도: QHD / 2560*1440, 패널: IPS, 밝기: 350nits, 연결단자: DP(1), HDMI(1), 스탠드: 높낮이, 틸트, 피벗, 스위블',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'삼성',category:'데스크탑',name:'DM501THA',spec_summary:'CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: Non, POWER: 500w, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'삼성',category:'노트북',name:'NT751XHD',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'삼성',category:'노트북',name:'NT751XGK',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 1 / U5,U7, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'삼성',category:'노트북',name:'NT941XHA',spec_summary:'크기: 16 inch, CPU: Intel Ultra 2 - U5, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'삼성',category:'노트북',name:'NT961XHA',spec_summary:'크기: 16 inch, CPU: Intel Ultra 2 - U5, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'삼성',category:'모니터',name:'LS24D408GAKXKR',spec_summary:'크기: 24 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(2), DP(1), 스탠드: 높낮이, 틸트, 피벗',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'삼성',category:'모니터',name:'LS27D304GAKXKR',spec_summary:'크기: 27 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(1), VGA(1), 스탠드: 높낮이, 틸트, 피벗, 스위블',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'레노버',category:'데스크탑',name:'ThinkCentre neo 50t',spec_summary:'CPU: Intel Ultra 2 / U3,U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 200w~400w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'레노버',category:'데스크탑',name:'ThinkCentre M70t',spec_summary:'CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 260w~400w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'레노버',category:'데스크탑',name:'ThinkCentre M90t',spec_summary:'CPU: Intel Ultra 2 / U5,U7,U9, RAM: DDR5 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 310w~500w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'레노버',category:'노트북',name:'ThinkPad E16 Gen 3',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'레노버',category:'노트북',name:'ThinkPad T16 Gen 4',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'Samsung',category:'데스크탑',name:'DM501THA',spec_summary:'CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: Non, POWER: 500w, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'Samsung',category:'노트북',name:'NT751XHD',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'Samsung',category:'노트북',name:'NT751XGK',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 1 / U5,U7, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'Samsung',category:'노트북',name:'NT941XHA',spec_summary:'크기: 16 inch, CPU: Intel Ultra 2 - U5, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'Samsung',category:'노트북',name:'NT961XHA',spec_summary:'크기: 16 inch, CPU: Intel Ultra 2 - U5, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'Samsung',category:'모니터',name:'LS24D408GAKXKR',spec_summary:'크기: 24 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(2), DP(1), 스탠드: 높낮이, 틸트, 피벗',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'Samsung',category:'모니터',name:'LS27D304GAKXKR',spec_summary:'크기: 27 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(1), VGA(1), 스탠드: 높낮이, 틸트, 피벗, 스위블',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'Lenovo',category:'데스크탑',name:'ThinkCentre neo 50t',spec_summary:'CPU: Intel Ultra 2 / U3,U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 200w~400w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'Lenovo',category:'데스크탑',name:'ThinkCentre M70t',spec_summary:'CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 260w~400w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'Lenovo',category:'데스크탑',name:'ThinkCentre M90t',spec_summary:'CPU: Intel Ultra 2 / U5,U7,U9, RAM: DDR5 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 310w~500w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'Lenovo',category:'노트북',name:'ThinkPad E16 Gen 3',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
+  {brand:'Lenovo',category:'노트북',name:'ThinkPad T16 Gen 4',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
   {brand:'LG',category:'노트북',name:'15U55T-GAP50ML',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 2 / U5, RAM: DDR5 16GB, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
   {brand:'LG',category:'노트북',name:'15Z90T-GAP5AL',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
   {brand:'LG',category:'노트북',name:'15Z90T-GAP7HL',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 2 - U7, RAM: DDR5 32GB (On BD), SSD: NVMe DDS 512GB, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
@@ -1060,40 +1043,41 @@ const SAMPLE_PRODUCTS = [
   {brand:'LG',category:'모니터',name:'27BA450',spec_summary:'크기: 27 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(1), VGA(1), 스탠드: 높낮이, 틸트, 피벗, 스위블',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true}
 ];
 
-let db;
-// ===== Supabase 초기화 (load 이벤트: async CDN 완전 로드 보장) =====
-window.addEventListener('load', () => {
-  if (!window.supabase) {
-    console.warn('Supabase CDN 로드 실패');
-    return;
-  }
+// ===== Supabase 클라이언트 초기화 =====
+const db = supabase.createClient(SUPA_URL, SUPA_KEY, {
+  auth: { persistSession: true, autoRefreshToken: true }
+});
+
+// ===== 앱 시작: 기존 세션 확인 =====
+window.addEventListener('DOMContentLoaded', async () => {
   try {
-    const { createClient } = window.supabase;
-    db = createClient(SUPA_URL, SUPA_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true }
-    });
-    // 기존 세션 확인 → 있으면 바로 앱으로
-    db.auth.getSession().then(({ data: { session } }) => {
-      if (session) showApp(session.user.email);
-    }).catch(() => {});
-    // 인증 상태 변경 감지
-    db.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT') showLoginScreen();
-      if (event === 'TOKEN_REFRESHED' && session) {
-        const el = document.getElementById('user-email-display');
-        if (el) el.textContent = session.user.email;
-      }
-    });
+    const { data: { session } } = await db.auth.getSession();
+    if (session) {
+      await showApp(session.user.email);
+    } else {
+      showLoginScreen();
+    }
   } catch(e) {
-    console.error('Supabase 초기화 오류:', e);
+    showLoginScreen();
   }
+
+  // 인증 상태 변경 감지
+  db.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_OUT') showLoginScreen();
+    if (event === 'TOKEN_REFRESHED' && session) {
+      const el = document.getElementById('user-email-display');
+      if (el) el.textContent = session.user.email;
+    }
+  });
 });
 
 // ===== 초기화 (하위 호환) =====
 async function initApp() {
+  // 세션 체크는 DOMContentLoaded에서 처리
+  // 여기서는 데이터 로딩 초기화만 담당
   try {
     const { data: { session } } = await db.auth.getSession();
-    if (session) showApp(session.user.email);
+    if (session) await showApp(session.user.email);
     else showLoginScreen();
   } catch(e) { showLoginScreen(); }
 }
@@ -1102,27 +1086,38 @@ async function initApp() {
 // ===== 로그인 =====
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
-  const pw = document.getElementById('login-pw').value;
-  const btn = document.getElementById('btn-login');
-  const err = document.getElementById('login-err');
-  if (!db) {
-    err.style.display='block';
-    err.textContent='⚠️ 서버 연결 중입니다. 잠시 후 다시 시도해주세요.';
+  const pw    = document.getElementById('login-pw').value.trim();
+  const btn   = document.getElementById('btn-login');
+  const err   = document.getElementById('login-err');
+
+  // 입력값 검증
+  if (!email || !pw) {
+    err.style.display = 'block';
+    err.textContent   = '이메일과 비밀번호를 입력하세요.';
     return;
   }
-  if (!email || !pw) { err.style.display='block'; err.textContent='이메일과 비밀번호를 입력하세요.'; return; }
-  btn.textContent = '로그인 중...'; btn.disabled = true;
-  err.style.display = 'none';
+  // db 연결 확인
+  if (!db) {
+    err.style.display = 'block';
+    err.textContent   = '⚠️ 서버 연결 중입니다. 잠시 후 다시 시도해주세요.';
+    return;
+  }
+
+  err.style.display   = 'none';
+  btn.textContent     = '로그인 중...';
+  btn.disabled        = true;
+
   try {
     const { data, error } = await db.auth.signInWithPassword({ email, password: pw });
-    if (error) {
-      err.style.display='block'; err.textContent = error.message;
-      btn.textContent='로그인'; btn.disabled=false; return;
-    }
-    showApp(data.user.email);
-  } catch(e) {
-    err.style.display='block'; err.textContent='로그인 중 오류가 발생했습니다.';
-    btn.textContent='로그인'; btn.disabled=false;
+    if (error) throw error;
+    await showApp(data.user.email);
+  } catch (e) {
+    err.style.display = 'block';
+    err.textContent   = e.message || '로그인 중 오류가 발생했습니다.';
+  } finally {
+    // 항상 버튼 복구 (로그인 성공 시 화면이 전환되므로 실질적으로 실패 시만 보임)
+    btn.textContent = '로그인';
+    btn.disabled    = false;
   }
 }
 
@@ -1136,14 +1131,20 @@ async function doLogout() {
 function showLoginScreen() {
   const loginScreen = document.getElementById('login-screen');
   const app = document.getElementById('app');
-  if (loginScreen) loginScreen.style.display = 'flex';
-  if (app) app.style.display = 'none';
+  if (loginScreen) {
+    loginScreen.classList.remove('hidden');
+    loginScreen.style.display = 'flex';
+  }
+  if (app) {
+    app.classList.add('hidden');
+    app.style.display = 'none';
+  }
 }
 
 async function showApp(email) {
   const loginScreen = document.getElementById('login-screen');
   const app = document.getElementById('app');
-  if (loginScreen) loginScreen.style.display = 'none';
+  if (loginScreen) { loginScreen.style.display = 'none'; loginScreen.classList.add('hidden'); }
   if (app) app.style.display = 'flex';
   // 초기 패널: CSS 클래스만 사용 (inline style 제거해야 switchTopTab이 동작함)
   document.querySelectorAll('.top-panel').forEach(p => {
@@ -1168,6 +1169,38 @@ async function showApp(email) {
 
 
 // ===== 탭 전환 =====
+
+function switchSubTab(prefix, tab, el) {
+  // prefix: 'p'(구매) or 'r'(렌탈)
+  // tab: 'quote' or 'history'
+  const panelId = prefix + '-sub-' + tab;
+
+  // 같은 prefix의 sub-panel 모두 숨기기
+  document.querySelectorAll('#panel-' + (prefix==='p'?'purchase':'rental') + ' .sub-panel').forEach(p => {
+    p.style.display = '';
+    p.classList.remove('active');
+  });
+
+  // 선택 패널 표시
+  const panel = document.getElementById(panelId);
+  if (panel) {
+    panel.style.display = '';
+    panel.classList.add('active');
+  }
+
+  // 버튼 active 처리
+  const parentTabs = el ? el.closest('.sub-tabs') : null;
+  if (parentTabs) {
+    parentTabs.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+  }
+  if (el) el.classList.add('active');
+
+  // 이력 탭으로 전환 시 데이터 새로고침
+  if (tab === 'history') {
+    if (prefix === 'p' && typeof loadHistory === 'function') loadHistory();
+    if (prefix === 'r' && typeof rLoadHistory === 'function') rLoadHistory();
+  }
+}
 function switchTopTab(tab, el) {
   // 모든 top-panel: inline style 제거 후 class 방식으로 숨기기
   document.querySelectorAll('.top-panel').forEach(p=>{
@@ -1340,7 +1373,7 @@ function updateAQCalc() {
   document.getElementById('aq-total-val').textContent = fmt(unit*qty)+' 원';
 }
 function resetAQPrice() {
-  const p = products.find(x=>x.id===currentSpecProductId);
+  const p = products.find(x=>String(x.id)===String(currentSpecProductId));
   if (!p) return;
   let total = p.base_price;
   for (const optId of Object.values(selectedSpecOpts)) {
@@ -1484,7 +1517,7 @@ async function saveQuote() {
     }));
     const {error:itemErr} = await db.from('quote_items').insert(itemsPayload);
     if (itemErr) throw new Error('품목 저장 실패: '+itemErr.message);
-    showToast('견적이 저장되었습니다! ('+currentQuoteNum+')', 'success');
+    showToast('견적이 저장되었습니다! ('+currentQuoteNum+')', 'success'); loadHistory();
   } catch(e) {
     console.error('saveQuote 오류:', e);
     showToast('저장 실패: '+e.message, 'error');
@@ -1659,11 +1692,7 @@ function printQuote() {
   win.document.close();
 }
 
-function copyQuoteLink(token) {
-  if (!token) { showToast('저장된 견적만 링크 복사가 가능합니다','error'); return; }
-  const url = `${location.origin}/quote-view.html?token=${token}`;
-  navigator.clipboard.writeText(url).then(()=>showToast('링크가 복사되었습니다!','success')).catch(()=>showToast('복사 실패','error'));
-}
+/* copyQuoteLink v1 removed – using async v2 */
 
 
 async function copyQuoteLink(shareToken, quoteNum) {
@@ -1906,6 +1935,11 @@ function rFilterCat() {
   rRenderProductList();
 }
 
+
+// rRenderProducts → rRenderProductList alias (호환성)
+function rRenderProducts() {
+  if (typeof rRenderProductList === 'function') rRenderProductList();
+}
 function rRenderProductList() {
   let list = rProducts;
   if (rCurrentFilterCat) list = list.filter(p=>p.category===rCurrentFilterCat);
@@ -1927,7 +1961,7 @@ function setRentalType(type, btn) {
 }
 
 function rOpenAtqModal(pid) {
-  const p = rProducts.find(x=>x.id===pid);
+  const p = rProducts.find(x=>String(x.id)===String(pid));
   if (!p) return;
   rCurrentProductId = pid;
   rAtqType = rCurrentType;
@@ -1945,7 +1979,7 @@ function rSetAtqType(type) {
   rAtqType = type;
   document.getElementById('r-atq-daily-btn').classList.toggle('active', type==='일');
   document.getElementById('r-atq-monthly-btn').classList.toggle('active', type==='월');
-  const p = rProducts.find(x=>x.id===rCurrentProductId);
+  const p = rProducts.find(x=>String(x.id)===String(rCurrentProductId));
   if (p) document.getElementById('r-atq-unit').value = type==='일'?(p.daily_price||0):(p.monthly_price||0);
   rUpdateAtqCalc();
 }
@@ -2076,7 +2110,7 @@ async function rSaveQuote() {
       unit_price:it.unit_price, quantity:it.quantity, total_price:it.total_price, sort_order:i
     })));
     if (itemErr) throw new Error('렌탈 품목 저장 실패: '+itemErr.message);
-    showToast('렌탈 견적이 저장되었습니다 ✅','success');
+    showToast('렌탈 견적이 저장되었습니다 ✅','success'); rLoadHistory();
   } catch(e) {
     console.error('rSaveQuote 오류:', e);
     showToast('저장 실패: '+e.message, 'error');
