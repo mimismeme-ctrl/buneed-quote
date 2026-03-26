@@ -1088,56 +1088,95 @@ textarea.field-input{resize:vertical;min-height:52px;}
 
 // ===== SUPABASE =====
 // ===== 관리자 이메일 목록 =====
-const ADMIN_EMAILS = [
-  'admin@beeuneed.co.kr',
-  'manager@beeuneed.co.kr',
-  'beeuneed@gmail.com'
-];
+
 
 const SUPA_URL = 'https://emvczjswzyxlwqhymfmh.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtdmN6anN3enl4bHdxaHltZm1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTcxNDAsImV4cCI6MjA4OTg3MzE0MH0.hOLthetdToPnxLoU7wW8nW9DUC5JtN4j4LOPF8vaS6Y';
 const SAMPLE_PRODUCTS = [
-  {brand:'HP',category:'데스크탑',name:'Pro Tower 280 G9',spec_summary:'CPU: Intel i3,i5,i7 14세대, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 350w~500w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'데스크탑',name:'Pro Tower 400 G9',spec_summary:'CPU: Intel i3,i5,i7 14세대, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 350w~500w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'데스크탑',name:'Elite Tower 800 G9',spec_summary:'CPU: Intel i5,i7,i9 14세대, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 550w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'데스크탑',name:'ProDesk 4 G1i Tower',spec_summary:'CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 400w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'데스크탑',name:'ProDesk 8 G1i Tower',spec_summary:'CPU: Intel Ultra 2 / U5,U7,U9, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 500w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'워크스테이션',name:'Z1 G1i Tower',spec_summary:'CPU: Intel Ultra 2 / U5,U7,U9, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 500w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'워크스테이션',name:'Z2 G1i Tower',spec_summary:'CPU: Intel Ultra 2 / U5,U7,U9, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 500w~1200w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'워크스테이션',name:'Z2 G9 Tower',spec_summary:'CPU: Intel i7,i9 14세대, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 500w~700w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'워크스테이션',name:'Z4 G5 Tower',spec_summary:'CPU: Intel Xeon W3,W5,W7, RAM: DDR5 ECC 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 525w~1125w, OS: Windows 11 Pro 64 for Workstations',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'워크스테이션',name:'Z6 G5 Tower',spec_summary:'CPU: Intel Xeon W3,W5,W7, RAM: DDR5 ECC 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 775w~1450w, OS: Windows 11 Pro 64 for Workstations',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'워크스테이션',name:'Z8 G5 Tower',spec_summary:'CPU: Intel Xeon 4410Y~, RAM: DDR5 ECC 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 1125w~1700w, OS: Windows 11 Pro 64 for Workstations',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'워크스테이션',name:'Z8 Fury G5 Tower',spec_summary:'CPU: Intel Xeon W5,W7,W9, RAM: DDR5 ECC 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 1125w~2250w, OS: Windows 11 Pro 64 for Workstations',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'모니터',name:'ZBook 8 G1i 16',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'모니터',name:'ZBook X G1i 16',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'모니터',name:'ZBook Fury G1i 16',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'노트북',name:'ProBook 4 G1i',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'노트북',name:'ProBook 8 G1i',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'노트북',name:'EliteBook X G1i',spec_summary:'크기: 14 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB,32GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'노트북',name:'EliteBook Ultra G1i AI',spec_summary:'크기: 14 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB,32GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'모니터',name:'324pe',spec_summary:'크기: 24 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(1), DP(1), VGA(1), 스탠드: 높낮이, 틸트, 피벗',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'모니터',name:'524pf',spec_summary:'크기: 24 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 350nits, 연결단자: DP(1), HDMI(1), 스탠드: 높낮이, 틸트, 피벗, 스위블',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'모니터',name:'327pf',spec_summary:'크기: 27 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(1), DP(1), VGA(1), 스탠드: 틸트',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'모니터',name:'327ph',spec_summary:'크기: 27 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(1), DP(1), VGA(1), 스탠드: 높낮이, 틸트',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'HP',category:'모니터',name:'527pq',spec_summary:'크기: 27 inch, 해상도: QHD / 2560*1440, 패널: IPS, 밝기: 350nits, 연결단자: DP(1), HDMI(1), 스탠드: 높낮이, 틸트, 피벗, 스위블',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'Samsung',category:'데스크탑',name:'DM501THA',spec_summary:'CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: Non, POWER: 500w, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'Samsung',category:'노트북',name:'NT751XHD',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'Samsung',category:'노트북',name:'NT751XGK',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 1 / U5,U7, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'Samsung',category:'노트북',name:'NT941XHA',spec_summary:'크기: 16 inch, CPU: Intel Ultra 2 - U5, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'Samsung',category:'노트북',name:'NT961XHA',spec_summary:'크기: 16 inch, CPU: Intel Ultra 2 - U5, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'Samsung',category:'모니터',name:'LS24D408GAKXKR',spec_summary:'크기: 24 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(2), DP(1), 스탠드: 높낮이, 틸트, 피벗',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'Samsung',category:'모니터',name:'LS27D304GAKXKR',spec_summary:'크기: 27 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(1), VGA(1), 스탠드: 높낮이, 틸트, 피벗, 스위블',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'Lenovo',category:'데스크탑',name:'ThinkCentre neo 50t',spec_summary:'CPU: Intel Ultra 2 / U3,U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 200w~400w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'Lenovo',category:'데스크탑',name:'ThinkCentre M70t',spec_summary:'CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 260w~400w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'Lenovo',category:'데스크탑',name:'ThinkCentre M90t',spec_summary:'CPU: Intel Ultra 2 / U5,U7,U9, RAM: DDR5 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), ODD: DVD-Writer ODD (옵션), POWER: 310w~500w, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'Lenovo',category:'노트북',name:'ThinkPad E16 Gen 3',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 8GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽 (추가가능), OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'Lenovo',category:'노트북',name:'ThinkPad T16 Gen 4',spec_summary:'크기: 14/16 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB ~, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro&Home',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'LG',category:'노트북',name:'15U55T-GAP50ML',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 2 / U5, RAM: DDR5 16GB, SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'LG',category:'노트북',name:'15Z90T-GAP5AL',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 2 / U5,U7, RAM: DDR5 16GB (On BD), SSD: NVMe DDS 256GB~, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'LG',category:'노트북',name:'15Z90T-GAP7HL',spec_summary:'크기: 15.6 inch, CPU: Intel Ultra 2 - U7, RAM: DDR5 32GB (On BD), SSD: NVMe DDS 512GB, VGA: 기본 내장그래픽, OS: Windows11pro',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'LG',category:'모니터',name:'24BA450',spec_summary:'크기: 24 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(2), DP(1), 스탠드: 높낮이, 틸트, 피벗, 스위블',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true},
-  {brand:'LG',category:'모니터',name:'27BA450',spec_summary:'크기: 27 inch, 해상도: FHD / 1920*1080, 패널: IPS, 밝기: 250nits, 연결단자: HDMI(1), VGA(1), 스탠드: 높낮이, 틸트, 피벗, 스위블',base_price:0,daily_price:0,monthly_price:0,feature:'',is_active:true}
+  {brand:'HP',category:'데스크탑',name:'Pro Tower 280 G9',spec_summary:'CPU: Intel i3,i5,i7 14세대 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 350w~500w',base_price:1200000,feature:'',is_active:true},
+  {brand:'HP',category:'데스크탑',name:'Pro Tower 400 G9',spec_summary:'CPU: Intel i3,i5,i7 14세대 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 350w~500w',base_price:1200000,feature:'',is_active:true},
+  {brand:'HP',category:'데스크탑',name:'Elite Tower 800 G9',spec_summary:'CPU: Intel i5,i7,i9 14세대 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 550w',base_price:1200000,feature:'',is_active:true},
+  {brand:'HP',category:'데스크탑',name:'ProDesk 4 G1i Tower',spec_summary:'CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 400w',base_price:1200000,feature:'',is_active:true},
+  {brand:'HP',category:'데스크탑',name:'ProDesk 8 G1i Tower',spec_summary:'CPU: Intel Ultra 2, U5,U7,U9 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 500w',base_price:1200000,feature:'',is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z1 G1i Tower',spec_summary:'CPU: Intel Ultra 2, U5,U7,U9 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 500w',base_price:2500000,feature:'',is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z2 G1i Tower',spec_summary:'CPU: Intel Ultra 2, U5,U7,U9 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 500w~1200w',base_price:3000000,feature:'',is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z2 G9 Tower',spec_summary:'CPU: Intel i7,i9 14세대 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 500w~700w',base_price:3000000,feature:'',is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z4 G5 Tower',spec_summary:'CPU: Intel Xeon W3,W5,W7 / RAM: DDR5 ECC 16GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows 11 Pro 64 for Workstations / POWER: 525w~1125w',base_price:5000000,feature:'',is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z6 G5 Tower',spec_summary:'CPU: Intel Xeon W3,W5,W7 / RAM: DDR5 ECC 16GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows 11 Pro 64 for Workstations / POWER: 775w~1450w',base_price:7000000,feature:'',is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z8 G5 Tower',spec_summary:'CPU: Intel Xeon 4410Y~ / RAM: DDR5 ECC 16GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows 11 Pro 64 for Workstations / POWER: 1125w~1700w',base_price:12000000,feature:'',is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z8 Fury G5 Tower',spec_summary:'CPU: Intel Xeon W5,W7,W9 / RAM: DDR5 ECC 16GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows 11 Pro 64 for Workstations / POWER: 1125w~2250w',base_price:12000000,feature:'',is_active:true},
+  {brand:'HP',category:'모바일워크스테이션',name:'ZBook 8 G1i 16',spec_summary:'크기: 14/16 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home',base_price:2800000,feature:'',is_active:true},
+  {brand:'HP',category:'모바일워크스테이션',name:'ZBook X G1i 16',spec_summary:'크기: 14/16 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home',base_price:2800000,feature:'',is_active:true},
+  {brand:'HP',category:'모바일워크스테이션',name:'ZBook Fury G1i 16',spec_summary:'크기: 14/16 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home',base_price:2800000,feature:'',is_active:true},
+  {brand:'HP',category:'노트북',name:'ProBook 4 G1i',spec_summary:'크기: 14/16 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home',base_price:1500000,feature:'',is_active:true},
+  {brand:'HP',category:'노트북',name:'ProBook 8 G1i',spec_summary:'크기: 14/16 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 16GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 / OS: Windows11pro&Home',base_price:1500000,feature:'',is_active:true},
+  {brand:'HP',category:'노트북',name:'EliteBook X G1i',spec_summary:'크기: 14 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 16GB,32GB (On BD) / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 / OS: Windows11pro&Home',base_price:1500000,feature:'',is_active:true},
+  {brand:'HP',category:'노트북',name:'EliteBook Ultra G1i AI',spec_summary:'크기: 14 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 16GB,32GB (On BD) / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 / OS: Windows11pro&Home',base_price:1500000,feature:'',is_active:true},
+  {brand:'HP',category:'모니터',name:'324pe',spec_summary:'크기: 24 inch / 해상도: FHD / 1920*1080 / 패널: IPS / 밝기: 250nits / 연결단자: HDMI(1), DP(1), VGA(1)',base_price:350000,feature:'',is_active:true},
+  {brand:'HP',category:'모니터',name:'524pf',spec_summary:'크기: 24 inch / 해상도: FHD / 1920*1080 / 패널: IPS / 밝기: 350nits / 연결단자: DP(1), HDMI(1)',base_price:350000,feature:'',is_active:true},
+  {brand:'HP',category:'모니터',name:'327pf',spec_summary:'크기: 27 inch / 해상도: FHD / 1920*1080 / 패널: IPS / 밝기: 250nits / 연결단자: HDMI(1), DP(1), VGA(1)',base_price:350000,feature:'',is_active:true},
+  {brand:'HP',category:'모니터',name:'327ph',spec_summary:'크기: 27 inch / 해상도: FHD / 1920*1080 / 패널: IPS / 밝기: 250nits / 연결단자: HDMI(1), DP(1), VGA(1)',base_price:350000,feature:'',is_active:true},
+  {brand:'HP',category:'모니터',name:'527pq',spec_summary:'크기: 27 inch / 해상도: QHD / 2560*1440 / 패널: IPS / 밝기: 350nits / 연결단자: DP(1), HDMI(1)',base_price:350000,feature:'',is_active:true},
+  {brand:'Samsung',category:'데스크탑',name:'DM501THA',spec_summary:'CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro / POWER: 500w',base_price:1300000,feature:'',is_active:true},
+  {brand:'Samsung',category:'노트북',name:'NT751XHD',spec_summary:'크기: 15.6 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 16GB (On BD) / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 / OS: Windows11pro',base_price:1600000,feature:'',is_active:true},
+  {brand:'Samsung',category:'노트북',name:'NT751XGK',spec_summary:'크기: 15.6 inch / CPU: Intel Ultra 1, U5,U7 / RAM: DDR5 16GB (On BD) / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 / OS: Windows11pro',base_price:1600000,feature:'',is_active:true},
+  {brand:'Samsung',category:'노트북',name:'NT941XHA',spec_summary:'크기: 16 inch / CPU: Intel Ultra 2 - U5 / RAM: DDR5 16GB (On BD) / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 / OS: Windows11pro',base_price:1600000,feature:'',is_active:true},
+  {brand:'Samsung',category:'노트북',name:'NT961XHA',spec_summary:'크기: 16 inch / CPU: Intel Ultra 2 - U5 / RAM: DDR5 16GB (On BD) / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 / OS: Windows11pro',base_price:1600000,feature:'',is_active:true},
+  {brand:'Samsung',category:'모니터',name:'LS24D408GAKXKR',spec_summary:'크기: 24 inch / 해상도: FHD / 1920*1080 / 패널: IPS / 밝기: 250nits / 연결단자: HDMI(2), DP(1)',base_price:300000,feature:'',is_active:true},
+  {brand:'Samsung',category:'모니터',name:'LS27D304GAKXKR',spec_summary:'크기: 27 inch / 해상도: FHD / 1920*1080 / 패널: IPS / 밝기: 250nits / 연결단자: HDMI(1), VGA(1)',base_price:300000,feature:'',is_active:true},
+  {brand:'Lenovo',category:'데스크탑',name:'ThinkCentre neo 50t',spec_summary:'CPU: Intel Ultra 2, U3,U5,U7 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 200w~400w',base_price:1100000,feature:'',is_active:true},
+  {brand:'Lenovo',category:'데스크탑',name:'ThinkCentre M70t',spec_summary:'CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 260w~400w',base_price:1100000,feature:'',is_active:true},
+  {brand:'Lenovo',category:'데스크탑',name:'ThinkCentre M90t',spec_summary:'CPU: Intel Ultra 2, U5,U7,U9 / RAM: DDR5 16GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 310w~500w',base_price:1100000,feature:'',is_active:true},
+  {brand:'Lenovo',category:'노트북',name:'ThinkPad E16 Gen 3',spec_summary:'크기: 14/16 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home',base_price:1400000,feature:'',is_active:true},
+  {brand:'Lenovo',category:'노트북',name:'ThinkPad T16 Gen 4',spec_summary:'크기: 14/16 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 16GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 / OS: Windows11pro&Home',base_price:1400000,feature:'',is_active:true},
+  {brand:'LG',category:'노트북',name:'15U55T-GAP50ML',spec_summary:'크기: 15.6 inch / CPU: Intel Ultra 2, U5 / RAM: DDR5 16GB / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 / OS: Windows11pro',base_price:1600000,feature:'',is_active:true},
+  {brand:'LG',category:'노트북',name:'15Z90T-GAP5AL',spec_summary:'크기: 15.6 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 16GB (On BD) / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 / OS: Windows11pro',base_price:1600000,feature:'',is_active:true},
+  {brand:'LG',category:'노트북',name:'15Z90T-GAP7HL',spec_summary:'크기: 15.6 inch / CPU: Intel Ultra 2 - U7 / RAM: DDR5 32GB (On BD) / SSD: NVMe DDS 512GB / VGA: 기본 내장그래픽 / OS: Windows11pro',base_price:1600000,feature:'',is_active:true},
+  {brand:'LG',category:'모니터',name:'24BA450',spec_summary:'크기: 24 inch / 해상도: FHD / 1920*1080 / 패널: IPS / 밝기: 250nits / 연결단자: HDMI(2), DP(1)',base_price:280000,feature:'',is_active:true},
+  {brand:'LG',category:'모니터',name:'27BA450',spec_summary:'크기: 27 inch / 해상도: FHD / 1920*1080 / 패널: IPS / 밝기: 250nits / 연결단자: HDMI(1), VGA(1)',base_price:280000,feature:'',is_active:true}
+];
+const RENTAL_SAMPLE_PRODUCTS = [
+  {brand:'HP',category:'데스크탑',name:'Pro Tower 280 G9',spec:'CPU: Intel i3,i5,i7 14세대 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 350w~500w',daily_price:3000,monthly_price:60000,is_active:true},
+  {brand:'HP',category:'데스크탑',name:'Pro Tower 400 G9',spec:'CPU: Intel i3,i5,i7 14세대 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 350w~500w',daily_price:3000,monthly_price:60000,is_active:true},
+  {brand:'HP',category:'데스크탑',name:'Elite Tower 800 G9',spec:'CPU: Intel i5,i7,i9 14세대 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 550w',daily_price:3000,monthly_price:60000,is_active:true},
+  {brand:'HP',category:'데스크탑',name:'ProDesk 4 G1i Tower',spec:'CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 400w',daily_price:3000,monthly_price:60000,is_active:true},
+  {brand:'HP',category:'데스크탑',name:'ProDesk 8 G1i Tower',spec:'CPU: Intel Ultra 2, U5,U7,U9 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 500w',daily_price:3000,monthly_price:60000,is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z1 G1i Tower',spec:'CPU: Intel Ultra 2, U5,U7,U9 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 500w',daily_price:8000,monthly_price:160000,is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z2 G1i Tower',spec:'CPU: Intel Ultra 2, U5,U7,U9 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 500w~1200w',daily_price:8000,monthly_price:160000,is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z2 G9 Tower',spec:'CPU: Intel i7,i9 14세대 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 500w~700w',daily_price:8000,monthly_price:160000,is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z4 G5 Tower',spec:'CPU: Intel Xeon W3,W5,W7 / RAM: DDR5 ECC 16GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows 11 Pro 64 for Workstations / POWER: 525w~1125w',daily_price:8000,monthly_price:160000,is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z6 G5 Tower',spec:'CPU: Intel Xeon W3,W5,W7 / RAM: DDR5 ECC 16GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows 11 Pro 64 for Workstations / POWER: 775w~1450w',daily_price:8000,monthly_price:160000,is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z8 G5 Tower',spec:'CPU: Intel Xeon 4410Y~ / RAM: DDR5 ECC 16GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows 11 Pro 64 for Workstations / POWER: 1125w~1700w',daily_price:8000,monthly_price:160000,is_active:true},
+  {brand:'HP',category:'워크스테이션',name:'Z8 Fury G5 Tower',spec:'CPU: Intel Xeon W5,W7,W9 / RAM: DDR5 ECC 16GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows 11 Pro 64 for Workstations / POWER: 1125w~2250w',daily_price:8000,monthly_price:160000,is_active:true},
+  {brand:'HP',category:'모바일워크스테이션',name:'ZBook 8 G1i 16',spec:'크기: 14/16 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home',daily_price:7000,monthly_price:140000,is_active:true},
+  {brand:'HP',category:'모바일워크스테이션',name:'ZBook X G1i 16',spec:'크기: 14/16 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home',daily_price:7000,monthly_price:140000,is_active:true},
+  {brand:'HP',category:'모바일워크스테이션',name:'ZBook Fury G1i 16',spec:'크기: 14/16 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home',daily_price:7000,monthly_price:140000,is_active:true},
+  {brand:'HP',category:'노트북',name:'ProBook 4 G1i',spec:'크기: 14/16 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home',daily_price:4000,monthly_price:80000,is_active:true},
+  {brand:'HP',category:'노트북',name:'ProBook 8 G1i',spec:'크기: 14/16 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 16GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 / OS: Windows11pro&Home',daily_price:4000,monthly_price:80000,is_active:true},
+  {brand:'HP',category:'노트북',name:'EliteBook X G1i',spec:'크기: 14 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 16GB,32GB (On BD) / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 / OS: Windows11pro&Home',daily_price:4000,monthly_price:80000,is_active:true},
+  {brand:'HP',category:'노트북',name:'EliteBook Ultra G1i AI',spec:'크기: 14 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 16GB,32GB (On BD) / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 / OS: Windows11pro&Home',daily_price:4000,monthly_price:80000,is_active:true},
+  {brand:'HP',category:'모니터',name:'324pe',spec:'크기: 24 inch / 해상도: FHD / 1920*1080 / 패널: IPS / 밝기: 250nits / 연결단자: HDMI(1), DP(1), VGA(1)',daily_price:1500,monthly_price:30000,is_active:true},
+  {brand:'HP',category:'모니터',name:'524pf',spec:'크기: 24 inch / 해상도: FHD / 1920*1080 / 패널: IPS / 밝기: 350nits / 연결단자: DP(1), HDMI(1)',daily_price:1500,monthly_price:30000,is_active:true},
+  {brand:'HP',category:'모니터',name:'327pf',spec:'크기: 27 inch / 해상도: FHD / 1920*1080 / 패널: IPS / 밝기: 250nits / 연결단자: HDMI(1), DP(1), VGA(1)',daily_price:1500,monthly_price:30000,is_active:true},
+  {brand:'HP',category:'모니터',name:'327ph',spec:'크기: 27 inch / 해상도: FHD / 1920*1080 / 패널: IPS / 밝기: 250nits / 연결단자: HDMI(1), DP(1), VGA(1)',daily_price:1500,monthly_price:30000,is_active:true},
+  {brand:'HP',category:'모니터',name:'527pq',spec:'크기: 27 inch / 해상도: QHD / 2560*1440 / 패널: IPS / 밝기: 350nits / 연결단자: DP(1), HDMI(1)',daily_price:1500,monthly_price:30000,is_active:true},
+  {brand:'Samsung',category:'데스크탑',name:'DM501THA',spec:'CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro / POWER: 500w',daily_price:3000,monthly_price:60000,is_active:true},
+  {brand:'Samsung',category:'노트북',name:'NT751XHD',spec:'크기: 15.6 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 16GB (On BD) / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 / OS: Windows11pro',daily_price:4000,monthly_price:80000,is_active:true},
+  {brand:'Samsung',category:'노트북',name:'NT751XGK',spec:'크기: 15.6 inch / CPU: Intel Ultra 1, U5,U7 / RAM: DDR5 16GB (On BD) / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 / OS: Windows11pro',daily_price:4000,monthly_price:80000,is_active:true},
+  {brand:'Samsung',category:'노트북',name:'NT941XHA',spec:'크기: 16 inch / CPU: Intel Ultra 2 - U5 / RAM: DDR5 16GB (On BD) / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 / OS: Windows11pro',daily_price:4000,monthly_price:80000,is_active:true},
+  {brand:'Samsung',category:'노트북',name:'NT961XHA',spec:'크기: 16 inch / CPU: Intel Ultra 2 - U5 / RAM: DDR5 16GB (On BD) / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 / OS: Windows11pro',daily_price:4000,monthly_price:80000,is_active:true},
+  {brand:'Samsung',category:'모니터',name:'LS24D408GAKXKR',spec:'크기: 24 inch / 해상도: FHD / 1920*1080 / 패널: IPS / 밝기: 250nits / 연결단자: HDMI(2), DP(1)',daily_price:1500,monthly_price:30000,is_active:true},
+  {brand:'Samsung',category:'모니터',name:'LS27D304GAKXKR',spec:'크기: 27 inch / 해상도: FHD / 1920*1080 / 패널: IPS / 밝기: 250nits / 연결단자: HDMI(1), VGA(1)',daily_price:1500,monthly_price:30000,is_active:true},
+  {brand:'Lenovo',category:'데스크탑',name:'ThinkCentre neo 50t',spec:'CPU: Intel Ultra 2, U3,U5,U7 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 200w~400w',daily_price:3000,monthly_price:60000,is_active:true},
+  {brand:'Lenovo',category:'데스크탑',name:'ThinkCentre M70t',spec:'CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 260w~400w',daily_price:3000,monthly_price:60000,is_active:true},
+  {brand:'Lenovo',category:'데스크탑',name:'ThinkCentre M90t',spec:'CPU: Intel Ultra 2, U5,U7,U9 / RAM: DDR5 16GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home / POWER: 310w~500w',daily_price:3000,monthly_price:60000,is_active:true},
+  {brand:'Lenovo',category:'노트북',name:'ThinkPad E16 Gen 3',spec:'크기: 14/16 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 8GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 (추가가능) / OS: Windows11pro&Home',daily_price:4000,monthly_price:80000,is_active:true},
+  {brand:'Lenovo',category:'노트북',name:'ThinkPad T16 Gen 4',spec:'크기: 14/16 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 16GB ~ / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 / OS: Windows11pro&Home',daily_price:4000,monthly_price:80000,is_active:true},
+  {brand:'LG',category:'노트북',name:'15U55T-GAP50ML',spec:'크기: 15.6 inch / CPU: Intel Ultra 2, U5 / RAM: DDR5 16GB / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 / OS: Windows11pro',daily_price:4000,monthly_price:80000,is_active:true},
+  {brand:'LG',category:'노트북',name:'15Z90T-GAP5AL',spec:'크기: 15.6 inch / CPU: Intel Ultra 2, U5,U7 / RAM: DDR5 16GB (On BD) / SSD: NVMe DDS 256GB~ / VGA: 기본 내장그래픽 / OS: Windows11pro',daily_price:4000,monthly_price:80000,is_active:true},
+  {brand:'LG',category:'노트북',name:'15Z90T-GAP7HL',spec:'크기: 15.6 inch / CPU: Intel Ultra 2 - U7 / RAM: DDR5 32GB (On BD) / SSD: NVMe DDS 512GB / VGA: 기본 내장그래픽 / OS: Windows11pro',daily_price:4000,monthly_price:80000,is_active:true},
+  {brand:'LG',category:'모니터',name:'24BA450',spec:'크기: 24 inch / 해상도: FHD / 1920*1080 / 패널: IPS / 밝기: 250nits / 연결단자: HDMI(2), DP(1)',daily_price:1500,monthly_price:30000,is_active:true},
+  {brand:'LG',category:'모니터',name:'27BA450',spec:'크기: 27 inch / 해상도: FHD / 1920*1080 / 패널: IPS / 밝기: 250nits / 연결단자: HDMI(1), VGA(1)',daily_price:1500,monthly_price:30000,is_active:true}
 ];
 
 // ===== Supabase 클라이언트 초기화 =====
@@ -1260,12 +1299,11 @@ async function showApp(email) {
   if (emailEl) emailEl.textContent = email;
 
   // ── 관리자 권한 체크 ──────────────────────────────────────────
-  const normalizedEmail = (email || '').toLowerCase().trim();
-  const isAdmin = ADMIN_EMAILS.some(e => e.toLowerCase() === normalizedEmail);
+  // 로그인된 모든 사용자에게 관리자 기능 제공
   const adminTab  = document.getElementById('ttab-admin');
   const adminBadge = document.querySelector('.h-badge.admin-badge');
-  if (adminTab)  { adminTab.style.display  = isAdmin ? '' : 'none'; }
-  if (adminBadge){ adminBadge.style.display = isAdmin ? 'inline-flex' : 'none'; }
+  if (adminTab)  { adminTab.style.display  = ''; }
+  if (adminBadge){ adminBadge.style.display = 'inline-flex'; }
   // ─────────────────────────────────────────────────────────────
 
   // 데이터 로드 (에러가 나도 이후 코드가 실행되도록 각각 try-catch)
@@ -1280,10 +1318,8 @@ async function showApp(email) {
   try { loadCompanySettings(); } catch(e) {}
 
   // 관리자인 경우에만 제품 목록 렌더
-  if (isAdmin) {
-    try { renderAdminProducts(); } catch(e) { console.warn('renderAdminProducts 오류:', e); }
+  try { renderAdminProducts(); } catch(e) { console.warn('renderAdminProducts 오류:', e); }
     try { rRenderAdminProducts(); } catch(e) { console.warn('rRenderAdminProducts 오류:', e); }
-  }
 }
 
 
@@ -2052,18 +2088,12 @@ async function rLoadRentalProducts() {
     const { data, error } = await db.from('rental_products').select('*').eq('is_active',true).order('category');
     if (error || !data || data.length === 0) {
       // DB 비어있을 때 구매 제품 카탈로그와 동일 데이터 사용 (렌탈용 가격은 0)
-      rProducts = (typeof SAMPLE_PRODUCTS !== 'undefined') ? SAMPLE_PRODUCTS.map((p,i)=>({
-        ...p, id:i+1, daily_price: p.daily_price||0, monthly_price: p.monthly_price||0
-      })) : [];
+      rProducts = (typeof RENTAL_SAMPLE_PRODUCTS !== 'undefined') ? RENTAL_SAMPLE_PRODUCTS.map((p,i)=>({...p,id:i+1})) : [];
     } else {
       rProducts = data;
     }
   } catch(e) {
-    rProducts = (typeof SAMPLE_PRODUCTS !== 'undefined') ? SAMPLE_PRODUCTS.map((p,i)=>({
-      ...p, id:i+1, daily_price: p.daily_price||0, monthly_price: p.monthly_price||0
-    })) : [];
-  }
-  rRenderProductList();
+    rProducts = (typeof RENTAL_SAMPLE_PRODUCTS !== 'undefined') ? RENTAL_SAMPLE_PRODUCTS.map((p,i)=>({...p,id:i+1})) : [];
 }
 
 function rFilterCat() {
