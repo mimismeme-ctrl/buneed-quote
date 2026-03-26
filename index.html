@@ -2094,6 +2094,7 @@ async function rLoadRentalProducts() {
     }
   } catch(e) {
     rProducts = (typeof RENTAL_SAMPLE_PRODUCTS !== 'undefined') ? RENTAL_SAMPLE_PRODUCTS.map((p,i)=>({...p,id:i+1})) : [];
+  }
 }
 
 function rFilterCat() {
