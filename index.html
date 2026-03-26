@@ -1293,6 +1293,9 @@ const db = supabase.createClient(SUPA_URL, SUPA_KEY, {
 
 // ===== 앱 시작: 기존 세션 확인 =====
 window.addEventListener('DOMContentLoaded', async () => {
+  // 공유 링크 파라미터 먼저 체크 → 있으면 로그인 없이 바로 견적 표시
+  if (await checkShareParam()) return;
+
   try {
     const { data: { session } } = await db.auth.getSession();
     if (session) {
@@ -1941,7 +1944,7 @@ function previewQuote() {
       <div class="q-party-grid">
         <!-- 수신 박스: 연한 파란 배경 + 네이비 헤더바 -->
         <div style="border:1px solid #b8cde8;border-radius:6px;overflow:hidden;">
-          <div style="background:#1B3A6B;padding:7px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;justify-content:space-between;">
+          <div style="background:#0E76BB;padding:7px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;justify-content:space-between;">
             <span style="font-size:12px;font-weight:700;color:#fff;letter-spacing:0.1em;">수 신</span>
           </div>
           <div style="background:#ffffff;padding:10px 12px;">
@@ -2038,17 +2041,20 @@ function printQuote() {
     .q-section{margin-bottom:14px;}
     .q-section-title{font-size:10px;font-weight:700;color:#1B3A6B;margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid #dbeafe;padding-bottom:3px;}
     table{width:100%;border-collapse:collapse;font-size:11px;}
-    th{background:#dbeafe !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:7px 9px;font-weight:700;color:#1B3A6B !important;border-bottom:1.5px solid #93c5fd;text-align:left;font-size:10.5px;letter-spacing:0.02em;}
+    th{background:#dbeafe !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:7px 9px;font-weight:700;color:#1B3A6B !important;border-bottom:1.5px solid #93c5fd;text-align:left;font-size:10.5px;}
     td{padding:5px 9px;border-bottom:1px solid #e8edf5;font-size:11px;vertical-align:middle;}
     .q-party-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+    /* 수신 헤더: 연한 파랑 #0E76BB */
+    .q-party-susin-header{background:#0E76BB !important;padding:7px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    /* 공급 헤더: 진한 네이비 #1B3A6B */
+    .q-party-gonggeup-header{background:#1B3A6B !important;padding:7px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .q-party-header-text{font-size:12px;font-weight:700;color:#fff;letter-spacing:0.1em;}
     .q-party-box{border:1px solid #b8cde8;border-radius:6px;overflow:hidden;}
-    .q-party-box h4{font-size:11px;font-weight:700;color:#1B3A6B;margin-bottom:6px;}
-    .q-total td{background:#e8f0f8 !important;font-weight:800;font-size:13px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-    .q-party-box h4{font-size:10px;font-weight:700;color:#1B3A6B;margin-bottom:6px;}
     .q-summary-table{width:260px;margin-left:auto;border-collapse:collapse;font-size:11px;margin-top:8px;}
     .q-summary-table td{padding:4px 6px;border:none;color:#374151;}
     .q-summary-table td:last-child{text-align:right;}
     .q-total-row td{font-weight:800;font-size:14px;border-top:2px solid #1B3A6B;padding-top:6px;color:#1B3A6B;}
+    .r-q-total-row td{font-weight:800;font-size:14px;border-top:2px solid #1B3A6B;padding-top:6px;color:#1B3A6B;}
     .q-footer-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e2e8f0;padding:7px 20px;text-align:center;font-size:9.5px;color:#94a3b8;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
     @media print{
       body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
@@ -2601,7 +2607,7 @@ function rPreviewQuote() {
       <div class="q-party-grid">
         <!-- 수신 박스 -->
         <div style="border:1px solid #b8cde8;border-radius:6px;overflow:hidden;">
-          <div style="background:#1B3A6B;padding:7px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;justify-content:space-between;">
+          <div style="background:#0E76BB;padding:7px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;justify-content:space-between;">
             <span style="font-size:12px;font-weight:700;color:#fff;letter-spacing:0.1em;">수 신</span>
           </div>
           <div style="background:#ffffff;padding:10px 12px;">
@@ -2677,19 +2683,25 @@ function rPrintQuote() {
     h1{font-size:19px;font-weight:800;color:#1B3A6B;letter-spacing:0.04em;margin-bottom:3px;}
     .q-date{font-size:10px;color:#64748b;line-height:1.6;}
     .q-section{margin-bottom:14px;}
-    .r-q-section-title{font-size:10px;font-weight:700;color:#1B3A6B;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid #dbeafe;padding-bottom:3px;}
+    .q-section-title,.r-q-section-title{font-size:10px;font-weight:700;color:#1B3A6B;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid #dbeafe;padding-bottom:3px;}
     .q-rental-info-box{background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;padding:10px 14px;margin-bottom:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
     .q-rental-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px;}
     .q-rental-info-item .label{font-size:9.5px;color:#475569;font-weight:600;margin-bottom:1px;}
     .q-rental-info-item .value{font-size:11px;font-weight:700;color:#1e293b;}
     .q-party-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+    /* 수신 헤더: 연한 파랑 #0E76BB */
+    .q-party-susin-header{background:#0E76BB !important;padding:7px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    /* 공급 헤더: 진한 네이비 #1B3A6B */
+    .q-party-gonggeup-header{background:#1B3A6B !important;padding:7px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .q-party-header-text{font-size:12px;font-weight:700;color:#fff;letter-spacing:0.1em;}
+    .q-party-box{border:1px solid #b8cde8;border-radius:6px;overflow:hidden;}
     table{width:100%;border-collapse:collapse;font-size:11px;}
     th{background:#dbeafe !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:6px 8px;font-weight:700;color:#1B3A6B !important;border-bottom:1.5px solid #93c5fd;text-align:left;font-size:10.5px;}
     td{padding:5px 8px;border-bottom:1px solid #e8edf5;font-size:11px;vertical-align:middle;}
     .q-summary-table{width:260px;margin-left:auto;border-collapse:collapse;font-size:11px;margin-top:8px;}
     .q-summary-table td{padding:4px 6px;border:none;color:#374151;}
     .q-summary-table td:last-child{text-align:right;}
-    .r-q-total-row td{font-weight:800;font-size:13px;border-top:2px solid #1B3A6B;padding-top:6px;color:#1B3A6B;}
+    .q-total-row td,.r-q-total-row td{font-weight:800;font-size:14px;border-top:2px solid #1B3A6B;padding-top:6px;color:#1B3A6B;}
     .q-footer-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e2e8f0;padding:7px 20px;text-align:center;font-size:9.5px;color:#94a3b8;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
     @media print{
       body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
