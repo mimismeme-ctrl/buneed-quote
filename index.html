@@ -2037,7 +2037,7 @@ async function rSaveQuote() {
     const vat = Math.round(supply*0.1);
     const total = supply + vat + deposit;
     if (!rCurrentShareToken) rCurrentShareToken = crypto.randomUUID();
-    const qNum = document.getElementById('r-quote-num').value || rInitQuoteNum();
+    const qNum = (document.getElementById('r-quote-num')||{}).value || rInitQuoteNum();
     const payload = {
       quote_number: qNum, share_token: rCurrentShareToken,
       company_name: company,
@@ -2057,7 +2057,7 @@ async function rSaveQuote() {
       sales_name: document.getElementById('r-sales-name').value,
       sales_phone: document.getElementById('r-sales-phone').value,
       sales_email: document.getElementById('r-sales-email').value,
-      sales_dept: document.getElementById('r-sales-dept').value,
+      sales_dept: (document.getElementById('r-sales-dept')||{}).value||null,
     };
     let qId = rCurrentQuoteId;
     if (qId) {
@@ -2080,6 +2080,7 @@ async function rSaveQuote() {
   } catch(e) {
     console.error('rSaveQuote 오류:', e);
     showToast('저장 실패: '+e.message, 'error');
+    alert('⚠️ 저장 실패\n' + e.message + '\n\n브라우저 콘솔(F12)에서 자세한 오류를 확인하세요.');
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = '💾 저장'; }
   }
@@ -2128,17 +2129,6 @@ function rPreviewQuote() {
         <div class="q-date">견적번호: ${qNum}</div>
       </div>
     </div>
-    <div class="q-rental-info-box">
-      <div style="font-size:11px;font-weight:700;color:#1a56a0;margin-bottom:8px;">📅 렌탈 조건</div>
-      <div class="q-rental-info-grid">
-        <div class="q-rental-info-item"><div class="label">렌탈 단위</div><div class="value">${rCurrentType} 단위</div></div>
-        <div class="q-rental-info-item"><div class="label">렌탈 기간</div><div class="value">${durationLabel}</div></div>
-        <div class="q-rental-info-item"><div class="label">시작일</div><div class="value">${startDate}</div></div>
-        <div class="q-rental-info-item"><div class="label">설치/납품 장소</div><div class="value">${deliveryLoc}</div></div>
-        <div class="q-rental-info-item"><div class="label">반납/회수</div><div class="value">${returnMethod}</div></div>
-        ${purpose?`<div class="q-rental-info-item"><div class="label">사용목적</div><div class="value">${purpose}</div></div>`:''}
-      </div>
-    </div>
     <div class="q-section">
       <div class="q-party-grid">
         <!-- 수신 박스 -->
@@ -2169,6 +2159,17 @@ function rPreviewQuote() {
             </table>
           </div>
         </div>
+      </div>
+    </div>
+    <div class="q-rental-info-box">
+      <div style="font-size:11px;font-weight:700;color:#1a56a0;margin-bottom:8px;">📅 렌탈 조건</div>
+      <div class="q-rental-info-grid">
+        <div class="q-rental-info-item"><div class="label">렌탈 단위</div><div class="value">${rCurrentType} 단위</div></div>
+        <div class="q-rental-info-item"><div class="label">렌탈 기간</div><div class="value">${durationLabel}</div></div>
+        <div class="q-rental-info-item"><div class="label">시작일</div><div class="value">${startDate}</div></div>
+        <div class="q-rental-info-item"><div class="label">설치/납품 장소</div><div class="value">${deliveryLoc}</div></div>
+        <div class="q-rental-info-item"><div class="label">반납/회수</div><div class="value">${returnMethod}</div></div>
+        ${purpose?`<div class="q-rental-info-item"><div class="label">사용목적</div><div class="value">${purpose}</div></div>`:''}
       </div>
     </div>
     <div class="q-section">
