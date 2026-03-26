@@ -284,12 +284,13 @@ textarea.field-input{resize:vertical;min-height:52px;}
 }
 .q-table tbody tr:hover td{background:#f0f5ff;}
 .q-summary-table{
-  width:100%;margin-top:12px;border-collapse:collapse;
+  width:260px;margin-top:12px;margin-left:auto;border-collapse:collapse;
 }
-.q-summary-table td{padding:4px 8px;}
-.q-total-row td{font-weight:800;font-size:14px;border-top:2px solid var(--p-navy);padding-top:8px;}
-.r-q-total-row td{font-weight:800;font-size:14px;border-top:2px solid var(--r-primary);padding-top:8px;}
-.q-footer-bar{margin-top:20px;border-top:1px solid var(--border);padding-top:12px;text-align:center;font-size:10px;color:#94a3b8;}
+.q-summary-table td{padding:5px 8px;font-size:12px;color:#374151;}
+.q-summary-table td:last-child{text-align:right;}
+.q-total-row td{font-weight:800;font-size:14px;color:#1B3A6B;border-top:2px solid var(--p-navy);padding-top:8px;}
+.r-q-total-row td{font-weight:800;font-size:14px;color:#1a56a0;border-top:2px solid var(--r-primary);padding-top:8px;}
+.q-footer-bar{margin-top:20px;border-top:1px solid var(--border);padding-top:10px;text-align:center;font-size:10px;color:#94a3b8;line-height:1.6;}
 .q-rental-info-box{background:#f0f8ff;border:1px solid var(--r-light);border-radius:8px;padding:10px 14px;margin-bottom:14px;}
 .q-rental-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px;}
 .q-rental-info-item .label{font-size:10px;color:var(--r-primary);font-weight:600;margin-bottom:2px;}
@@ -2009,11 +2010,11 @@ function previewQuote() {
     </div>
     ${''/* 납품일/유효기간은 위에 표시됨 */}
     <table class="q-summary-table">
-      <tr><td style="color:#64748b;">소 계</td><td style="text-align:right;">${fmt(sub)} 원</td></tr>
-      ${discAmt>0?`<tr><td style="color:#ef4444;">할인</td><td style="text-align:right;color:#ef4444;">- ${fmt(discAmt)} 원</td></tr>`:''}
-      <tr><td style="color:#64748b;">공급가액</td><td style="text-align:right;font-weight:600;">${fmt(supply)} 원</td></tr>
-      <tr><td style="color:#64748b;">부가세 (10%)</td><td style="text-align:right;">${fmt(vat)} 원</td></tr>
-      <tr class="q-total-row"><td>합 계</td><td style="text-align:right;color:#1B3A6B;">${fmt(total)} 원</td></tr>
+      <tr><td>소 계</td><td>${fmt(sub)} 원</td></tr>
+      ${discAmt>0?`<tr><td style="color:#ef4444;">할인</td><td style="color:#ef4444;">- ${fmt(discAmt)} 원</td></tr>`:''}
+      <tr><td style="font-weight:600;">공급가액</td><td style="font-weight:600;">${fmt(supply)} 원</td></tr>
+      <tr><td>부가세 (10%)</td><td>${fmt(vat)} 원</td></tr>
+      <tr class="q-total-row"><td>합 계</td><td>${fmt(total)} 원</td></tr>
     </table>
 
     <div class="q-footer-bar">주식회사 비유니드 | 경기도 하남시 미사강변한강로 135 다동 4층 445호 | 031.8028.0464 | www.buneed.co.kr</div>
@@ -2028,25 +2029,32 @@ function printQuote() {
   win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>구매견적서</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:'Pretendard','Apple SD Gothic Neo',sans-serif;background:#fff;color:#1a2e5a;}
-    .qdoc{padding:28px 32px;max-width:820px;margin:0 auto;}
-    .q-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;}
-    h1{font-size:22px;font-weight:800;}
-    .q-section{margin-bottom:18px;}
-    .q-section-title{font-size:11px;font-weight:700;color:#1B3A6B;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;}
-    table{width:100%;border-collapse:collapse;font-size:12px;}
-    th{background:#dbeafe !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:8px 10px;font-weight:700;color:#1B3A6B !important;border-bottom:2px solid #93c5fd;text-align:left;font-size:11.5px;letter-spacing:0.03em;}
-    td{padding:7px 10px;border-bottom:1px solid #e8edf5;font-size:12px;vertical-align:middle;}
-    .q-party-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-    .q-party-box{border:1px solid #e2e8f0;border-radius:8px;padding:12px;}
-    .q-party-box.supplier{border-left:4px solid #1B3A6B;background:#f0f4ff;}
-    .q-total td{background:#e8f0f8 !important;font-weight:800;font-size:14px;}
-    @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;} @page{margin:15mm;}}
-    .q-party-box h4{font-size:11px;font-weight:700;color:#1B3A6B;margin-bottom:8px;}
-    .q-summary-table{width:300px;margin-left:auto;}
-    .q-total-row td{font-weight:800;font-size:15px;border-top:2px solid #1B3A6B;padding-top:8px;}
-    .q-footer-bar{margin-top:24px;border-top:1px solid #e2e8f0;padding-top:12px;text-align:center;font-size:10px;color:#94a3b8;}
-    @page{margin:15mm;}
+    body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#fff;color:#1a2e5a;font-size:11px;line-height:1.55;}
+    .qdoc{padding:18px 20px 70px 20px;max-width:100%;margin:0;}
+    .q-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #1B3A6B;}
+    .q-logo-area img{height:40px;display:block;}
+    h1{font-size:20px;font-weight:800;color:#1B3A6B;letter-spacing:0.04em;margin-bottom:3px;}
+    .q-date{font-size:10px;color:#64748b;line-height:1.6;}
+    .q-section{margin-bottom:14px;}
+    .q-section-title{font-size:10px;font-weight:700;color:#1B3A6B;margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid #dbeafe;padding-bottom:3px;}
+    table{width:100%;border-collapse:collapse;font-size:11px;}
+    th{background:#dbeafe !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:7px 9px;font-weight:700;color:#1B3A6B !important;border-bottom:1.5px solid #93c5fd;text-align:left;font-size:10.5px;letter-spacing:0.02em;}
+    td{padding:5px 9px;border-bottom:1px solid #e8edf5;font-size:11px;vertical-align:middle;}
+    .q-party-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+    .q-party-box{border:1px solid #b8cde8;border-radius:6px;overflow:hidden;}
+    .q-party-box h4{font-size:11px;font-weight:700;color:#1B3A6B;margin-bottom:6px;}
+    .q-total td{background:#e8f0f8 !important;font-weight:800;font-size:13px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .q-party-box h4{font-size:10px;font-weight:700;color:#1B3A6B;margin-bottom:6px;}
+    .q-summary-table{width:260px;margin-left:auto;border-collapse:collapse;font-size:11px;margin-top:8px;}
+    .q-summary-table td{padding:4px 6px;border:none;color:#374151;}
+    .q-summary-table td:last-child{text-align:right;}
+    .q-total-row td{font-weight:800;font-size:14px;border-top:2px solid #1B3A6B;padding-top:6px;color:#1B3A6B;}
+    .q-footer-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e2e8f0;padding:7px 20px;text-align:center;font-size:9.5px;color:#94a3b8;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    @media print{
+      body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+      .q-footer-bar{position:fixed;bottom:0;left:0;right:0;}
+    }
+    @page{margin:15mm 14mm 22mm 14mm;}
   </style></head><body><div class="qdoc">${content}</div>
   <script>setTimeout(()=>{window.print();},400);<\/script>
   </body></html>`);
@@ -2640,13 +2648,13 @@ function rPreviewQuote() {
       </table>
     </div>
     <table class="q-summary-table">
-      <tr><td style="color:#64748b;">소 계</td><td style="text-align:right;">${fmt(sub)} 원</td></tr>
-      ${discount>0?`<tr><td style="color:#ef4444;">할인</td><td style="text-align:right;color:#ef4444;">- ${fmt(discount)} 원</td></tr>`:''}
-      ${installFee>0?`<tr><td style="color:#64748b;">설치비</td><td style="text-align:right;">${fmt(installFee)} 원</td></tr>`:''}
-      <tr><td style="color:#64748b;">공급가액</td><td style="text-align:right;font-weight:600;">${fmt(supply)} 원</td></tr>
-      <tr><td style="color:#64748b;">부가세 (10%)</td><td style="text-align:right;">${fmt(vat)} 원</td></tr>
-      ${deposit>0?`<tr><td style="color:#1565c0;">보증금</td><td style="text-align:right;color:#1565c0;">${fmt(deposit)} 원</td></tr>`:''}
-      <tr class="r-q-total-row"><td>최종 합계</td><td style="text-align:right;color:#1a56a0;">${fmt(total)} 원</td></tr>
+      <tr><td>소 계</td><td>${fmt(sub)} 원</td></tr>
+      ${discount>0?`<tr><td style="color:#ef4444;">할인</td><td style="color:#ef4444;">- ${fmt(discount)} 원</td></tr>`:''}
+      ${installFee>0?`<tr><td>설치비</td><td>${fmt(installFee)} 원</td></tr>`:''}
+      <tr><td style="font-weight:600;">공급가액</td><td style="font-weight:600;">${fmt(supply)} 원</td></tr>
+      <tr><td>부가세 (10%)</td><td>${fmt(vat)} 원</td></tr>
+      ${deposit>0?`<tr><td style="color:#1565c0;">보증금</td><td style="color:#1565c0;">${fmt(deposit)} 원</td></tr>`:''}
+      <tr class="r-q-total-row"><td>최종 합계</td><td>${fmt(total)} 원</td></tr>
     </table>
     ${memo?`<div style="margin-top:14px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px;font-size:12px;"><strong style="color:#1565c0;">📝 메모</strong><div style="margin-top:4px;color:#374151;">${memo}</div></div>`:''}
     ${validUntil?`<div style="margin-top:8px;font-size:11px;color:#94a3b8;text-align:right;">유효기간: ${validUntil}</div>`:''}
@@ -2662,10 +2670,10 @@ function rPrintQuote() {
   win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>렌탈견적서</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#fff;color:#1a2e5a;font-size:12px;line-height:1.55;}
-    .qdoc{padding:0;max-width:100%;margin:0;}
+    body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#fff;color:#1a2e5a;font-size:11px;line-height:1.55;}
+    .qdoc{padding:18px 20px 70px 20px;max-width:100%;margin:0;}
     .q-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #1B3A6B;}
-    .q-logo-area img{height:38px;}
+    .q-logo-area img{height:38px;display:block;}
     h1{font-size:19px;font-weight:800;color:#1B3A6B;letter-spacing:0.04em;margin-bottom:3px;}
     .q-date{font-size:10px;color:#64748b;line-height:1.6;}
     .q-section{margin-bottom:14px;}
@@ -2676,15 +2684,18 @@ function rPrintQuote() {
     .q-rental-info-item .value{font-size:11px;font-weight:700;color:#1e293b;}
     .q-party-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
     table{width:100%;border-collapse:collapse;font-size:11px;}
-    th{background:#dbeafe !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:6px 8px;font-weight:700;color:#1B3A6B !important;border-bottom:1.5px solid #93c5fd;text-align:left;}
+    th{background:#dbeafe !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:6px 8px;font-weight:700;color:#1B3A6B !important;border-bottom:1.5px solid #93c5fd;text-align:left;font-size:10.5px;}
     td{padding:5px 8px;border-bottom:1px solid #e8edf5;font-size:11px;vertical-align:middle;}
     .q-summary-table{width:260px;margin-left:auto;border-collapse:collapse;font-size:11px;margin-top:8px;}
     .q-summary-table td{padding:4px 6px;border:none;color:#374151;}
     .q-summary-table td:last-child{text-align:right;}
     .r-q-total-row td{font-weight:800;font-size:13px;border-top:2px solid #1B3A6B;padding-top:6px;color:#1B3A6B;}
-    .q-footer-bar{margin-top:18px;border-top:1px solid #e2e8f0;padding-top:10px;text-align:center;font-size:9.5px;color:#94a3b8;}
-    @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;} @page{margin:15mm 14mm;}}
-    @page{margin:15mm 14mm;}
+    .q-footer-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e2e8f0;padding:7px 20px;text-align:center;font-size:9.5px;color:#94a3b8;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    @media print{
+      body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+      .q-footer-bar{position:fixed;bottom:0;left:0;right:0;}
+    }
+    @page{margin:15mm 14mm 22mm 14mm;}
   </style></head><body><div class="qdoc">${content}</div>
   <script>setTimeout(()=>{window.print();},400);<\/script>
   </body></html>`);
