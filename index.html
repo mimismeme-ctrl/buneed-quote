@@ -121,16 +121,16 @@
 .sub-panel{display:none;flex:1;flex-direction:column;min-height:0;overflow:hidden;}
 .sub-panel.active{display:flex;flex-direction:column;}
 /* ===== 공통 레이아웃 ===== */
-.split-layout{display:flex;flex-direction:column;flex:1;min-height:0;gap:0;overflow:hidden;}
-.catalog-panel{width:100%;height:220px;min-height:180px;background:#fff;border-bottom:1.5px solid var(--border);border-right:none;display:flex;flex-direction:column;overflow:hidden;}
+.split-layout{display:flex;flex:1;min-height:0;gap:0;overflow:hidden;}
+.catalog-panel{width:180px;min-width:150px;background:#fff;border-right:1.5px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
 .panel-header{padding:10px 12px;font-size:12px;font-weight:700;color:var(--navy);border-bottom:1px solid var(--border);background:#f8fafc;}
 .panel-header.r-header{color:var(--r-primary);}
-.filter-area{padding:6px 10px;border-bottom:1px solid var(--border);background:#fff;display:flex;gap:6px;flex-wrap:nowrap;}
-.filter-select{flex:1;min-width:100px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--navy);outline:none;margin-bottom:0;background:#fff;}
+.filter-area{padding:8px 10px;border-bottom:1px solid var(--border);background:#fff;}
+.filter-select{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--navy);outline:none;margin-bottom:6px;background:#fff;}
 .filter-select:focus{border-color:var(--p-blue);}
 .r-filter-select:focus{border-color:var(--r-blue);}
-.product-list{flex:1;overflow-y:hidden;overflow-x:auto;padding:6px;min-height:0;display:flex;flex-wrap:nowrap;gap:6px;align-items:flex-start;}
-.product-card{flex:none;width:140px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;margin-bottom:0;cursor:pointer;transition:all .15s;background:#fff;}
+.product-list{flex:1;overflow-y:auto;overflow-x:hidden;padding:6px;min-height:0;}
+.product-card{padding:8px 10px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer;transition:all .15s;background:#fff;}
 .product-card:hover{border-color:var(--p-blue);background:var(--p-accent);}
 .product-card.r-card:hover{border-color:var(--r-blue);background:var(--r-accent);}
 .product-card .pc-name{font-size:12px;font-weight:700;color:var(--p-navy);margin-bottom:2px;}
@@ -304,7 +304,8 @@ textarea.field-input{resize:vertical;min-height:52px;}
 
 /* ===== 모바일 반응형 ===== */
 @media (max-width: 768px) {
-  .catalog-panel{height:200px;min-width:unset;}
+  .split-layout{flex-direction:column;}
+  .catalog-panel{height:280px;min-width:unset;}
   .form-panel{overflow-y:auto;}
   .top-tab{padding:0 12px;height:44px;font-size:12px;gap:4px;}
   .top-tabs{padding:0 8px;}
@@ -567,13 +568,15 @@ textarea.field-input{resize:vertical;min-height:52px;}
   margin-bottom: 16px;
 }
 .atq-product-info .atq-name {
-  font-size: 15px; font-weight: 700; color: #1e293b; margin-bottom: 4px;
+  font-size: 16px; font-weight: 800; color: #1B3A6B; margin-bottom: 5px; letter-spacing: -0.3px;
 }
 .atq-product-info .atq-meta {
-  font-size: 12px; color: #64748b; margin-bottom: 6px;
+  font-size: 12px; color: #475569; margin-bottom: 7px; font-weight: 600;
+  display: flex; align-items: center; gap: 6px;
 }
 .atq-product-info .atq-spec {
-  font-size: 11px; color: #94a3b8; line-height: 1.5;
+  font-size: 11.5px; color: #475569; line-height: 1.7;
+  background: #fff; border-radius: 6px; padding: 6px 10px;
 }
 .atq-row-2col {
   display: grid;
@@ -924,13 +927,14 @@ textarea.field-input{resize:vertical;min-height:52px;}
         <div class="admin-card-header">
           <h2>📦 구매 제품 관리</h2>
           <div style="display:flex;gap:8px;align-items:center;">
+            <button class="btn btn-sm btn-danger" id="p-bulk-del-btn" onclick="pBulkDelete()" style="display:none;">🗑️ 선택 삭제</button>
             <input class="field-input" id="admin-product-search" placeholder="🔍 제품명/브랜드 검색..." oninput="filterAdminProducts()" style="font-size:12px;padding:5px 10px;width:200px;">
             <button class="btn btn-sm btn-primary" onclick="openProductModal()">+ 제품 추가</button>
           </div>
         </div>
         <div style="flex:1;overflow:auto;">
           <table class="data-table">
-            <thead><tr><th>카테고리</th><th>브랜드</th><th>제품명</th><th>사양</th><th style="text-align:right;">기본가격</th><th>관리</th></tr></thead>
+            <thead><tr><th style="width:36px;"><input type="checkbox" id="p-check-all" onchange="pToggleAll(this)" style="width:15px;height:15px;cursor:pointer;"></th><th>카테고리</th><th>브랜드</th><th>제품명</th><th>사양</th><th style="text-align:right;">기본가격</th><th>관리</th></tr></thead>
             <tbody id="admin-product-body"><tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted)">로딩 중...</td></tr></tbody>
           </table>
         </div>
@@ -942,13 +946,14 @@ textarea.field-input{resize:vertical;min-height:52px;}
         <div class="admin-card-header">
           <h2>🖥️ 렌탈 제품 관리</h2>
           <div style="display:flex;gap:8px;align-items:center;">
+            <button class="btn btn-sm btn-danger" id="r-bulk-del-btn" onclick="rBulkDelete()" style="display:none;">🗑️ 선택 삭제</button>
             <input class="field-input" id="r-admin-product-search" placeholder="🔍 제품명/브랜드 검색..." oninput="rFilterAdminProducts()" style="font-size:12px;padding:5px 10px;width:200px;">
             <button class="btn btn-sm btn-r-primary" onclick="rOpenProductModal()">+ 제품 추가</button>
           </div>
         </div>
         <div style="flex:1;overflow:auto;">
           <table class="data-table">
-            <thead><tr><th>카테고리</th><th>브랜드</th><th>제품명</th><th>사양</th><th style="text-align:right;">일 렌탈료</th><th style="text-align:right;">월 렌탈료</th><th>관리</th></tr></thead>
+            <thead><tr><th style="width:36px;"><input type="checkbox" id="r-check-all" onchange="rToggleAll(this)" style="width:15px;height:15px;cursor:pointer;"></th><th>카테고리</th><th>브랜드</th><th>제품명</th><th>사양</th><th style="text-align:right;">일 렌탈료</th><th style="text-align:right;">월 렌탈료</th><th>관리</th></tr></thead>
             <tbody id="r-admin-product-body"><tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">로딩 중...</td></tr></tbody>
           </table>
         </div>
@@ -987,7 +992,7 @@ textarea.field-input{resize:vertical;min-height:52px;}
           <input class="field-input" type="number" id="aq-qty" value="1" min="1" oninput="updateAQCalc()">
         </div>
         <div class="form-group">
-          <label>단가 (직접 수정)</label>
+          <label>단가 <span style="font-size:10px;color:#94a3b8;font-weight:400;">(직접 수정 가능)</span></label>
           <input class="field-input" type="number" id="aq-unit" oninput="updateAQCalc()">
         </div>
       </div>
@@ -1073,7 +1078,7 @@ textarea.field-input{resize:vertical;min-height:52px;}
           <input class="field-input" type="number" id="r-atq-qty" value="1" min="1" oninput="rUpdateAtqCalc()">
         </div>
         <div class="form-group">
-          <label>단가 (직접 수정)</label>
+          <label>단가 <span style="font-size:10px;color:#94a3b8;font-weight:400;">(직접 수정 가능)</span></label>
           <input class="field-input" type="number" id="r-atq-unit" oninput="rUpdateAtqCalc()">
         </div>
       </div>
@@ -1643,7 +1648,16 @@ function openSpecModal(productId) {
   document.getElementById('aq-title').textContent = p.name;
   const specSummaryHtml = p.spec_summary ? '<div style="color:#64748b;font-size:11px;margin-top:4px;line-height:1.5;">'+fmtSpec(p.spec_summary)+'</div>' : '';
   const featureHtml = p.feature ? '<div style="color:#475569;font-size:11px;margin-top:4px;padding:6px 8px;background:#f8fafc;border-radius:4px;line-height:1.5;">'+p.feature+'</div>' : '';
-  document.getElementById('aq-product-info').innerHTML = `<strong>${p.name}</strong> <span style="color:#94a3b8;font-size:11px;">${p.brand} · ${p.category}</span>${specSummaryHtml}${featureHtml}`;
+  document.getElementById('aq-product-info').innerHTML = `
+    <div class="atq-name">${p.name}</div>
+    <div class="atq-meta">
+      ${p.brand?`<span>🏷️ ${p.brand}</span>`:''}
+      ${p.category?`<span style="color:#94a3b8;">|</span><span>📁 ${p.category}</span>`:''}
+      ${p.base_price?`<span style="color:#94a3b8;">|</span><span style="color:#1B3A6B;font-weight:700;">₩ ${fmt(p.base_price)}</span>`:''}
+    </div>
+    ${p.spec_summary?`<div class="atq-spec">${fmtSpec(p.spec_summary)}</div>`:''}
+    ${p.feature?`<div style="margin-top:6px;padding:6px 10px;background:#fff3cd;border:1px solid #ffc107;border-radius:6px;font-size:11px;color:#856404;line-height:1.5;">💡 ${p.feature}</div>`:''}
+  `;
   const cats = specCategories.filter(c=>c.product_categories?.includes(p.category)||!c.product_categories?.length);
   let optsHtml = '';
   for (const cat of cats) {
@@ -2140,10 +2154,11 @@ async function renderAdminProducts() {
   if (!body) return;
   try {
     const { data, error } = await db.from('products').select('*').order('category');
-    if (error) { body.innerHTML='<tr><td colspan="6" style="text-align:center;padding:20px;color:#ef4444">로드 오류</td></tr>'; return; }
-    if (!data?.length) { body.innerHTML='<tr><td colspan="6" style="text-align:center;padding:20px;color:#94a3b8">제품 없음</td></tr>'; return; }
+    if (error) { body.innerHTML='<tr><td colspan="8" style="text-align:center;padding:20px;color:#ef4444">로드 오류</td></tr>'; return; }
+    if (!data?.length) { body.innerHTML='<tr><td colspan="8" style="text-align:center;padding:20px;color:#94a3b8">제품 없음</td></tr>'; return; }
     body.innerHTML = data.map(p=>`
       <tr>
+        <td style="text-align:center;"><input type="checkbox" class="p-row-check" data-id="${p.id}" onchange="pCheckChange()" style="width:15px;height:15px;cursor:pointer;"></td>
         <td>${p.category}</td>
         <td>${p.brand}</td>
         <td style="font-weight:600;">${p.name}</td>
@@ -2156,7 +2171,7 @@ async function renderAdminProducts() {
       </tr>`).join('');
   } catch(e) {
     console.error('renderAdminProducts 오류:', e);
-    if (body) body.innerHTML='<tr><td colspan="6" style="text-align:center;color:#ef4444">오류 발생: '+e.message+'</td></tr>';
+    if (body) body.innerHTML='<tr><td colspan="8" style="text-align:center;color:#ef4444">오류 발생: '+e.message+'</td></tr>';
   }
 }
 
@@ -2321,7 +2336,16 @@ function rOpenAtqModal(pid) {
   rCurrentProductId = pid;
   rAtqType = rCurrentType;
   document.getElementById('r-atq-title').textContent = p.name + ' 추가';
-  document.getElementById('r-atq-info').innerHTML = `<strong>${p.name}</strong> | ${p.brand||''} | ${p.category||''}${p.spec?`<br><span style="color:#64748b;font-size:11px;">${p.spec}</span>`:''}`;
+  document.getElementById('r-atq-info').innerHTML = `
+    <div class="atq-name" style="color:var(--r-primary);">${p.name}</div>
+    <div class="atq-meta" style="color:var(--r-blue);">
+      ${p.brand?`<span>🏷️ ${p.brand}</span>`:''}
+      ${p.category?`<span style="color:#94a3b8;">|</span><span>📁 ${p.category}</span>`:''}
+      ${p.daily_price?`<span style="color:#94a3b8;">|</span><span style="color:var(--r-primary);font-weight:700;">일 ₩${fmt(p.daily_price)}</span>`:''}
+      ${p.monthly_price?`<span style="color:#94a3b8;">/</span><span style="color:var(--r-primary);font-weight:700;">월 ₩${fmt(p.monthly_price)}</span>`:''}
+    </div>
+    ${p.spec?`<div class="atq-spec" style="background:rgba(255,255,255,0.7);">${p.spec}</div>`:''}
+  `;
   document.getElementById('r-atq-daily-btn').classList.toggle('active', rAtqType==='일');
   document.getElementById('r-atq-monthly-btn').classList.toggle('active', rAtqType==='월');
   document.getElementById('r-atq-unit').value = rAtqType==='일' ? (p.daily_price||0) : (p.monthly_price||0);
@@ -2714,10 +2738,11 @@ async function rRenderAdminProducts() {
   if (!body) return;
   try {
     const { data, error } = await db.from('rental_products').select('*').order('category');
-    if (error) { body.innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:#ef4444">로드 오류</td></tr>'; return; }
-    if (!data?.length) { body.innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:#94a3b8">제품 없음</td></tr>'; return; }
+    if (error) { body.innerHTML='<tr><td colspan="8" style="text-align:center;padding:20px;color:#ef4444">로드 오류</td></tr>'; return; }
+    if (!data?.length) { body.innerHTML='<tr><td colspan="8" style="text-align:center;padding:20px;color:#94a3b8">제품 없음</td></tr>'; return; }
     body.innerHTML = data.map(p=>`
       <tr>
+        <td style="text-align:center;"><input type="checkbox" class="r-row-check" data-id="${p.id}" onchange="rCheckChange()" style="width:15px;height:15px;cursor:pointer;"></td>
         <td>${p.category||''}</td>
         <td>${p.brand||''}</td>
         <td style="font-weight:600;">${p.name}</td>
@@ -2731,7 +2756,7 @@ async function rRenderAdminProducts() {
       </tr>`).join('');
   } catch(e) {
     console.error('rRenderAdminProducts 오류:', e);
-    if (body) body.innerHTML='<tr><td colspan="7" style="text-align:center;color:#ef4444">오류 발생: '+e.message+'</td></tr>';
+    if (body) body.innerHTML='<tr><td colspan="8" style="text-align:center;color:#ef4444">오류 발생: '+e.message+'</td></tr>';
   }
 }
 function rOpenProductModal(pid) {
@@ -2775,6 +2800,65 @@ async function rDeleteProduct(pid) {
   await rLoadRentalProducts(); rRenderAdminProducts(); rRenderProductList();
   showToast('삭제되었습니다','success');
 }
+
+// ===== 구매 제품 체크박스 일괄 삭제 =====
+function pToggleAll(cb) {
+  document.querySelectorAll('.p-row-check').forEach(c => c.checked = cb.checked);
+  pCheckChange();
+}
+function pCheckChange() {
+  const checked = document.querySelectorAll('.p-row-check:checked');
+  const btn = document.getElementById('p-bulk-del-btn');
+  if (btn) btn.style.display = checked.length > 0 ? '' : 'none';
+  const all = document.querySelectorAll('.p-row-check');
+  const allCb = document.getElementById('p-check-all');
+  if (allCb) allCb.indeterminate = checked.length > 0 && checked.length < all.length;
+  if (allCb && checked.length === all.length && all.length > 0) allCb.checked = true;
+  if (allCb && checked.length === 0) allCb.checked = false;
+}
+async function pBulkDelete() {
+  const checked = [...document.querySelectorAll('.p-row-check:checked')];
+  if (!checked.length) return;
+  if (!confirm(`선택한 ${checked.length}개 구매 제품을 삭제하시겠습니까?`)) return;
+  const ids = checked.map(c => c.dataset.id);
+  const { error } = await db.from('products').delete().in('id', ids);
+  if (error) { showToast('삭제 오류: ' + error.message, 'error'); return; }
+  showToast(`${ids.length}개 제품이 삭제되었습니다`, 'success');
+  await loadProducts(); renderAdminProducts(); renderProducts();
+  document.getElementById('p-check-all').checked = false;
+  const btn = document.getElementById('p-bulk-del-btn');
+  if (btn) btn.style.display = 'none';
+}
+
+// ===== 렌탈 제품 체크박스 일괄 삭제 =====
+function rToggleAll(cb) {
+  document.querySelectorAll('.r-row-check').forEach(c => c.checked = cb.checked);
+  rCheckChange();
+}
+function rCheckChange() {
+  const checked = document.querySelectorAll('.r-row-check:checked');
+  const btn = document.getElementById('r-bulk-del-btn');
+  if (btn) btn.style.display = checked.length > 0 ? '' : 'none';
+  const all = document.querySelectorAll('.r-row-check');
+  const allCb = document.getElementById('r-check-all');
+  if (allCb) allCb.indeterminate = checked.length > 0 && checked.length < all.length;
+  if (allCb && checked.length === all.length && all.length > 0) allCb.checked = true;
+  if (allCb && checked.length === 0) allCb.checked = false;
+}
+async function rBulkDelete() {
+  const checked = [...document.querySelectorAll('.r-row-check:checked')];
+  if (!checked.length) return;
+  if (!confirm(`선택한 ${checked.length}개 렌탈 제품을 삭제하시겠습니까?`)) return;
+  const ids = checked.map(c => c.dataset.id);
+  const { error } = await db.from('rental_products').delete().in('id', ids);
+  if (error) { showToast('삭제 오류: ' + error.message, 'error'); return; }
+  showToast(`${ids.length}개 렌탈 제품이 삭제되었습니다`, 'success');
+  await rLoadRentalProducts(); rRenderAdminProducts(); rRenderProductList();
+  document.getElementById('r-check-all').checked = false;
+  const btn = document.getElementById('r-bulk-del-btn');
+  if (btn) btn.style.display = 'none';
+}
+
 
 </script>
 </body>
