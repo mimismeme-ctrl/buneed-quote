@@ -572,6 +572,9 @@ textarea.field-input{resize:vertical;min-height:52px;}
                 <div><div class="field-label">연락처</div><input class="field-input" id="f-sales-phone" placeholder="010-0000-0000"></div>
                 <div><div class="field-label">이메일</div><input class="field-input" id="f-sales-email" placeholder="sales@buneed.co.kr"></div>
               </div>
+              <div class="form-row">
+                <div><div class="field-label">부서</div><input class="field-input" id="f-sales-dept" placeholder="예: 영업팀"></div>
+              </div>
             </div>
             <!-- 고객(수신) 정보 -->
             <div class="form-section">
@@ -1427,7 +1430,7 @@ function calcPrice() {
 }
 function calcPriceByAmt() {
   const sub = quoteItems.reduce((s,it)=>s+it.total_price,0);
-  const discAmt = parseInt(document.getElementById('discount-amt').value)||0;
+  const discAmt = parseInt((document.getElementById('discount-amt')||{}).value)||0;
   document.getElementById('discount-rate').value = sub>0?(discAmt/sub*100).toFixed(1):0;
   const supply = sub - discAmt;
   const vat = Math.round(supply*0.1);
@@ -1453,12 +1456,12 @@ async function saveQuote() {
     const payload = {
       quote_number: currentQuoteNum, share_token: currentShareToken,
       company_name: company,
-      contact_name: document.getElementById('f-contact').value,
-      contact_tel: document.getElementById('f-phone').value,
-      contact_email: document.getElementById('f-email').value,
-      delivery_date: document.getElementById('f-delivery').value||null,
-      valid_until: document.getElementById('f-validity').value||'견적일로부터 30일',
-      memo: document.getElementById('f-memo').value,
+      contact_name: (document.getElementById('f-contact')||{}).value||null,
+      contact_tel: (document.getElementById('f-phone')||{}).value||null,
+      contact_email: (document.getElementById('f-email')||{}).value||null,
+      delivery_date: (document.getElementById('f-delivery')||{}).value||null,
+      valid_until: (document.getElementById('f-validity')||{value:'견적일로부터 30일'}).value||'견적일로부터 30일',
+      memo: (document.getElementById('f-memo')||{}).value||null,
       subtotal:sub, discount_amount:discAmt, supply_price:supply, vat, total:supply+vat,
       status:'draft',
       sales_name: document.getElementById('f-sales-name').value||null,
@@ -2010,9 +2013,9 @@ function rCalcPriceByRate() {
 }
 function rCalcPrice() {
   const sub = rQuoteItems.reduce((s,i)=>s+i.total_price,0);
-  const discount = parseInt(document.getElementById('r-discount').value)||0;
-  const installFee = parseInt(document.getElementById('r-install-fee').value)||0;
-  const deposit = parseInt(document.getElementById('r-deposit').value)||0;
+  const discount = parseInt((document.getElementById('r-discount')||{}).value)||0;
+  const installFee = parseInt((document.getElementById('r-install-fee')||{}).value)||0;
+  const deposit = parseInt((document.getElementById('r-deposit')||{}).value)||0;
   const supply = sub - discount + installFee;
   const vat = Math.round(supply*0.1);
   document.getElementById('r-ps-subtotal').textContent = fmt(sub)+' 원';
@@ -2041,22 +2044,22 @@ async function rSaveQuote() {
     const payload = {
       quote_number: qNum, share_token: rCurrentShareToken,
       company_name: company,
-      contact_name: document.getElementById('r-contact').value,
-      contact_tel: document.getElementById('r-phone').value,
-      contact_email: document.getElementById('r-email').value,
-      usage_purpose: document.getElementById('r-purpose').value,
+      contact_name: (document.getElementById('r-contact')||{}).value||null,
+      contact_tel: (document.getElementById('r-phone')||{}).value||null,
+      contact_email: (document.getElementById('r-email')||{}).value||null,
+      usage_purpose: (document.getElementById('r-purpose')||{}).value||null,
       rental_type: rCurrentType,
-      rental_duration: parseInt(document.getElementById('r-duration').value)||null,
-      rental_start_date: document.getElementById('r-start-date').value||null,
-      delivery_location: document.getElementById('r-delivery-loc').value,
-      return_method: document.getElementById('r-return-method').value,
+      rental_duration: parseInt((document.getElementById('r-duration')||{}).value)||null,
+      rental_start_date: (document.getElementById('r-start-date')||{}).value||null,
+      delivery_location: (document.getElementById('r-delivery-loc')||{}).value||null,
+      return_method: (document.getElementById('r-return-method')||{}).value||null,
       subtotal:sub, discount_amount:discount, installation_fee:installFee,
       deposit, supply_price:supply, vat, total, status:'draft',
-      memo: document.getElementById('r-memo').value,
-      valid_until: document.getElementById('r-valid').value,
-      sales_name: document.getElementById('r-sales-name').value,
-      sales_phone: document.getElementById('r-sales-phone').value,
-      sales_email: document.getElementById('r-sales-email').value,
+      memo: (document.getElementById('r-memo')||{}).value||null,
+      valid_until: (document.getElementById('r-valid')||{}).value||null,
+      sales_name: (document.getElementById('r-sales-name')||{}).value||null,
+      sales_phone: (document.getElementById('r-sales-phone')||{}).value||null,
+      sales_email: (document.getElementById('r-sales-email')||{}).value||null,
       sales_dept: (document.getElementById('r-sales-dept')||{}).value||null,
     };
     let qId = rCurrentQuoteId;
