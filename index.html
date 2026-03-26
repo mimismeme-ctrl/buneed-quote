@@ -101,7 +101,8 @@
   padding:0 16px;flex-shrink:0;gap:2px;
 }
 .sub-tab{
-  padding:0 14px;height:36px;font-size:12px;font-weight:600;
+  padding:0 28px;height:38px;font-size:12px;font-weight:600;
+  min-width:120px;
   color:#94a3b8;cursor:pointer;border:none;background:transparent;
   border-bottom:2px solid transparent;transition:all .15s;
   font-family:'Pretendard',system-ui,sans-serif;
@@ -167,11 +168,14 @@
 .field-input.small{padding:4px 8px;}
 textarea.field-input{resize:vertical;min-height:52px;}
 /* ===== 견적 품목 ===== */
-.quote-items-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.quote-items-header{display:flex;justify-content:space-between;align-items:center;margin:-14px -14px 10px -14px;border-radius:6px 6px 0 0;overflow:hidden;}
 .items-table{width:100%;border-collapse:collapse;font-size:12px;}
 .items-table th{background:#dbeafe;padding:6px 8px;font-weight:700;color:#1B3A6B;border-bottom:2px solid #93c5fd;text-align:left;white-space:nowrap;}
 .items-table td{padding:7px 8px;border-bottom:1px solid var(--border);vertical-align:middle;}
-.qty-input{width:50px;padding:4px 6px;border:1px solid var(--border);border-radius:5px;font-size:11px;text-align:center;}
+.qty-input{width:38px;padding:3px 4px;border:1px solid #cbd5e1;border-radius:5px;font-size:11px;text-align:center;font-weight:600;}
+.qty-stepper{display:inline-flex;align-items:center;gap:4px;}
+.qty-btn{width:24px;height:24px;border:1px solid #cbd5e1;border-radius:5px;background:#f8fafc;color:#1B3A6B;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:background .15s;}
+.qty-btn:hover{background:#dbeafe;border-color:#93c5fd;}
 .btn-rm{background:#fee2e2;color:#ef4444;border:none;border-radius:5px;padding:3px 7px;font-size:11px;cursor:pointer;}
 /* ===== 금액 요약 (구매) ===== */
 .price-summary{background:#fff;border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1px solid var(--border);}
@@ -611,7 +615,7 @@ textarea.field-input{resize:vertical;min-height:52px;}
             <!-- 품목 -->
             <div class="form-section">
               <div class="quote-items-header">
-                <div class="section-title" style="margin-bottom:0">📋 견적 품목</div>
+                <div class="section-title" style="margin:0;border-radius:0;width:100%;">📋 견적 품목</div>
               </div>
               <div id="quote-items-area"><div class="no-products" style="padding:16px 0">좌측 카탈로그에서 제품을 클릭하여 추가하세요</div></div>
             </div>
@@ -743,7 +747,7 @@ textarea.field-input{resize:vertical;min-height:52px;}
             <!-- 렌탈 품목 -->
             <div class="form-section">
               <div class="quote-items-header">
-                <div class="r-section-title" style="margin-bottom:0">📋 렌탈 품목</div>
+                <div class="r-section-title" style="margin:0;border-radius:0;width:100%;">📋 렌탈 품목</div>
               </div>
               <div id="r-quote-items-area"><div class="no-products" style="padding:16px 0">좌측 카탈로그에서 제품을 클릭하여 추가하세요</div></div>
             </div>
@@ -835,7 +839,7 @@ textarea.field-input{resize:vertical;min-height:52px;}
         </div>
         <div style="overflow-x:auto;max-height:calc(100vh - 200px);overflow-y:auto;">
           <table class="data-table">
-            <thead><tr><th>제품명</th><th>브랜드</th><th>카테고리</th><th>사양</th><th style="text-align:right;">일 렌탈료</th><th style="text-align:right;">월 렌탈료</th><th>관리</th></tr></thead>
+            <thead><tr><th>제품명</th><th>브랜드</th><th>카테고리</th><th style="text-align:right;">일 렌탈료</th><th style="text-align:right;">월 렌탈료</th><th>사양</th><th>관리</th></tr></thead>
             <tbody id="r-admin-product-body"><tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">로딩 중...</td></tr></tbody>
           </table>
         </div>
@@ -1413,16 +1417,21 @@ function renderQuoteItems() {
     el.innerHTML='<div class="no-products" style="padding:16px 0">좌측 카탈로그에서 제품을 클릭하여 추가하세요</div>';
     return;
   }
-  el.innerHTML = `<table class="items-table"><thead><tr><th style="width:70px;">브랜드</th><th>제품명 / 사양</th><th>단가</th><th>수량</th><th>합계</th><th></th></tr></thead><tbody>
+  el.innerHTML = `<table class="items-table"><thead><tr><th style="width:70px;">브랜드</th><th>제품명 / 사양</th><th style="text-align:right;min-width:90px;">단가</th><th style="text-align:center;min-width:100px;">수량</th><th></th></tr></thead><tbody>
     ${quoteItems.map((it,i)=>`<tr>
       <td style="text-align:center;vertical-align:middle;padding:6px 4px;">
         <div style="font-size:10.5px;font-weight:700;color:#1B3A6B;white-space:nowrap;">${it.brand||''}</div>
         <div style="font-size:10px;color:#94a3b8;margin-top:2px;">${it.category||''}</div>
       </td>
       <td><strong>${it.product_name}</strong>${it.spec_summary ? `<div style="font-size:10.5px;color:#64748b;margin-top:3px;line-height:1.4;">${fmtSpec(it.spec_summary)}</div>` : ''}</td>
-      <td>${fmt(it.unit_price)}원</td>
-      <td><input class="qty-input" type="number" value="${it.qty}" min="1" onchange="changeQty(${i},this.value)"></td>
-      <td style="font-weight:600;">${fmt(it.total_price)}원</td>
+      <td style="text-align:right;font-size:12px;">${fmt(it.unit_price)}원</td>
+      <td style="text-align:center;">
+        <div class="qty-stepper">
+          <button class="qty-btn" onclick="changeQty(${i},${it.qty}-1)">−</button>
+          <input class="qty-input" type="number" value="${it.qty}" min="1" onchange="changeQty(${i},this.value)">
+          <button class="qty-btn" onclick="changeQty(${i},${it.qty}+1)">+</button>
+        </div>
+      </td>
       <td><button class="btn-rm" onclick="removeItem(${i})">✕</button></td>
     </tr>`).join('')}
     </tbody></table>`;
@@ -2005,7 +2014,7 @@ function rRenderQuoteItems() {
     el.innerHTML='<div class="no-products" style="padding:16px 0">좌측 카탈로그에서 제품을 클릭하여 추가하세요</div>';
     return;
   }
-  el.innerHTML = `<table class="items-table"><thead><tr><th style="width:70px;">브랜드</th><th>제품명 / 사양</th><th>단위</th><th>단가</th><th>수량</th><th>소계</th><th></th></tr></thead><tbody>
+  el.innerHTML = `<table class="items-table"><thead><tr><th style="width:70px;">브랜드</th><th>제품명 / 사양</th><th style="text-align:center;width:50px;">단위</th><th style="text-align:right;min-width:90px;">단가</th><th style="text-align:center;min-width:100px;">수량</th><th></th></tr></thead><tbody>
     ${rQuoteItems.map((it,i)=>`<tr>
       <td style="text-align:center;vertical-align:middle;padding:6px 4px;">
         <div style="font-size:10.5px;font-weight:700;color:#1B3A6B;white-space:nowrap;">${it.brand||''}</div>
@@ -2013,9 +2022,14 @@ function rRenderQuoteItems() {
       </td>
       <td><strong>${it.product_name}</strong>${it.product_spec?`<div style="font-size:10px;color:#64748b;margin-top:2px;line-height:1.4;">${fmtSpec(it.product_spec)}</div>`:''}​</td>
       <td><span class="badge ${it.rental_type==='일'?'badge-daily':'badge-monthly'}">${it.rental_type}</span></td>
-      <td>${fmt(it.unit_price)}원</td>
-      <td><input class="qty-input" type="number" value="${it.quantity}" min="1" onchange="rChangeQty(${i},this.value)"></td>
-      <td style="font-weight:600;color:var(--r-primary);">${fmt(it.total_price)}원</td>
+      <td style="text-align:right;font-size:12px;">${fmt(it.unit_price)}원</td>
+      <td style="text-align:center;">
+        <div class="qty-stepper">
+          <button class="qty-btn" onclick="rChangeQty(${i},${it.quantity}-1)">−</button>
+          <input class="qty-input" type="number" value="${it.quantity}" min="1" onchange="rChangeQty(${i},this.value)">
+          <button class="qty-btn" onclick="rChangeQty(${i},${it.quantity}+1)">+</button>
+        </div>
+      </td>
       <td><button class="btn-rm" onclick="rRemoveItem(${i})">✕</button></td>
     </tr>`).join('')}
     </tbody></table>`;
@@ -2456,9 +2470,9 @@ async function rRenderAdminProducts() {
       <td style="font-weight:600;">${p.name}</td>
       <td>${p.brand||''}</td>
       <td>${p.category||''}</td>
-      <td style="font-size:11px;color:#64748b;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.spec||''}</td>
       <td style="text-align:right;">${fmt(p.daily_price||0)}원</td>
       <td style="text-align:right;">${fmt(p.monthly_price||0)}원</td>
+      <td style="font-size:11px;color:#64748b;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.spec||''}</td>
       <td style="display:flex;gap:5px;">
         <button class="btn btn-r-secondary btn-sm" onclick="rOpenProductModal('${p.id}')">수정</button>
         <button class="btn btn-danger btn-sm" onclick="rDeleteProduct('${p.id}')">삭제</button>
