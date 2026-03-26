@@ -1846,10 +1846,10 @@ async function saveQuote() {
       memo: (document.getElementById('f-memo')||{}).value||null,
       subtotal:sub, discount_amount:discAmt, supply_price:supply, vat, total:supply+vat,
       status:'draft',
-      sales_name: document.getElementById('f-sales-name').value||null,
-      sales_phone: document.getElementById('f-sales-phone').value||null,
-      sales_email: document.getElementById('f-sales-email').value||null,
-      sales_dept: document.getElementById('f-sales-dept').value||null,
+      sales_name: (document.getElementById('f-sales-name')||{}).value||null,
+      sales_phone: (document.getElementById('f-sales-phone')||{}).value||null,
+      sales_email: (document.getElementById('f-sales-email')||{}).value||null,
+      sales_dept: (document.getElementById('f-sales-dept')||{}).value||null,
     };
     let qId;
     if (editingQuoteId) {
@@ -2027,10 +2027,13 @@ function previewQuote() {
 }
 
 function printQuote() {
-  const content = document.getElementById('preview-content').innerHTML;
-  const win = window.open('','_blank');
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>구매견적서</title>
-  <style>
+  const previewEl = document.getElementById('preview-content');
+  if (!previewEl || !previewEl.innerHTML.trim()) {
+    showToast('먼저 미리보기를 열어주세요', 'error'); return;
+  }
+  // 현재 body 저장 후 인쇄용 내용만 표시
+  const origBody = document.body.innerHTML;
+  const printStyle = `<style id="print-only-style">
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#fff;color:#1a2e5a;font-size:11px;line-height:1.55;}
     .qdoc{padding:18px 20px 70px 20px;max-width:100%;margin:0;}
@@ -2044,10 +2047,8 @@ function printQuote() {
     th{background:#dbeafe !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:7px 9px;font-weight:700;color:#1B3A6B !important;border-bottom:1.5px solid #93c5fd;text-align:left;font-size:10.5px;}
     td{padding:5px 9px;border-bottom:1px solid #e8edf5;font-size:11px;vertical-align:middle;}
     .q-party-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
-    /* 수신 헤더: 연한 파랑 #0E76BB */
-    .q-party-susin-header{background:#0E76BB !important;padding:7px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-    /* 공급 헤더: 진한 네이비 #1B3A6B */
-    .q-party-gonggeup-header{background:#1B3A6B !important;padding:7px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .q-party-susin-header{background:#0E76BB !important;padding:7px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;}
+    .q-party-gonggeup-header{background:#1B3A6B !important;padding:7px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;}
     .q-party-header-text{font-size:12px;font-weight:700;color:#fff;letter-spacing:0.1em;}
     .q-party-box{border:1px solid #b8cde8;border-radius:6px;overflow:hidden;}
     .q-summary-table{width:260px;margin-left:auto;border-collapse:collapse;font-size:11px;margin-top:8px;}
@@ -2055,16 +2056,22 @@ function printQuote() {
     .q-summary-table td:last-child{text-align:right;}
     .q-total-row td{font-weight:800;font-size:14px;border-top:2px solid #1B3A6B;padding-top:6px;color:#1B3A6B;}
     .r-q-total-row td{font-weight:800;font-size:14px;border-top:2px solid #1B3A6B;padding-top:6px;color:#1B3A6B;}
-    .q-footer-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e2e8f0;padding:7px 20px;text-align:center;font-size:9.5px;color:#94a3b8;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .q-rental-info-box{background:#f8fafc !important;border:1px solid #cbd5e1;border-radius:6px;padding:10px 14px;margin-bottom:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .q-rental-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px;}
+    .q-rental-info-item .label{font-size:9.5px;color:#475569;font-weight:600;margin-bottom:1px;}
+    .q-rental-info-item .value{font-size:11px;font-weight:700;color:#1e293b;}
+    .q-footer-bar{position:fixed;bottom:0;left:0;right:0;background:#fff !important;border-top:1px solid #e2e8f0;padding:7px 20px;text-align:center;font-size:9.5px;color:#94a3b8;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
     @media print{
       body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
       .q-footer-bar{position:fixed;bottom:0;left:0;right:0;}
     }
     @page{margin:15mm 14mm 22mm 14mm;}
-  </style></head><body><div class="qdoc">${content}</div>
-  <script>setTimeout(()=>{window.print();},400);<\/script>
-  </body></html>`);
-  win.document.close();
+  </style>`;
+  document.body.innerHTML = printStyle + '<div class="qdoc">' + previewEl.innerHTML + '</div>';
+  window.print();
+  document.body.innerHTML = origBody;
+  // 이벤트/바인딩 복원을 위해 페이지 리로드 없이 모달 재오픈
+  setTimeout(() => { location.reload(); }, 100);
 }
 
 /* copyQuoteLink v1 removed – using async v2 */
@@ -2671,10 +2678,11 @@ function rPreviewQuote() {
 }
 
 function rPrintQuote() {
-  const content = document.getElementById('r-preview-content').innerHTML;
-  const win = window.open('','_blank');
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>렌탈견적서</title>
-  <style>
+  const previewEl = document.getElementById('r-preview-content');
+  if (!previewEl || !previewEl.innerHTML.trim()) {
+    showToast('먼저 미리보기를 열어주세요', 'error'); return;
+  }
+  const printStyle = `<style id="print-only-style">
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#fff;color:#1a2e5a;font-size:11px;line-height:1.55;}
     .qdoc{padding:18px 20px 70px 20px;max-width:100%;margin:0;}
@@ -2684,15 +2692,13 @@ function rPrintQuote() {
     .q-date{font-size:10px;color:#64748b;line-height:1.6;}
     .q-section{margin-bottom:14px;}
     .q-section-title,.r-q-section-title{font-size:10px;font-weight:700;color:#1B3A6B;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid #dbeafe;padding-bottom:3px;}
-    .q-rental-info-box{background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;padding:10px 14px;margin-bottom:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .q-rental-info-box{background:#f8fafc !important;border:1px solid #cbd5e1;border-radius:6px;padding:10px 14px;margin-bottom:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
     .q-rental-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px;}
     .q-rental-info-item .label{font-size:9.5px;color:#475569;font-weight:600;margin-bottom:1px;}
     .q-rental-info-item .value{font-size:11px;font-weight:700;color:#1e293b;}
     .q-party-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
-    /* 수신 헤더: 연한 파랑 #0E76BB */
-    .q-party-susin-header{background:#0E76BB !important;padding:7px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-    /* 공급 헤더: 진한 네이비 #1B3A6B */
-    .q-party-gonggeup-header{background:#1B3A6B !important;padding:7px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .q-party-susin-header{background:#0E76BB !important;padding:7px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;}
+    .q-party-gonggeup-header{background:#1B3A6B !important;padding:7px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;}
     .q-party-header-text{font-size:12px;font-weight:700;color:#fff;letter-spacing:0.1em;}
     .q-party-box{border:1px solid #b8cde8;border-radius:6px;overflow:hidden;}
     table{width:100%;border-collapse:collapse;font-size:11px;}
@@ -2702,17 +2708,18 @@ function rPrintQuote() {
     .q-summary-table td{padding:4px 6px;border:none;color:#374151;}
     .q-summary-table td:last-child{text-align:right;}
     .q-total-row td,.r-q-total-row td{font-weight:800;font-size:14px;border-top:2px solid #1B3A6B;padding-top:6px;color:#1B3A6B;}
-    .q-footer-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e2e8f0;padding:7px 20px;text-align:center;font-size:9.5px;color:#94a3b8;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .q-footer-bar{position:fixed;bottom:0;left:0;right:0;background:#fff !important;border-top:1px solid #e2e8f0;padding:7px 20px;text-align:center;font-size:9.5px;color:#94a3b8;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
     @media print{
       body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
       .q-footer-bar{position:fixed;bottom:0;left:0;right:0;}
     }
     @page{margin:15mm 14mm 22mm 14mm;}
-  </style></head><body><div class="qdoc">${content}</div>
-  <script>setTimeout(()=>{window.print();},400);<\/script>
-  </body></html>`);
-  win.document.close();
+  </style>`;
+  document.body.innerHTML = printStyle + '<div class="qdoc">' + previewEl.innerHTML + '</div>';
+  window.print();
+  setTimeout(() => { location.reload(); }, 100);
 }
+
 
 function copyRentalQuoteLink(token) {
   if (!token) { showToast('저장된 견적만 링크 복사가 가능합니다','error'); return; }
