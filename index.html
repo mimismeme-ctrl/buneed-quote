@@ -1179,6 +1179,10 @@ const RENTAL_SAMPLE_PRODUCTS = [
   {brand:'LG',category:'모니터',name:'27BA450',spec:'크기: 27 inch / 해상도: FHD / 1920*1080 / 패널: IPS / 밝기: 250nits / 연결단자: HDMI(1), VGA(1)',daily_price:1500,monthly_price:30000,is_active:true}
 ];
 
+// ===== 유틸리티 함수 =====
+function fmt(n) { return Math.round(n || 0).toLocaleString('ko-KR'); }
+function fmtNum(n) { return fmt(n); }
+
 // ===== Supabase 클라이언트 초기화 =====
 const db = supabase.createClient(SUPA_URL, SUPA_KEY, {
   auth: { persistSession: true, autoRefreshToken: true }
@@ -1520,8 +1524,6 @@ function toggleSpecOpt(catId, optId, delta) {
   }
   resetAQPrice();
 }
-
-function fmtNum(n) { return fmt(n); }
 function updateAQCalc() {
   const unit = parseInt(document.getElementById('aq-unit').value)||0;
   const qty = parseInt(document.getElementById('aq-qty').value)||1;
