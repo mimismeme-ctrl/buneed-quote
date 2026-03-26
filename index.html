@@ -263,7 +263,7 @@ textarea.field-input{resize:vertical;min-height:52px;}
   padding-bottom:6px;border-bottom:1.5px solid #dde3ee;
   margin-bottom:10px;
 }
-.r-q-section-title{font-size:11px;font-weight:700;color:var(--r-primary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;}
+.r-q-section-title{font-size:12px;font-weight:800;color:#1B3A6B;text-transform:uppercase;letter-spacing:.08em;padding-bottom:6px;border-bottom:1.5px solid #dde3ee;margin-bottom:10px;}
 .q-party-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px;}
 .q-party-box{border:1px solid var(--border);border-radius:8px;padding:10px;}
 .q-party-box h4{font-size:11px;font-weight:700;margin-bottom:6px;}
@@ -1370,34 +1370,135 @@ async function checkShareParam() {
         <td style="text-align:right;font-weight:700;color:${thColor};">${fmt(it.total_price||0)}원</td>
       </tr>`).join('');
     
+    // 추가 데이터 추출
+    const svCompany = data.company_name || '';
+    const svContact = data.contact_name || '';
+    const svPhone = data.contact_tel || '';
+    const svEmail = data.contact_email || '';
+    const svSalesName = data.sales_name || '';
+    const svSalesPhone = data.sales_phone || '031.8028.0464';
+    const svSalesEmail = data.sales_email || 'sales@buneed.co.kr';
+    const svDelivery = data.delivery_date || '';
+    const svValidity = data.valid_until || '견적일로부터 30일';
+    const svMemo = data.memo || '';
+    // 수신=연파랑, 공급=진파랑
+    const susinColor = '#0E76BB';
+    const gonggeupColor = '#1B3A6B';
+
     shareDiv.innerHTML = `
-    <div style="background:#fff;border-radius:12px;padding:28px 32px;max-width:820px;width:100%;box-shadow:0 4px 24px rgba(27,58,107,.12);">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;border-bottom:2px solid ${thColor};padding-bottom:14px;">
-        <div><h1 style="color:${thColor};font-size:22px;font-weight:800;margin:0 0 4px 0;">${typeLabel}</h1>
-          <div style="font-size:11px;color:#64748b;">견적번호: ${data.quote_number||'-'} | 작성일: ${today}</div></div>
-        <div style="text-align:right;font-size:11px;color:#64748b;">
-          <div>주식회사 비유니드</div><div>031.8028.0464</div></div>
+    <style>
+      .sv-wrap{background:#fff;border-radius:12px;padding:24px 28px;max-width:860px;width:100%;box-shadow:0 4px 24px rgba(27,58,107,.12);}
+      .sv-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;border-bottom:2px solid ${thColor};padding-bottom:12px;}
+      .sv-title{color:${thColor};font-size:22px;font-weight:800;margin:0 0 4px 0;}
+      .sv-meta{font-size:11px;color:#64748b;}
+      .sv-co{text-align:right;font-size:11px;color:#64748b;}
+      .sv-party-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+      .sv-party-box{border:1px solid #b8cde8;border-radius:8px;overflow:hidden;}
+      .sv-party-hd{padding:7px 14px;display:flex;align-items:center;}
+      .sv-party-hd span{font-size:12px;font-weight:700;color:#fff;letter-spacing:0.1em;}
+      .sv-party-body{background:#fff;padding:10px 12px;}
+      .sv-party-body table{font-size:12px;width:100%;border-collapse:collapse;}
+      .sv-party-body td{color:#64748b;padding:3px 0;font-size:11px;}
+      .sv-party-body td:last-child{color:#1e293b;font-weight:600;}
+      .sv-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+      .sv-info-box{border:1px solid #e2e8f0;border-radius:6px;overflow:hidden;}
+      .sv-info-hd{background:#f1f5f9;padding:5px 10px;font-size:11px;font-weight:700;color:#1B3A6B;}
+      .sv-info-body{padding:8px 12px;background:#fff;font-size:12px;min-height:40px;}
+      .sv-info-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+      .sv-info-lbl{font-size:11px;color:#64748b;min-width:72px;}
+      .sv-info-val{font-size:12px;font-weight:600;color:#1e293b;}
+      .sv-tbl-wrap{overflow-x:auto;margin-bottom:14px;}
+      .sv-tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:480px;}
+      .sv-tbl th{background:${thColor};color:#fff;padding:8px 8px;font-weight:700;text-align:left;}
+      .sv-tbl td{padding:7px 8px;border-bottom:1px solid #e8edf5;vertical-align:middle;}
+      .sv-summary{display:flex;justify-content:flex-end;}
+      .sv-sum-tbl{width:100%;max-width:280px;font-size:12px;border-collapse:collapse;}
+      .sv-sum-tbl td{padding:5px 6px;}
+      .sv-sum-tbl td:last-child{text-align:right;}
+      .sv-sum-total td{font-weight:800;font-size:14px;color:${thColor};border-top:2px solid ${thColor};padding-top:8px;}
+      .sv-footer{margin-top:16px;text-align:center;border-top:1px solid #e2e8f0;padding-top:10px;font-size:10px;color:#94a3b8;line-height:1.7;}
+      @media(max-width:600px){
+        .sv-wrap{padding:14px 12px;border-radius:0;}
+        .sv-party-grid{grid-template-columns:1fr;}
+        .sv-info-grid{grid-template-columns:1fr;}
+        .sv-title{font-size:18px;}
+        .sv-header{flex-direction:column;gap:6px;}
+        .sv-co{text-align:left;}
+        .sv-tbl{min-width:360px;}
+      }
+    </style>
+    <div class="sv-wrap">
+      <div class="sv-header">
+        <div>
+          <div class="sv-title">${typeLabel}</div>
+          <div class="sv-meta">견적번호: ${data.quote_number||'-'} | 작성일: ${today}</div>
+        </div>
+        <div class="sv-co"><div style="font-weight:700;color:#1B3A6B;">주식회사 비유니드</div><div>031.8028.0464</div></div>
       </div>
-      <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px;">
-        <thead><tr style="background:${thColor};color:#fff;">
-          <th style="padding:8px 6px;text-align:center;width:24px;">No</th>
-          <th style="padding:8px 6px;text-align:center;width:70px;">브랜드</th>
-          <th style="padding:8px 10px;text-align:left;">제품명</th>
-          <th style="padding:8px 6px;text-align:right;white-space:nowrap;width:90px;">단가</th>
-          <th style="padding:8px 6px;text-align:center;width:40px;">수량</th>
-          <th style="padding:8px 6px;text-align:right;white-space:nowrap;width:90px;">금액</th>
-        </tr></thead>
-        <tbody>${itemsHtml}</tbody>
-      </table>
-      <div style="display:flex;justify-content:flex-end;">
-        <table style="width:260px;font-size:12px;border-collapse:collapse;">
-          ${discAmt>0?`<tr><td style="color:#ef4444;">할인</td><td style="text-align:right;color:#ef4444;">- ${fmt(discAmt)} 원</td></tr>`:''}
-          <tr><td style="color:#64748b;">공급가액</td><td style="text-align:right;font-weight:600;">${fmt(supply)} 원</td></tr>
-          <tr><td style="color:#64748b;">부가세(10%)</td><td style="text-align:right;">${fmt(vat)} 원</td></tr>
-          <tr style="border-top:2px solid ${thColor};"><td style="font-weight:800;font-size:14px;padding-top:8px;">합 계</td><td style="text-align:right;font-weight:800;font-size:14px;color:${thColor};padding-top:8px;">${fmt(total)} 원</td></tr>
+      <div class="sv-party-grid">
+        <div class="sv-party-box">
+          <div class="sv-party-hd" style="background:${susinColor};">
+            <span>수 신</span>
+          </div>
+          <div class="sv-party-body">
+            <table>
+              <tr><td>업체명</td><td style="font-weight:700;color:#1e293b;">${svCompany||'-'}</td></tr>
+              <tr><td>담당자</td><td>${svContact||'-'}</td></tr>
+              <tr><td>연락처</td><td>${svPhone||'-'}</td></tr>
+              <tr><td>이메일</td><td>${svEmail||'-'}</td></tr>
+            </table>
+          </div>
+        </div>
+        <div class="sv-party-box">
+          <div class="sv-party-hd" style="background:${gonggeupColor};">
+            <span>공 급</span>
+          </div>
+          <div class="sv-party-body">
+            <table>
+              <tr><td>업체명</td><td style="font-weight:700;color:#1e293b;">(주)비유니드</td></tr>
+              <tr><td>담당자</td><td>${svSalesName||'-'}</td></tr>
+              <tr><td>연락처</td><td>${svSalesPhone}</td></tr>
+              <tr><td>이메일</td><td>${svSalesEmail}</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      ${(svDelivery||svValidity||svMemo)?`
+      <div class="sv-info-grid">
+        <div class="sv-info-box">
+          <div class="sv-info-hd">📅 납품 / 유효 기간</div>
+          <div class="sv-info-body">
+            ${svDelivery?`<div class="sv-info-row"><span class="sv-info-lbl">납품희망일</span><span class="sv-info-val">${svDelivery}</span></div>`:''}
+            <div class="sv-info-row"><span class="sv-info-lbl">견적유효기간</span><span class="sv-info-val">${svValidity}</span></div>
+          </div>
+        </div>
+        ${svMemo?`<div class="sv-info-box">
+          <div class="sv-info-hd">🗒️ 특이사항</div>
+          <div class="sv-info-body" style="color:#374151;line-height:1.6;">${svMemo}</div>
+        </div>`:'<div></div>'}
+      </div>`:''}
+      <div class="sv-tbl-wrap">
+        <table class="sv-tbl">
+          <thead><tr>
+            <th style="text-align:center;width:28px;">No</th>
+            <th style="text-align:center;width:70px;">브랜드</th>
+            <th style="text-align:left;">제품명</th>
+            <th style="text-align:right;white-space:nowrap;width:90px;">단가</th>
+            <th style="text-align:center;width:40px;">수량</th>
+            <th style="text-align:right;white-space:nowrap;width:90px;">금액</th>
+          </tr></thead>
+          <tbody>${itemsHtml}</tbody>
         </table>
       </div>
-      <div style="margin-top:20px;text-align:center;border-top:1px solid #e2e8f0;padding-top:12px;font-size:10px;color:#94a3b8;">
+      <div class="sv-summary">
+        <table class="sv-sum-tbl">
+          ${discAmt>0?`<tr><td style="color:#ef4444;">할인</td><td style="color:#ef4444;">- ${fmt(discAmt)} 원</td></tr>`:''}
+          <tr><td style="color:#64748b;">공급가액</td><td style="font-weight:600;">${fmt(supply)} 원</td></tr>
+          <tr><td style="color:#64748b;">부가세(10%)</td><td>${fmt(vat)} 원</td></tr>
+          <tr class="sv-sum-total"><td>합 계</td><td>${fmt(total)} 원</td></tr>
+        </table>
+      </div>
+      <div class="sv-footer">
         주식회사 비유니드 | 경기도 하남시 미사강변한강로 135 다동 4층 445호 | 031.8028.0464 | www.buneed.co.kr
       </div>
     </div>`;
@@ -2036,8 +2137,11 @@ function printQuote() {
   const printStyle = `<style id="print-only-style">
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#fff;color:#1a2e5a;font-size:11px;line-height:1.55;}
-    .qdoc{padding:18px 20px 70px 20px;max-width:100%;margin:0;}
-    .q-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #1B3A6B;}
+    .qdoc{padding:18px 20px 24px 20px;max-width:100%;margin:0;}
+    .q-header{display:flex !important;flex-direction:row !important;justify-content:space-between !important;align-items:flex-start !important;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #1B3A6B;}
+    .q-logo-area{display:block !important;}
+    .q-logo-area img{height:40px !important;display:block !important;}
+    .q-date{text-align:right;}
     .q-logo-area img{height:40px;display:block;}
     h1{font-size:20px;font-weight:800;color:#1B3A6B;letter-spacing:0.04em;margin-bottom:3px;}
     .q-date{font-size:10px;color:#64748b;line-height:1.6;}
@@ -2046,7 +2150,7 @@ function printQuote() {
     table{width:100%;border-collapse:collapse;font-size:11px;}
     th{background:#dbeafe !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:7px 9px;font-weight:700;color:#1B3A6B !important;border-bottom:1.5px solid #93c5fd;text-align:left;font-size:10.5px;}
     td{padding:5px 9px;border-bottom:1px solid #e8edf5;font-size:11px;vertical-align:middle;}
-    .q-party-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+    .q-party-grid{display:grid !important;grid-template-columns:1fr 1fr !important;gap:10px;margin-bottom:12px;}
     .q-party-susin-header{background:#0E76BB !important;padding:7px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;}
     .q-party-gonggeup-header{background:#1B3A6B !important;padding:7px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;}
     .q-party-header-text{font-size:12px;font-weight:700;color:#fff;letter-spacing:0.1em;}
@@ -2060,7 +2164,7 @@ function printQuote() {
     .q-rental-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px;}
     .q-rental-info-item .label{font-size:9.5px;color:#475569;font-weight:600;margin-bottom:1px;}
     .q-rental-info-item .value{font-size:11px;font-weight:700;color:#1e293b;}
-    .q-footer-bar{position:fixed;bottom:0;left:0;right:0;background:#fff !important;border-top:1px solid #e2e8f0;padding:7px 20px;text-align:center;font-size:9.5px;color:#94a3b8;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .q-footer-bar{margin-top:16px;border-top:1px solid #e2e8f0;padding-top:8px;text-align:center;font-size:9.5px;color:#94a3b8;line-height:1.6;}
     @media print{
       body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
       .q-footer-bar{position:fixed;bottom:0;left:0;right:0;}
@@ -2685,9 +2789,12 @@ function rPrintQuote() {
   const printStyle = `<style id="print-only-style">
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#fff;color:#1a2e5a;font-size:11px;line-height:1.55;}
-    .qdoc{padding:18px 20px 70px 20px;max-width:100%;margin:0;}
-    .q-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #1B3A6B;}
-    .q-logo-area img{height:38px;display:block;}
+    .qdoc{padding:18px 20px 24px 20px;max-width:100%;margin:0;}
+    .q-header{display:flex !important;flex-direction:row !important;justify-content:space-between !important;align-items:flex-start !important;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #1B3A6B;}
+    .q-logo-area{display:block !important;}
+    .q-logo-area img{height:40px !important;display:block !important;}
+    .q-date{text-align:right;}
+    .q-logo-area img{height:40px !important;display:block !important;}
     h1{font-size:19px;font-weight:800;color:#1B3A6B;letter-spacing:0.04em;margin-bottom:3px;}
     .q-date{font-size:10px;color:#64748b;line-height:1.6;}
     .q-section{margin-bottom:14px;}
@@ -2696,7 +2803,7 @@ function rPrintQuote() {
     .q-rental-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px;}
     .q-rental-info-item .label{font-size:9.5px;color:#475569;font-weight:600;margin-bottom:1px;}
     .q-rental-info-item .value{font-size:11px;font-weight:700;color:#1e293b;}
-    .q-party-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+    .q-party-grid{display:grid !important;grid-template-columns:1fr 1fr !important;gap:10px;margin-bottom:12px;}
     .q-party-susin-header{background:#0E76BB !important;padding:7px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;}
     .q-party-gonggeup-header{background:#1B3A6B !important;padding:7px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;display:flex;align-items:center;}
     .q-party-header-text{font-size:12px;font-weight:700;color:#fff;letter-spacing:0.1em;}
@@ -2708,7 +2815,7 @@ function rPrintQuote() {
     .q-summary-table td{padding:4px 6px;border:none;color:#374151;}
     .q-summary-table td:last-child{text-align:right;}
     .q-total-row td,.r-q-total-row td{font-weight:800;font-size:14px;border-top:2px solid #1B3A6B;padding-top:6px;color:#1B3A6B;}
-    .q-footer-bar{position:fixed;bottom:0;left:0;right:0;background:#fff !important;border-top:1px solid #e2e8f0;padding:7px 20px;text-align:center;font-size:9.5px;color:#94a3b8;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .q-footer-bar{margin-top:16px;border-top:1px solid #e2e8f0;padding-top:8px;text-align:center;font-size:9.5px;color:#94a3b8;line-height:1.6;}
     @media print{
       body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
       .q-footer-bar{position:fixed;bottom:0;left:0;right:0;}
