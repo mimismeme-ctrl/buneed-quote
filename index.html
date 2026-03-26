@@ -78,7 +78,7 @@
 .h-logo .name{ font-size:16px;font-weight:800;color:#1B3A6B;letter-spacing:-0.5px; }
 .h-divider{ width:1px;height:20px;background:#e2e8f0;margin:0 4px; }
 
-.h-badge.admin-badge{ background:#f5f5f5;color:#6b7280; }
+.h-badge.admin-badge{ display:inline-flex; align-items:center; background:#e0e7ef; color:#1B3A6B; font-weight:700; }
 .h-spacer{ flex:1; }
 .h-email{ font-size:12px;color:#94a3b8;display:none; }
 @media(min-width:640px){ .h-email{ display:block; } }
@@ -442,6 +442,96 @@ textarea.field-input{resize:vertical;min-height:52px;}
   color: #fff;
   border-color: var(--r-primary, #1B6B3A);
 }
+
+/* ===== .hidden 유틸리티 ===== */
+.hidden { display: none !important; }
+
+/* ===== 모달 오버레이 ===== */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,.45);
+  align-items: center; justify-content: center;
+  overflow-y: auto; padding: 20px;
+}
+.modal-overlay.open {
+  display: flex;
+}
+.modal-box {
+  background: #fff;
+  border-radius: 12px;
+  width: 520px; max-width: 96vw;
+  max-height: 90vh;
+  display: flex; flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,.22);
+  overflow: hidden;
+}
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.modal-header h2 { font-size: 15px; font-weight: 700; color: var(--p-navy); }
+.modal-close {
+  background: none; border: none; font-size: 18px;
+  cursor: pointer; color: var(--muted); line-height: 1;
+  padding: 4px 8px; border-radius: 4px;
+  transition: background .15s;
+}
+.modal-close:hover { background: #f1f5f9; color: #334155; }
+.modal-body {
+  padding: 20px; overflow-y: auto; flex: 1;
+}
+.modal-footer {
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: flex-end; gap: 8px;
+  flex-shrink: 0; background: #f8fafc;
+}
+
+/* ===== 토스트 알림 ===== */
+#toast {
+  position: fixed; bottom: 24px; right: 24px;
+  z-index: 9999;
+  display: flex; flex-direction: column; gap: 8px;
+  pointer-events: none;
+}
+.toast-item {
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px; font-weight: 600;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,.18);
+  animation: slideIn .25s ease;
+  pointer-events: auto;
+  max-width: 320px;
+}
+.toast-item.success { background: var(--success); }
+.toast-item.error   { background: var(--danger); }
+.toast-item.info    { background: var(--p-navy); }
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+/* ===== 이력 empty-state ===== */
+.empty-state {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 20px; color: var(--muted);
+  font-size: 13px; gap: 10px; text-align: center;
+}
+.empty-state .icon { font-size: 36px; }
+
+/* ===== 링크 복사 버튼 ===== */
+.btn-link-copy {
+  background: #f0f9ff; color: #0369a1;
+  border: 1px solid #bae6fd; border-radius: 6px;
+  padding: 4px 10px; font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: background .15s;
+}
+.btn-link-copy:hover { background: #e0f2fe; }
 </style>
 </head>
 <body>
@@ -590,7 +680,7 @@ textarea.field-input{resize:vertical;min-height:52px;}
           <div class="action-bar">
             <button class="btn btn-secondary" onclick="resetQuote()">🔄 초기화</button>
             <button class="btn btn-secondary" onclick="previewQuote()">👁️ 미리보기</button>
-            <button class="btn btn-primary" onclick="saveQuote()">💾 저장</button>
+            <button class="btn btn-primary" id="btn-save-quote" onclick="saveQuote()">💾 저장</button>
           </div>
         </div>
       </div>
@@ -997,6 +1087,13 @@ textarea.field-input{resize:vertical;min-height:52px;}
 <script>
 
 // ===== SUPABASE =====
+// ===== 관리자 이메일 목록 =====
+const ADMIN_EMAILS = [
+  'admin@beeuneed.co.kr',
+  'manager@beeuneed.co.kr',
+  'beeuneed@gmail.com'
+];
+
 const SUPA_URL = 'https://emvczjswzyxlwqhymfmh.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtdmN6anN3enl4bHdxaHltZm1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTcxNDAsImV4cCI6MjA4OTg3MzE0MH0.hOLthetdToPnxLoU7wW8nW9DUC5JtN4j4LOPF8vaS6Y';
 const SAMPLE_PRODUCTS = [
@@ -1146,25 +1243,47 @@ async function showApp(email) {
   const app = document.getElementById('app');
   if (loginScreen) { loginScreen.style.display = 'none'; loginScreen.classList.add('hidden'); }
   if (app) app.style.display = 'flex';
+
   // 초기 패널: CSS 클래스만 사용 (inline style 제거해야 switchTopTab이 동작함)
   document.querySelectorAll('.top-panel').forEach(p => {
-    p.style.display = '';   // inline style 제거
+    p.style.display = '';
     p.classList.remove('active');
   });
   const initPanel = document.getElementById('panel-purchase');
   if (initPanel) {
-    initPanel.style.display = '';  // inline style 제거
+    initPanel.style.display = '';
     initPanel.classList.add('active');
   }
+
+  // 이메일 표시
   const emailEl = document.getElementById('user-email-display');
   if (emailEl) emailEl.textContent = email;
-  await Promise.all([loadAllData(), rLoadRentalProducts(), rInitQuoteNum()]);
-  initQuoteNum();
-  loadHistory();
-  rLoadHistory();
-  loadCompanySettings();
-  renderAdminProducts();
-  rRenderAdminProducts();
+
+  // ── 관리자 권한 체크 ──────────────────────────────────────────
+  const normalizedEmail = (email || '').toLowerCase().trim();
+  const isAdmin = ADMIN_EMAILS.some(e => e.toLowerCase() === normalizedEmail);
+  const adminTab  = document.getElementById('ttab-admin');
+  const adminBadge = document.querySelector('.h-badge.admin-badge');
+  if (adminTab)  { adminTab.style.display  = isAdmin ? '' : 'none'; }
+  if (adminBadge){ adminBadge.style.display = isAdmin ? 'inline-flex' : 'none'; }
+  // ─────────────────────────────────────────────────────────────
+
+  // 데이터 로드 (에러가 나도 이후 코드가 실행되도록 각각 try-catch)
+  try { await loadAllData(); } catch(e) { console.warn('loadAllData 오류:', e); }
+  try { await rLoadRentalProducts(); } catch(e) { console.warn('rLoadRentalProducts 오류:', e); }
+  try { rInitQuoteNum(); } catch(e) { console.warn('rInitQuoteNum 오류:', e); }
+  try { initQuoteNum(); } catch(e) { console.warn('initQuoteNum 오류:', e); }
+
+  // 이력 / 회사 설정 로드
+  try { loadHistory(); } catch(e) { console.warn('loadHistory 오류:', e); }
+  try { rLoadHistory(); } catch(e) { console.warn('rLoadHistory 오류:', e); }
+  try { loadCompanySettings(); } catch(e) {}
+
+  // 관리자인 경우에만 제품 목록 렌더
+  if (isAdmin) {
+    try { renderAdminProducts(); } catch(e) { console.warn('renderAdminProducts 오류:', e); }
+    try { rRenderAdminProducts(); } catch(e) { console.warn('rRenderAdminProducts 오류:', e); }
+  }
 }
 
 
@@ -1217,10 +1336,10 @@ function switchTopTab(tab, el) {
   document.querySelectorAll('.h-nav-tab').forEach(t=>t.classList.remove('active'));
   const activeTab = document.getElementById('ttab-' + tab);
   if (activeTab) activeTab.classList.add('active');
-  // 관리자 탭으로 전환 시 데이터 로드
+  // 관리자 탭으로 전환 시 데이터 로드 (권한 있는 경우만)
   if (tab === 'admin') {
-    if (typeof renderAdminProducts === 'function') renderAdminProducts();
-    if (typeof rRenderAdminProducts === 'function') rRenderAdminProducts();
+    try { if (typeof renderAdminProducts === 'function') renderAdminProducts(); } catch(e){}
+    try { if (typeof rRenderAdminProducts === 'function') rRenderAdminProducts(); } catch(e){}
   }
 }
 
@@ -1747,8 +1866,11 @@ async function copyShareLink() {
 }
 
 async function loadHistory() {
-  const { data } = await db.from('quotes').select('*').order('created_at',{ascending:false});
   const body = document.getElementById('history-body');
+  if (!body) return;
+  try {
+  const { data, error } = await db.from('quotes').select('*').order('created_at',{ascending:false});
+  if (error) { body.innerHTML='<tr><td colspan="6" style="text-align:center;padding:24px;color:#ef4444">데이터 로드 오류: '+error.message+'</td></tr>'; return; }
   if (!data?.length) {
     body.innerHTML='<tr><td colspan="6" style="text-align:center;padding:24px;color:#94a3b8">저장된 견적이 없습니다</td></tr>';
     return;
@@ -1766,6 +1888,9 @@ async function loadHistory() {
         <button class="btn btn-danger btn-sm" onclick="deleteQuote('${q.id}')">삭제</button>
       </td>
     </tr>`).join('');
+  } catch(e) {
+    if (body) body.innerHTML='<tr><td colspan="6" style="text-align:center;padding:24px;color:#ef4444">오류: '+e.message+'</td></tr>';
+  }
 }
 
 async function loadQuote(qId) {
@@ -1829,21 +1954,28 @@ async function bulkInsertSampleProducts() {
 }
 
 async function renderAdminProducts() {
-  const { data } = await db.from('products').select('*').order('category');
   const body = document.getElementById('admin-product-body');
-  if (!data?.length) { body.innerHTML='<tr><td colspan="6" style="text-align:center;padding:20px;color:#94a3b8">제품 없음</td></tr>'; return; }
-  body.innerHTML = data.map(p=>`
-    <tr>
-      <td style="font-weight:600;">${p.name}</td>
-      <td>${p.brand}</td>
-      <td>${p.category}</td>
-      <td>${fmt(p.base_price)}원</td>
-      <td style="font-size:11px;color:#64748b;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.spec_summary||''}</td>
-      <td style="display:flex;gap:5px;">
-        <button class="btn btn-secondary btn-sm" onclick="openProductModal('${p.id}')">수정</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')">삭제</button>
-      </td>
-    </tr>`).join('');
+  if (!body) return;
+  try {
+    const { data, error } = await db.from('products').select('*').order('category');
+    if (error) { body.innerHTML='<tr><td colspan="6" style="text-align:center;padding:20px;color:#ef4444">로드 오류</td></tr>'; return; }
+    if (!data?.length) { body.innerHTML='<tr><td colspan="6" style="text-align:center;padding:20px;color:#94a3b8">제품 없음</td></tr>'; return; }
+    body.innerHTML = data.map(p=>`
+      <tr>
+        <td style="font-weight:600;">${p.name}</td>
+        <td>${p.brand}</td>
+        <td>${p.category}</td>
+        <td>${fmt(p.base_price)}원</td>
+        <td style="font-size:11px;color:#64748b;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.spec_summary||''}</td>
+        <td style="display:flex;gap:5px;">
+          <button class="btn btn-secondary btn-sm" onclick="openProductModal('${p.id}')">수정</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')">삭제</button>
+        </td>
+      </tr>`).join('');
+  } catch(e) {
+    console.error('renderAdminProducts 오류:', e);
+    if (body) body.innerHTML='<tr><td colspan="6" style="text-align:center;color:#ef4444">오류 발생: '+e.message+'</td></tr>';
+  }
 }
 let editingProductId = null;
 function openProductModal(pid) {
@@ -1878,9 +2010,13 @@ async function saveProduct() {
   } else {
     await db.from('products').insert(payload);
   }
-  closeModal('modal-product');
-  await loadProducts(); renderAdminProducts(); renderProducts();
-  showToast('저장되었습니다','success');
+  try {
+    closeModal('modal-product');
+    await loadProducts(); renderAdminProducts(); renderProducts();
+    showToast('저장되었습니다','success');
+  } catch(e) {
+    showToast('저장 중 오류: ' + (e.message||e), 'error');
+  }
 }
 async function deleteProduct(pid) {
   if (!confirm('제품을 삭제하시겠습니까?')) return;
@@ -2456,22 +2592,29 @@ function rResetQuote() {
 
 // 렌탈 제품 관리
 async function rRenderAdminProducts() {
-  const { data } = await db.from('rental_products').select('*').order('category');
   const body = document.getElementById('r-admin-product-body');
-  if (!data?.length) { body.innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:#94a3b8">제품 없음</td></tr>'; return; }
-  body.innerHTML = data.map(p=>`
-    <tr>
-      <td style="font-weight:600;">${p.name}</td>
-      <td>${p.brand||''}</td>
-      <td>${p.category||''}</td>
-      <td style="text-align:right;">${fmt(p.daily_price||0)}원</td>
-      <td style="text-align:right;">${fmt(p.monthly_price||0)}원</td>
-      <td style="font-size:11px;color:#64748b;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.spec||''}</td>
-      <td style="display:flex;gap:5px;">
-        <button class="btn btn-r-secondary btn-sm" onclick="rOpenProductModal('${p.id}')">수정</button>
-        <button class="btn btn-danger btn-sm" onclick="rDeleteProduct('${p.id}')">삭제</button>
-      </td>
-    </tr>`).join('');
+  if (!body) return;
+  try {
+    const { data, error } = await db.from('rental_products').select('*').order('category');
+    if (error) { body.innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:#ef4444">로드 오류</td></tr>'; return; }
+    if (!data?.length) { body.innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:#94a3b8">제품 없음</td></tr>'; return; }
+    body.innerHTML = data.map(p=>`
+      <tr>
+        <td style="font-weight:600;">${p.name}</td>
+        <td>${p.brand||''}</td>
+        <td>${p.category||''}</td>
+        <td style="text-align:right;">${fmt(p.daily_price||0)}원</td>
+        <td style="text-align:right;">${fmt(p.monthly_price||0)}원</td>
+        <td style="font-size:11px;color:#64748b;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.spec||''}</td>
+        <td style="display:flex;gap:5px;">
+          <button class="btn btn-r-secondary btn-sm" onclick="rOpenProductModal('${p.id}')">수정</button>
+          <button class="btn btn-danger btn-sm" onclick="rDeleteProduct('${p.id}')">삭제</button>
+        </td>
+      </tr>`).join('');
+  } catch(e) {
+    console.error('rRenderAdminProducts 오류:', e);
+    if (body) body.innerHTML='<tr><td colspan="7" style="text-align:center;color:#ef4444">오류 발생: '+e.message+'</td></tr>';
+  }
 }
 function rOpenProductModal(pid) {
   rEditingProductId = pid||null;
