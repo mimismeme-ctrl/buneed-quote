@@ -121,16 +121,16 @@
 .sub-panel{display:none;flex:1;flex-direction:column;min-height:0;overflow:hidden;}
 .sub-panel.active{display:flex;flex-direction:column;}
 /* ===== 공통 레이아웃 ===== */
-.split-layout{display:flex;flex:1;min-height:0;gap:0;overflow:hidden;}
-.catalog-panel{width:180px;min-width:150px;background:#fff;border-right:1.5px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.split-layout{display:flex;flex-direction:column;flex:1;min-height:0;gap:0;overflow:hidden;}
+.catalog-panel{width:100%;height:220px;min-height:180px;background:#fff;border-bottom:1.5px solid var(--border);border-right:none;display:flex;flex-direction:column;overflow:hidden;}
 .panel-header{padding:10px 12px;font-size:12px;font-weight:700;color:var(--navy);border-bottom:1px solid var(--border);background:#f8fafc;}
 .panel-header.r-header{color:var(--r-primary);}
-.filter-area{padding:8px 10px;border-bottom:1px solid var(--border);background:#fff;}
-.filter-select{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--navy);outline:none;margin-bottom:6px;background:#fff;}
+.filter-area{padding:6px 10px;border-bottom:1px solid var(--border);background:#fff;display:flex;gap:6px;flex-wrap:nowrap;}
+.filter-select{flex:1;min-width:100px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--navy);outline:none;margin-bottom:0;background:#fff;}
 .filter-select:focus{border-color:var(--p-blue);}
 .r-filter-select:focus{border-color:var(--r-blue);}
-.product-list{flex:1;overflow-y:auto;overflow-x:hidden;padding:6px;min-height:0;}
-.product-card{padding:8px 10px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer;transition:all .15s;background:#fff;}
+.product-list{flex:1;overflow-y:hidden;overflow-x:auto;padding:6px;min-height:0;display:flex;flex-wrap:nowrap;gap:6px;align-items:flex-start;}
+.product-card{flex:none;width:140px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;margin-bottom:0;cursor:pointer;transition:all .15s;background:#fff;}
 .product-card:hover{border-color:var(--p-blue);background:var(--p-accent);}
 .product-card.r-card:hover{border-color:var(--r-blue);background:var(--r-accent);}
 .product-card .pc-name{font-size:12px;font-weight:700;color:var(--p-navy);margin-bottom:2px;}
@@ -155,12 +155,13 @@
 }
 .r-section-title{
   font-size:12px;font-weight:700;color:#fff;
-  background:#1a56a0;
+  background:#1B3A6B;
   padding:7px 14px;
   margin:-14px -14px 14px -14px;
   border-radius:6px 6px 0 0;
   display:flex;align-items:center;gap:6px;
   letter-spacing:0.02em;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
 }
 .form-section{background:#fff;border-radius:8px;padding:14px;margin-bottom:10px;border:1px solid #f1f5f9;box-shadow:0 1px 3px rgba(0,0,0,.03);}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
@@ -303,8 +304,7 @@ textarea.field-input{resize:vertical;min-height:52px;}
 
 /* ===== 모바일 반응형 ===== */
 @media (max-width: 768px) {
-  .split-layout{flex-direction:column;}
-  .catalog-panel{height:280px;min-width:unset;}
+  .catalog-panel{height:200px;min-width:unset;}
   .form-panel{overflow-y:auto;}
   .top-tab{padding:0 12px;height:44px;font-size:12px;gap:4px;}
   .top-tabs{padding:0 8px;}
@@ -557,6 +557,34 @@ textarea.field-input{resize:vertical;min-height:52px;}
 /* 미리보기 모달 테이블 overflow */
 #preview-content, #r-preview-content { overflow-x:auto; }
 .modal-body { overflow-x:auto; }
+
+/* ===== 견적 추가 모달 공통 스타일 ===== */
+.atq-product-info {
+  background: #f1f5f9;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.atq-product-info .atq-name {
+  font-size: 15px; font-weight: 700; color: #1e293b; margin-bottom: 4px;
+}
+.atq-product-info .atq-meta {
+  font-size: 12px; color: #64748b; margin-bottom: 6px;
+}
+.atq-product-info .atq-spec {
+  font-size: 11px; color: #94a3b8; line-height: 1.5;
+}
+.atq-row-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.atq-row-2col .form-group { margin-bottom: 0; }
+.atq-row-2col label, .form-group > label {
+  display: block; font-size: 12px; font-weight: 600;
+  color: #475569; margin-bottom: 6px;
+}
 </style>
 </head>
 <body>
@@ -688,7 +716,6 @@ textarea.field-input{resize:vertical;min-height:52px;}
             </div>
             <!-- 금액 -->
             <div class="price-summary">
-              <div class="price-row"><label>소계</label><span id="sum-subtotal">0 원</span></div>
               <div class="discount-row">
                 <label style="color:var(--muted)">할인율</label>
                 <input class="discount-input" type="number" id="discount-rate" value="0" min="0" max="100" oninput="calcPrice()"> %
@@ -825,7 +852,6 @@ textarea.field-input{resize:vertical;min-height:52px;}
             <!-- 렌탈 금액 요약 -->
             <div class="form-section r-price-summary">
               <div class="r-section-title">💰 금액 요약</div>
-              <div class="ps-row"><span>소계 (렌탈료 합계)</span><span id="r-ps-subtotal">0 원</span></div>
               <div class="ps-row">
                 <span>할인율 / 할인금액</span>
                 <div class="ps-editable" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
@@ -953,18 +979,17 @@ textarea.field-input{resize:vertical;min-height:52px;}
       <button class="modal-close" onclick="closeModal('modal-aq')">✕</button>
     </div>
     <div class="modal-body">
-      <div id="aq-product-info" style="background:var(--p-accent);border-radius:8px;padding:10px;margin-bottom:12px;font-size:12px;"></div>
+      <div id="aq-product-info" class="atq-product-info"></div>
       <div id="spec-opts" style="margin-bottom:12px;"></div>
-      <div style="margin-bottom:10px;">
-        <div class="field-label">수량</div>
-        <input class="field-input" type="number" id="aq-qty" value="1" min="1" oninput="updateAQCalc()">
-      </div>
-      <div style="margin-bottom:10px;">
-        <div class="field-label">단가 (직접 수정)</div>
-        <input class="field-input" type="number" id="aq-unit" oninput="updateAQCalc()">
-      </div>
-      <div class="calc-row total-calc">
-        <span>소계</span><span id="aq-total-val">0 원</span>
+      <div class="atq-row-2col">
+        <div class="form-group">
+          <label>수량</label>
+          <input class="field-input" type="number" id="aq-qty" value="1" min="1" oninput="updateAQCalc()">
+        </div>
+        <div class="form-group">
+          <label>단가 (직접 수정)</label>
+          <input class="field-input" type="number" id="aq-unit" oninput="updateAQCalc()">
+        </div>
       </div>
     </div>
     <div class="modal-footer">
@@ -1035,14 +1060,14 @@ textarea.field-input{resize:vertical;min-height:52px;}
     </div>
     <div class="modal-body">
       <div class="atq-product-info" id="r-atq-info"></div>
-      <div class="atq-controls">
-        <div class="form-group">
-          <label>렌탈 단위</label>
-          <div class="rental-type-toggle">
-            <button class="rtt-btn active" id="r-atq-daily-btn" onclick="rSetAtqType('일')">일</button>
-            <button class="rtt-btn" id="r-atq-monthly-btn" onclick="rSetAtqType('월')">월</button>
-          </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>렌탈 단위</label>
+        <div class="rental-type-toggle" style="margin-top:6px;">
+          <button class="rtt-btn active" id="r-atq-daily-btn" onclick="rSetAtqType('일')">일</button>
+          <button class="rtt-btn" id="r-atq-monthly-btn" onclick="rSetAtqType('월')">월</button>
         </div>
+      </div>
+      <div class="atq-row-2col">
         <div class="form-group">
           <label>수량</label>
           <input class="field-input" type="number" id="r-atq-qty" value="1" min="1" oninput="rUpdateAtqCalc()">
@@ -1051,10 +1076,6 @@ textarea.field-input{resize:vertical;min-height:52px;}
           <label>단가 (직접 수정)</label>
           <input class="field-input" type="number" id="r-atq-unit" oninput="rUpdateAtqCalc()">
         </div>
-      </div>
-      <div class="atq-calc">
-        <span>소계 (단가 × 수량)</span>
-        <span id="r-atq-total-val">0 원</span>
       </div>
     </div>
     <div class="modal-footer">
@@ -1322,7 +1343,6 @@ async function checkShareParam() {
       </table>
       <div style="display:flex;justify-content:flex-end;">
         <table style="width:260px;font-size:12px;border-collapse:collapse;">
-          <tr><td style="padding:5px 0;color:#64748b;">소계</td><td style="text-align:right;">${fmt(sub)} 원</td></tr>
           ${discAmt>0?`<tr><td style="color:#ef4444;">할인</td><td style="text-align:right;color:#ef4444;">- ${fmt(discAmt)} 원</td></tr>`:''}
           <tr><td style="color:#64748b;">공급가액</td><td style="text-align:right;font-weight:600;">${fmt(supply)} 원</td></tr>
           <tr><td style="color:#64748b;">부가세(10%)</td><td style="text-align:right;">${fmt(vat)} 원</td></tr>
@@ -1728,7 +1748,6 @@ function calcPrice() {
   document.getElementById('discount-amt').value = discAmt;
   const supply = sub - discAmt;
   const vat = Math.round(supply*0.1);
-  document.getElementById('sum-subtotal').textContent = fmt(sub)+' 원';
   document.getElementById('sum-supply').textContent = fmt(supply)+' 원';
   document.getElementById('sum-vat').textContent = fmt(vat)+' 원';
   document.getElementById('sum-total').textContent = fmt(supply+vat)+' 원';
@@ -1739,7 +1758,6 @@ function calcPriceByAmt() {
   document.getElementById('discount-rate').value = sub>0?(discAmt/sub*100).toFixed(1):0;
   const supply = sub - discAmt;
   const vat = Math.round(supply*0.1);
-  document.getElementById('sum-subtotal').textContent = fmt(sub)+' 원';
   document.getElementById('sum-supply').textContent = fmt(supply)+' 원';
   document.getElementById('sum-vat').textContent = fmt(vat)+' 원';
   document.getElementById('sum-total').textContent = fmt(supply+vat)+' 원';
@@ -1932,7 +1950,6 @@ function previewQuote() {
     </div>
     ${''/* 납품일/유효기간은 위에 표시됨 */}
     <table class="q-summary-table">
-      <tr><td style="color:#64748b;">소계</td><td style="text-align:right;">${fmt(sub)} 원</td></tr>
       ${discAmt>0?`<tr><td style="color:#ef4444;">할인</td><td style="text-align:right;color:#ef4444;">- ${fmt(discAmt)} 원</td></tr>`:''}
       <tr><td style="color:#64748b;">공급가액</td><td style="text-align:right;font-weight:600;">${fmt(supply)} 원</td></tr>
       <tr><td style="color:#64748b;">부가세 (10%)</td><td style="text-align:right;">${fmt(vat)} 원</td></tr>
@@ -2387,7 +2404,6 @@ function rCalcPrice() {
   const deposit = parseInt((document.getElementById('r-deposit')||{}).value)||0;
   const supply = sub - discount + installFee;
   const vat = Math.round(supply*0.1);
-  document.getElementById('r-ps-subtotal').textContent = fmt(sub)+' 원';
   document.getElementById('r-ps-supply').textContent = fmt(supply)+' 원';
   document.getElementById('r-ps-vat').textContent = fmt(vat)+' 원';
   document.getElementById('r-ps-total').textContent = fmt(supply+vat+deposit)+' 원';
@@ -2552,7 +2568,6 @@ function rPreviewQuote() {
       </table>
     </div>
     <table class="q-summary-table">
-      <tr><td style="color:#64748b;">소계</td><td style="text-align:right;">${fmt(sub)} 원</td></tr>
       ${discount>0?`<tr><td style="color:#ef4444;">할인</td><td style="text-align:right;color:#ef4444;">- ${fmt(discount)} 원</td></tr>`:''}
       ${installFee>0?`<tr><td style="color:#64748b;">설치비</td><td style="text-align:right;">${fmt(installFee)} 원</td></tr>`:''}
       <tr><td style="color:#64748b;">공급가액</td><td style="text-align:right;font-weight:600;">${fmt(supply)} 원</td></tr>
