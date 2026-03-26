@@ -128,7 +128,7 @@
 .product-card .pc-name{font-size:12px;font-weight:700;color:var(--p-navy);margin-bottom:2px;}
 .product-card.r-card .pc-name{color:var(--r-primary);}
 .product-card .pc-brand{font-size:10px;color:var(--muted);}
-.pc-spec{font-size:10px;color:var(--muted);margin:3px 0 2px;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.pc-spec{font-size:10px;color:#475569;margin-top:4px;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .product-card .pc-price{font-size:12px;font-weight:700;color:var(--p-blue);margin-top:4px;}
 .product-card.r-card .pc-price{color:var(--r-blue);}
 .no-products{font-size:11px;color:var(--muted);text-align:center;padding:20px 0;}
@@ -1299,6 +1299,19 @@ async function loadSpecOptions() {
   specOptions = data || [];
 }
 
+function fmtSpec(spec) {
+  if (!spec) return '';
+  // KEY: 라벨 제거 (CPU:, RAM:, SSD:, VGA:, ODD:, POWER:, OS:, 크기:, 해상도:, 패널:, 밝기:, 연결단자:, 스탠드:, 기타: 등)
+  let s = spec.replace(/\b(CPU|RAM|SSD|HDD|VGA|ODD|POWER|OS|크기|해상도|패널|밝기|연결단자|스탠드|기타|무게|배터리|카메라|인터페이스|포트|네트워크|무선|터치|스피커|마이크|색상|재질|인증|보증|특징|구성|용량|속도|타입|형태|방식|채널|주파수|감도|임피던스|SNR|왜율|종류|규격|모델):\s*/gi, '');
+  // 콤마+공백 또는 콤마 뒤에 특정 키워드가 오는 경우만 / 로 변환
+  // 단, 값 내부의 콤마(i3,i5,i7 같은)는 그대로 유지
+  // 줄바꿈을 / 로 변환
+  s = s.replace(/\n/g, ' / ');
+  // 앞뒤 공백 정리
+  s = s.replace(/\/\s*\//g, ' / ').trim();
+  return s;
+}
+
 function renderProducts() {
   const cat = document.getElementById('f-cat').value;
   const brand = document.getElementById('f-brand').value;
@@ -1311,18 +1324,17 @@ function renderProducts() {
     <div class="product-card" onclick="openSpecModal('${p.id}')">
       <div class="pc-name">${p.name}</div>
       <div class="pc-brand">${p.brand} · ${p.category}</div>
-      ${p.spec_summary ? `<div class="pc-spec">${p.spec_summary}</div>` : ''}
       <div class="pc-price">${p.base_price > 0 ? fmt(p.base_price)+'원' : '가격 문의'}</div>
     </div>`).join('');
 }
 
 function openSpecModal(productId) {
-  const p = products.find(x=>x.id===productId);
+  const p = products.find(x=>String(x.id)===String(productId));
   if (!p) return;
   currentSpecProductId = productId;
   selectedSpecOpts = {};
   document.getElementById('aq-title').textContent = p.name;
-  const specSummaryHtml = p.spec_summary ? '<div style="color:#64748b;font-size:11px;margin-top:4px;line-height:1.5;">'+p.spec_summary+'</div>' : '';
+  const specSummaryHtml = p.spec_summary ? '<div style="color:#64748b;font-size:11px;margin-top:4px;line-height:1.5;">'+fmtSpec(p.spec_summary)+'</div>' : '';
   const featureHtml = p.feature ? '<div style="color:#475569;font-size:11px;margin-top:4px;padding:6px 8px;background:#f8fafc;border-radius:4px;line-height:1.5;">'+p.feature+'</div>' : '';
   document.getElementById('aq-product-info').innerHTML = `<strong>${p.name}</strong> <span style="color:#94a3b8;font-size:11px;">${p.brand} · ${p.category}</span>${specSummaryHtml}${featureHtml}`;
   const cats = specCategories.filter(c=>c.product_categories?.includes(p.category)||!c.product_categories?.length);
@@ -1397,10 +1409,13 @@ function renderQuoteItems() {
     el.innerHTML='<div class="no-products" style="padding:16px 0">좌측 카탈로그에서 제품을 클릭하여 추가하세요</div>';
     return;
   }
-  el.innerHTML = `<table class="items-table"><thead><tr><th>제품명</th><th>사양</th><th>단가</th><th>수량</th><th>합계</th><th></th></tr></thead><tbody>
+  el.innerHTML = `<table class="items-table"><thead><tr><th style="width:70px;">브랜드</th><th>제품명 / 사양</th><th>단가</th><th>수량</th><th>합계</th><th></th></tr></thead><tbody>
     ${quoteItems.map((it,i)=>`<tr>
-      <td><strong>${it.product_name}</strong></td>
-      <td style="font-size:11px;color:#64748b;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${it.spec_summary||''}</td>
+      <td style="text-align:center;vertical-align:middle;padding:6px 4px;">
+        <div style="font-size:10.5px;font-weight:700;color:#1B3A6B;white-space:nowrap;">${it.brand||''}</div>
+        <div style="font-size:10px;color:#94a3b8;margin-top:2px;">${it.category||''}</div>
+      </td>
+      <td><strong>${it.product_name}</strong>${it.spec_summary ? `<div style="font-size:10.5px;color:#64748b;margin-top:3px;line-height:1.4;">${fmtSpec(it.spec_summary)}</div>` : ''}</td>
       <td>${fmt(it.unit_price)}원</td>
       <td><input class="qty-input" type="number" value="${it.qty}" min="1" onchange="changeQty(${i},this.value)"></td>
       <td style="font-weight:600;">${fmt(it.total_price)}원</td>
@@ -1526,7 +1541,7 @@ function previewQuote() {
     if (cs.companyIntroLink) introHtml = `<div style="text-align:center;margin-top:6px;font-size:11px;"><a href="${cs.companyIntroLink}" target="_blank" style="color:#1a6fd8;">📄 회사소개서 보기</a></div>`;
   } catch(e) {}
     const itemsHtml = quoteItems.map((it,i)=>{
-    const specText = it.spec_summary ? it.spec_summary.replace(/[,;]\s*/g, '<br>') : '';
+    const specText = it.spec_summary ? fmtSpec(it.spec_summary) : '';
     return `
     <tr>
       <td style="text-align:center;width:28px;font-size:11px;color:#64748b;border-bottom:1px solid #e8edf5;">${i+1}</td>
@@ -1973,7 +1988,7 @@ function rAddToQuote() {
   const unit = parseInt(document.getElementById('r-atq-unit').value)||0;
   const qty = parseInt(document.getElementById('r-atq-qty').value)||1;
   rQuoteItems.push({
-    product_id: p.id, product_name: p.name, product_spec: p.spec||'',
+    product_id: p.id, product_name: p.name, product_spec: p.spec||p.spec_summary||'', brand: p.brand||'', category: p.category||'',
     rental_type: rAtqType, unit_price: unit, quantity: qty, total_price: unit*qty
   });
   rRenderQuoteItems(); rCalcPrice(); closeModal('r-modal-atq');
@@ -1986,9 +2001,13 @@ function rRenderQuoteItems() {
     el.innerHTML='<div class="no-products" style="padding:16px 0">좌측 카탈로그에서 제품을 클릭하여 추가하세요</div>';
     return;
   }
-  el.innerHTML = `<table class="items-table"><thead><tr><th>제품명</th><th>단위</th><th>단가</th><th>수량</th><th>소계</th><th></th></tr></thead><tbody>
+  el.innerHTML = `<table class="items-table"><thead><tr><th style="width:70px;">브랜드</th><th>제품명 / 사양</th><th>단위</th><th>단가</th><th>수량</th><th>소계</th><th></th></tr></thead><tbody>
     ${rQuoteItems.map((it,i)=>`<tr>
-      <td><strong>${it.product_name}</strong>${it.product_spec?`<br><span style="font-size:10px;color:#64748b;">${it.product_spec}</span>`:''}​</td>
+      <td style="text-align:center;vertical-align:middle;padding:6px 4px;">
+        <div style="font-size:10.5px;font-weight:700;color:#1565c0;white-space:nowrap;">${it.brand||''}</div>
+        <div style="font-size:10px;color:#94a3b8;margin-top:2px;">${it.category||''}</div>
+      </td>
+      <td><strong>${it.product_name}</strong>${it.product_spec?`<div style="font-size:10px;color:#64748b;margin-top:2px;line-height:1.4;">${fmtSpec(it.product_spec)}</div>`:''}​</td>
       <td><span class="badge ${it.rental_type==='일'?'badge-daily':'badge-monthly'}">${it.rental_type}</span></td>
       <td>${fmt(it.unit_price)}원</td>
       <td><input class="qty-input" type="number" value="${it.quantity}" min="1" onchange="rChangeQty(${i},this.value)"></td>
@@ -2113,7 +2132,7 @@ function rPreviewQuote() {
       </td>
       <td style="padding:8px 10px;border-bottom:1px solid #e8edf5;">
         <div style="font-weight:700;font-size:12.5px;color:#1e293b;">${item.product_name} <span style="background:${item.rental_type==='일'?'#fef3c7':'#dbeafe'};color:${item.rental_type==='일'?'#d97706':'#1a56a0'};padding:1px 6px;border-radius:99px;font-size:10px;font-weight:600;vertical-align:middle;">${item.rental_type}</span></div>
-        ${item.product_spec?`<div style="font-size:10.5px;color:#475569;margin-top:2px;line-height:1.5;">${item.product_spec}</div>`:''}
+        ${item.product_spec?`<div style="font-size:10.5px;color:#475569;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${fmtSpec(item.product_spec)}</div>`:''}
       </td>
       <td style="text-align:right;white-space:nowrap;font-weight:600;font-size:12px;min-width:90px;border-bottom:1px solid #e8edf5;">${fmt(item.unit_price)}원</td>
       <td style="text-align:center;font-weight:600;border-bottom:1px solid #e8edf5;">${item.quantity}</td>
