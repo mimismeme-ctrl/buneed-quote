@@ -2009,7 +2009,7 @@ function previewQuote() {
     </div>
     ${''/* 납품일/유효기간은 위에 표시됨 */}
     <table class="q-summary-table">
-      <tr><td style="color:#64748b;">소 계</td><td style="text-align:right;">${fmt(subtotal)} 원</td></tr>
+      <tr><td style="color:#64748b;">소 계</td><td style="text-align:right;">${fmt(sub)} 원</td></tr>
       ${discAmt>0?`<tr><td style="color:#ef4444;">할인</td><td style="text-align:right;color:#ef4444;">- ${fmt(discAmt)} 원</td></tr>`:''}
       <tr><td style="color:#64748b;">공급가액</td><td style="text-align:right;font-weight:600;">${fmt(supply)} 원</td></tr>
       <tr><td style="color:#64748b;">부가세 (10%)</td><td style="text-align:right;">${fmt(vat)} 원</td></tr>
@@ -2640,7 +2640,7 @@ function rPreviewQuote() {
       </table>
     </div>
     <table class="q-summary-table">
-      <tr><td style="color:#64748b;">소 계</td><td style="text-align:right;">${fmt(rSubtotal)} 원</td></tr>
+      <tr><td style="color:#64748b;">소 계</td><td style="text-align:right;">${fmt(sub)} 원</td></tr>
       ${discount>0?`<tr><td style="color:#ef4444;">할인</td><td style="text-align:right;color:#ef4444;">- ${fmt(discount)} 원</td></tr>`:''}
       ${installFee>0?`<tr><td style="color:#64748b;">설치비</td><td style="text-align:right;">${fmt(installFee)} 원</td></tr>`:''}
       <tr><td style="color:#64748b;">공급가액</td><td style="text-align:right;font-weight:600;">${fmt(supply)} 원</td></tr>
