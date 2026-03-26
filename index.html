@@ -741,11 +741,13 @@ textarea.field-input{resize:vertical;min-height:52px;}
             <!-- 금액 -->
             <div class="price-summary">
               <div class="price-row" style="border-bottom:1px dashed var(--border);padding-bottom:6px;margin-bottom:4px;"><label>소계</label><span id="sum-subtotal">0 원</span></div>
-              <div class="discount-row">
-                <label style="color:var(--muted)">할인율</label>
-                <input class="discount-input" type="number" id="discount-rate" value="0" min="0" max="100" oninput="calcPrice()"> %
-                <label style="color:var(--muted);margin-left:8px">할인액</label>
-                <input class="discount-input" type="number" id="discount-amt" value="0" min="0" oninput="calcPriceByAmt()"> 원
+              <div class="ps-row">
+                <span>할인율 / 할인금액</span>
+                <div class="ps-editable" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
+                  <input class="discount-input" type="number" id="discount-rate" value="0" min="0" max="100" style="width:55px;text-align:right;" oninput="calcPrice()" placeholder="0"> <span style="font-size:11px;">%</span>
+                  <span style="font-size:11px;color:#94a3b8;">|</span>
+                  <input class="discount-input" type="number" id="discount-amt" value="0" min="0" style="width:90px;text-align:right;" oninput="calcPriceByAmt()" placeholder="0"> <span style="font-size:11px;">원</span>
+                </div>
               </div>
               <div class="price-row"><label>공급가액</label><span id="sum-supply">0 원</span></div>
               <div class="price-row"><label>부가세 (10%)</label><span id="sum-vat">0 원</span></div>
