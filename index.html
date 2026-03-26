@@ -640,9 +640,9 @@ textarea.field-input{resize:vertical;min-height:52px;}
         <!-- 폼 -->
         <div class="form-panel">
           <div class="form-scroll">
-            <!-- 영업사(공급) 정보 -->
+            <!-- 공급사 정보 -->
             <div class="form-section sales-section">
-              <div class="section-title">🧑‍💼 영업사(공급) 정보</div>
+              <div class="section-title">🧑‍💼 공급사 정보</div>
               <div class="form-row">
                 <div><div class="field-label">회사명</div><input class="field-input" id="f-sales-company" value="(주)비유니드" placeholder="(주)비유니드"></div>
                 <div><div class="field-label">담당자 (직책 포함)</div><input class="field-input" id="f-sales-name" placeholder="예: 홍길동 영업팀장"></div>
@@ -651,13 +651,11 @@ textarea.field-input{resize:vertical;min-height:52px;}
                 <div><div class="field-label">연락처</div><input class="field-input" id="f-sales-phone" placeholder="010-0000-0000"></div>
                 <div><div class="field-label">이메일</div><input class="field-input" id="f-sales-email" placeholder="sales@buneed.co.kr"></div>
               </div>
-              <div class="form-row">
-                <div><div class="field-label">부서</div><input class="field-input" id="f-sales-dept" placeholder="예: 영업팀"></div>
-              </div>
+
             </div>
-            <!-- 고객(수신) 정보 -->
+            <!-- 고객사 정보 -->
             <div class="form-section">
-              <div class="section-title">👤 고객(수신) 정보</div>
+              <div class="section-title">👤 고객사 정보</div>
               <div class="form-row">
                 <div><div class="field-label">회사명 *</div><input class="field-input" id="f-company" placeholder="고객사 회사명"></div>
                 <div><div class="field-label">담당자 (직책 포함)</div><input class="field-input" id="f-contact" placeholder="예: 홍길동 구매팀장"></div>
@@ -762,9 +760,9 @@ textarea.field-input{resize:vertical;min-height:52px;}
         <!-- 렌탈 폼 -->
         <div class="form-panel">
           <div class="form-scroll">
-            <!-- 영업사(공급) 정보 -->
+            <!-- 공급사 정보 -->
             <div class="form-section r-sales-section">
-              <div class="r-section-title">🧑‍💼 영업사(공급) 정보</div>
+              <div class="r-section-title">🧑‍💼 공급사 정보</div>
               <div class="form-row">
                 <div><div class="field-label">회사명</div><input class="field-input r-field-input" id="r-sales-company" value="(주)비유니드" placeholder="비유니드"></div>
                 <div><div class="field-label">담당자 (직책 포함)</div><input class="field-input r-field-input" id="r-sales-name" placeholder="예: 홍길동 영업팀장"></div>
@@ -773,13 +771,11 @@ textarea.field-input{resize:vertical;min-height:52px;}
                 <div><div class="field-label">연락처</div><input class="field-input r-field-input" id="r-sales-phone" placeholder="010-0000-0000"></div>
                 <div><div class="field-label">이메일</div><input class="field-input r-field-input" id="r-sales-email" placeholder="sales@buneed.co.kr"></div>
               </div>
-              <div class="form-row">
-                <div><div class="field-label">부서</div><input class="field-input r-field-input" id="r-sales-dept" placeholder="예: 영업팀"></div>
-              </div>
+
             </div>
-            <!-- 고객(수신) 정보 -->
+            <!-- 고객사 정보 -->
             <div class="form-section">
-              <div class="r-section-title">👤 고객(수신) 정보</div>
+              <div class="r-section-title">👤 고객사 정보</div>
               <div class="form-row">
                 <div><div class="field-label">회사명 *</div><input class="field-input r-field-input" id="r-company" placeholder="고객사 회사명"></div>
                 <div><div class="field-label">담당자 (직책 포함)</div><input class="field-input r-field-input" id="r-contact" placeholder="예: 홍길동 구매팀장"></div>
@@ -816,10 +812,7 @@ textarea.field-input{resize:vertical;min-height:52px;}
                 <div><div class="field-label">설치/납품 장소</div><input class="field-input r-field-input" id="r-delivery-loc" placeholder="서울시 강남구..."></div>
                 <div><div class="field-label">반납/회수 방법</div><input class="field-input r-field-input" id="r-return-method" placeholder="만료 후 수거"></div>
               </div>
-              <div class="form-row">
-                <div><div class="field-label">사용 목적</div><input class="field-input r-field-input" id="r-purpose" placeholder="행사/전시, 사무용 등"></div>
-                <div></div>
-              </div>
+
               <div class="form-row full">
                 <div><div class="field-label">메모 / 특이사항</div><textarea class="field-input r-field-input" id="r-memo" rows="2" placeholder="설치 특이사항, 반납 조건 등"></textarea></div>
               </div>
@@ -2423,7 +2416,6 @@ async function rSaveQuote() {
       contact_name: (document.getElementById('r-contact')||{}).value||null,
       contact_tel: (document.getElementById('r-phone')||{}).value||null,
       contact_email: (document.getElementById('r-email')||{}).value||null,
-      usage_purpose: (document.getElementById('r-purpose')||{}).value||null,
       rental_type: rCurrentType,
       rental_duration: parseInt((document.getElementById('r-duration')||{}).value)||null,
       rental_start_date: (document.getElementById('r-start-date')||{}).value||null,
@@ -2473,7 +2465,6 @@ function rPreviewQuote() {
   const qNum=co('r-quote-num'), duration=co('r-duration'), startDate=co('r-start-date')||'-';
   const deliveryLoc=co('r-delivery-loc')||'-', returnMethod=co('r-return-method')||'-';
   const memo=co('r-memo'), validUntil=co('r-valid');
-  const purpose=co('r-purpose');
   const sub = rQuoteItems.reduce((s,i)=>s+i.total_price,0);
   const discount=parseInt(co('r-discount'))||0, installFee=parseInt(co('r-install-fee'))||0;
   const deposit=parseInt(co('r-deposit'))||0;
@@ -2551,7 +2542,6 @@ function rPreviewQuote() {
         <div class="q-rental-info-item"><div class="label">시작일</div><div class="value">${startDate}</div></div>
         <div class="q-rental-info-item"><div class="label">설치/납품 장소</div><div class="value">${deliveryLoc}</div></div>
         <div class="q-rental-info-item"><div class="label">반납/회수</div><div class="value">${returnMethod}</div></div>
-        ${purpose?`<div class="q-rental-info-item"><div class="label">사용목적</div><div class="value">${purpose}</div></div>`:''}
       </div>
     </div>
     <div class="q-section">
@@ -2662,7 +2652,7 @@ async function rLoadQuote(qId) {
   setV('r-quote-num',q.quote_number);
   setV('r-company',q.company_name); setV('r-contact',q.contact_name);
   setV('r-phone',q.contact_tel); setV('r-email',q.contact_email);
-  setV('r-purpose',q.usage_purpose); setV('r-duration',q.rental_duration);
+  setV('r-duration',q.rental_duration);
   setV('r-start-date',q.rental_start_date); setV('r-delivery-loc',q.delivery_location);
   setV('r-return-method',q.return_method);
   setV('r-discount',q.discount_amount||0); setV('r-install-fee',q.installation_fee||0);
@@ -2693,7 +2683,7 @@ function rResetQuote() {
   if (!confirm('렌탈 견적을 초기화하시겠습니까?')) return;
   rQuoteItems=[]; rCurrentQuoteId=null; rCurrentShareToken=null;
   rRenderQuoteItems(); rCalcPrice();
-  ['r-company','r-contact','r-phone','r-email','r-purpose','r-duration','r-start-date',
+  ['r-company','r-contact','r-phone','r-email','r-duration','r-start-date',
    'r-delivery-loc','r-return-method','r-memo'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('r-discount').value=0;
   document.getElementById('r-install-fee').value=0;
