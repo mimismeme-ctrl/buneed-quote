@@ -266,6 +266,7 @@ textarea.field-input{resize:vertical;min-height:52px;}
 }
 .r-q-section-title{font-size:12px;font-weight:800;color:#1B3A6B;text-transform:uppercase;letter-spacing:.08em;padding-bottom:6px;border-bottom:1.5px solid #dde3ee;margin-bottom:10px;}
 .q-party-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px;}
+.q-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .q-party-box{border:1px solid var(--border);border-radius:8px;padding:10px;}
 .q-party-box h4{font-size:11px;font-weight:700;margin-bottom:6px;}
 .q-party-box.supplier h4{color:var(--p-navy);}
@@ -378,6 +379,13 @@ textarea.field-input{resize:vertical;min-height:52px;}
   }
   .q-summary-table {
     width:100% !important;
+  }
+  .q-info-grid {
+    grid-template-columns:1fr !important;
+  }
+  #preview-content.modal-body,
+  #r-preview-content.modal-body {
+    padding:0 !important;
   }
   .q-footer-bar {
     font-size:9px !important;
@@ -1008,7 +1016,7 @@ textarea.field-input{resize:vertical;min-height:52px;}
             </div>
             <!-- 렌탈 조건 -->
             <div class="form-section">
-              <div class="r-section-title">📅 렌탈 조건</div>
+              <div class="r-section-title">렌탈 조건</div>
               <div class="form-row">
                 <div>
                   <div class="field-label">렌탈 단위</div>
@@ -2195,7 +2203,7 @@ function previewQuote() {
         <div style="font-size:10.5px;font-weight:700;color:#1B3A6B;white-space:nowrap;">${it.brand||''}</div>
         <div style="font-size:10px;color:#64748b;margin-top:2px;">${it.category||''}</div>
       </td>
-      <td style="min-width:180px;padding:8px 10px;border-bottom:1px solid #e8edf5;">
+      <td style="min-width:120px;padding:8px 10px;border-bottom:1px solid #e8edf5;">
         <div style="font-weight:700;font-size:12.5px;color:#1e293b;">${it.product_name}</div>
         ${specText ? `<div style="font-size:10.5px;color:#475569;line-height:1.5;margin-top:3px;">${specText}</div>` : ''}
       </td>
@@ -2252,7 +2260,7 @@ function previewQuote() {
           </div>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
+      <div class="q-info-grid" style="margin-top:12px;">
         <div style="border:1px solid #bcd0ee;border-radius:6px;overflow:hidden;">
           <div style="background:#f1f5f9;padding:5px 10px;">
             <span style="font-size:11px;font-weight:700;color:#1B3A6B;">납품 / 유효 기간</span>
@@ -2280,17 +2288,19 @@ function previewQuote() {
     </div>
     <div class="q-section">
       <div class="q-section-title">▪ 견적 내용</div>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
       <table class="q-table">
         <thead><tr>
           <th style="width:24px;text-align:center;font-size:10px;">No</th>
           <th style="text-align:center;width:65px;font-size:11px;">브랜드</th>
-          <th style="text-align:left;min-width:220px;">제품명 / 사양</th>
+          <th style="text-align:left;min-width:120px;">제품명 / 사양</th>
           <th style="text-align:right;white-space:nowrap;width:75px;font-size:11px;">단가</th>
           <th style="text-align:center;width:52px;white-space:nowrap;">수량</th>
           <th style="text-align:right;white-space:nowrap;min-width:80px;">금액</th>
         </tr></thead>
         <tbody>${itemsHtml}</tbody>
       </table>
+      </div>
     </div>
     ${''/* 납품일/유효기간은 위에 표시됨 */}
     <table class="q-summary-table">
@@ -2844,7 +2854,7 @@ function rPreviewQuote() {
         <div style="font-size:10.5px;font-weight:700;color:#1B3A6B;white-space:nowrap;">${item.brand||''}</div>
         <div style="font-size:10px;color:#64748b;margin-top:2px;">${item.category||''}</div>
       </td>
-      <td style="padding:8px 10px;border-bottom:1px solid #e8edf5;min-width:180px;">
+      <td style="padding:8px 10px;border-bottom:1px solid #e8edf5;min-width:120px;">
         <div style="font-weight:700;font-size:12.5px;color:#1e293b;">${item.product_name}</div>
         ${item.product_spec?`<div style="font-size:10.5px;color:#475569;margin-top:2px;line-height:1.4;">${fmtSpec(item.product_spec)}</div>`:''}
       </td>
@@ -2904,7 +2914,7 @@ function rPreviewQuote() {
       </div>
     </div>
     <div class="q-rental-info-box">
-      <div style="font-size:11px;font-weight:700;color:#1a56a0;margin-bottom:8px;">📅 렌탈 조건</div>
+      <div style="font-size:11px;font-weight:700;color:#1a56a0;margin-bottom:8px;">렌탈 조건</div>
       <div class="q-rental-info-grid">
         <div class="q-rental-info-item"><div class="label">렌탈 단위</div><div class="value">${rCurrentType} 단위</div></div>
         <div class="q-rental-info-item"><div class="label">렌탈 기간</div><div class="value">${durationLabel}</div></div>
@@ -2916,10 +2926,12 @@ function rPreviewQuote() {
     </div>
     <div class="q-section">
       <div class="r-q-section-title">▪ 견적 내용</div>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
       <table class="q-table">
-        <thead><tr><th style="width:24px;text-align:center;font-size:10px;">No</th><th style="text-align:center;width:65px;font-size:11px;">브랜드</th><th style="text-align:left;min-width:180px;">제품명 / 사양</th><th style="text-align:center;width:45px;font-size:11px;">단위</th><th style="text-align:right;width:72px;font-size:11px;">단가</th><th style="text-align:center;width:52px;white-space:nowrap;font-size:11px;">수량</th><th style="text-align:right;width:80px;font-size:11px;">금액</th></tr></thead>
+        <thead><tr><th style="width:24px;text-align:center;font-size:10px;">No</th><th style="text-align:center;width:65px;font-size:11px;">브랜드</th><th style="text-align:left;min-width:120px;">제품명 / 사양</th><th style="text-align:center;width:45px;font-size:11px;">단위</th><th style="text-align:right;width:72px;font-size:11px;">단가</th><th style="text-align:center;width:52px;white-space:nowrap;font-size:11px;">수량</th><th style="text-align:right;width:80px;font-size:11px;">금액</th></tr></thead>
         <tbody>${itemsHtml}</tbody>
       </table>
+      </div>
     </div>
     <table class="q-summary-table">
       <tr><td>소 계</td><td>${fmt(sub)} 원</td></tr>
