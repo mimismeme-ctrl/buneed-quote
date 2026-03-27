@@ -153,13 +153,7 @@ async function loadQuote() {
   `).join('');
 
   // 회사소개서 버튼
-  let introHtml = '';
-  try {
-    const cs = JSON.parse(localStorage.getItem('buneed_company_settings') || '{}');
-    if (cs.companyIntroLink) {
-      introHtml = '<a href="' + cs.companyIntroLink + '" target="_blank" class="q-intro-btn" style="display:inline-block;padding:3px 12px;border:1.5px solid #1B3A6B;border-radius:99px;font-size:11px;color:#1B3A6B;font-weight:600;text-decoration:none;background:#fff;margin-top:4px;">회사소개서</a>';
-    }
-  } catch(e) {}
+  const introHtml = '<a href="https://drive.google.com/file/d/1IWM2oVFwf7BT5k9Cm8LZA9g3AK8FatYx/view?usp=sharing" target="_blank" class="q-intro-btn" style="display:inline-block;padding:3px 12px;border:1.5px solid #1B3A6B;border-radius:99px;font-size:11px;color:#1B3A6B;font-weight:600;text-decoration:none;background:#fff;margin-top:4px;">회사소개서</a>';
 
   // 납기/유효기간/메모 섹션
   const infoGrid = (q.delivery_date || q.valid_until || q.memo) ? `

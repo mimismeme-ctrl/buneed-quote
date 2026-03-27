@@ -7,6 +7,7 @@
 <meta property="og:title" content="렌탈 견적서 - 비유니드">
 <meta property="og:description" content="여기를 눌러 링크를 확인하세요.">
 <meta property="og:type" content="website">
+<meta property="og:image" content="https://buneed-quote.vercel.app/og-image.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -2208,10 +2209,7 @@ function previewQuote() {
   const vat = Math.round(supply*0.1);
   const total = supply + vat;
   const today = new Date().toLocaleDateString('ko-KR');
-  let introHtml = '';
-  try { const cs = JSON.parse(localStorage.getItem('buneed_company_settings')||'{}');
-    if (cs.companyIntroLink) introHtml = `<a href="${cs.companyIntroLink}" target="_blank" class="q-intro-btn" style="display:inline-block;padding:3px 12px;border:1.5px solid #1B3A6B;border-radius:99px;font-size:11px;color:#1B3A6B;font-weight:600;text-decoration:none;letter-spacing:0.02em;background:#fff;white-space:nowrap;">회사소개서</a>`;
-  } catch(e) {}
+  const introHtml = '<a href="https://drive.google.com/file/d/1IWM2oVFwf7BT5k9Cm8LZA9g3AK8FatYx/view?usp=sharing" target="_blank" class="q-intro-btn" style="display:inline-block;padding:3px 12px;border:1.5px solid #1B3A6B;border-radius:99px;font-size:11px;color:#1B3A6B;font-weight:600;text-decoration:none;background:#fff;margin-top:4px;">회사소개서</a>';
     const itemsHtml = quoteItems.map((it,i)=>{
     const specText = it.spec_summary ? fmtSpec(it.spec_summary) : '';
     return `
@@ -2895,10 +2893,7 @@ function rPreviewQuote() {
   const deposit=parseInt(co('r-deposit'))||0;
   const supply=sub-discount+installFee, vat=Math.round(supply*0.1), total=supply+vat+deposit;
   const today=new Date().toLocaleDateString('ko-KR');
-  let rIntroHtml = '';
-  try { const cs = JSON.parse(localStorage.getItem('buneed_company_settings')||'{}');
-    if (cs.companyIntroLink) rIntroHtml = `<a href="${cs.companyIntroLink}" target="_blank" class="q-intro-btn" style="display:inline-block;padding:2px 10px;border:1.5px solid #1B3A6B;border-radius:99px;font-size:11px;color:#1B3A6B;font-weight:600;text-decoration:none;letter-spacing:0.02em;background:#fff;white-space:nowrap;">회사소개서</a>`;
-  } catch(e) {}
+  const rIntroHtml = '<a href="https://drive.google.com/file/d/1IWM2oVFwf7BT5k9Cm8LZA9g3AK8FatYx/view?usp=sharing" target="_blank" class="q-intro-btn" style="display:inline-block;padding:3px 12px;border:1.5px solid #1B3A6B;border-radius:99px;font-size:11px;color:#1B3A6B;font-weight:600;text-decoration:none;background:#fff;margin-top:4px;">회사소개서</a>';
   const durationLabel = rCurrentType==='일'?`${duration}일`:`${duration}개월`;
   const itemsHtml = rQuoteItems.map((item,i)=>`
     <tr>
