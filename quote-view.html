@@ -70,9 +70,11 @@ tbody tr:nth-child(even){background:#f9fafc;}
   .q-summary table { width: 100%; }
   .top-bar { flex-wrap: wrap; gap: 8px; }
   .print-btn { padding: 6px 14px; font-size: 11px; }
-  /* 테이블 가로 스크롤 처리 */
-  .q-section { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  table { min-width: 480px; }
+  /* 테이블 폰트 축소로 가로 스크롤 제거 */
+  table { font-size: 11px; }
+  thead th { padding: 6px 6px; font-size: 10px; }
+  tbody td { padding: 6px 6px; font-size: 11px; }
+  .text-right { font-size: 11px; }
 }
 @media (max-width: 480px) {
   .qdoc { padding: 14px 10px; }

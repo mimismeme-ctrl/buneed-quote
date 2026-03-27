@@ -264,7 +264,7 @@ textarea.field-input{resize:vertical;min-height:52px;}
   padding-bottom:20px;border-bottom:2.5px solid #1B3A6B;margin-bottom:20px;
 }
 .qdoc .q-logo-area{display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
-.qdoc .q-logo-area img{height:48px;}
+.qdoc .q-logo-area img{height:64px;}
 .qdoc .q-logo-area .q-tel{display:none;}
 .qdoc h1{font-size:20px;font-weight:800;margin-bottom:4px;letter-spacing:.05em;}
 .qdoc .q-date{font-size:11px;color:var(--muted);}
@@ -722,7 +722,7 @@ textarea.field-input{resize:vertical;min-height:52px;}
 
   /* 6. 로고 영역 – flex column 우측정렬 */
   .q-logo-area { display: flex !important; flex-direction: column !important; align-items: flex-end !important; gap: 4px !important; }
-  .q-logo-area img { height: 48px !important; display: block !important; }
+  .q-logo-area img { height: 64px !important; display: block !important; }
   /* 인쇄 시 회사소개서 버튼 완전 숨김 (모든 위치) */
   .q-logo-area a { display: none !important; }
   .q-intro-btn { display: none !important; }
@@ -1916,6 +1916,7 @@ let selectedSpecOpts = {};
 let editingQuoteId = null;
 let currentQuoteNum = '';
 let currentShareToken = null;
+let _lastPreviewHtml = '';
 
 function initQuoteNum() {
   const now = new Date();
@@ -2331,6 +2332,7 @@ function previewQuote() {
     <div class="q-spacer"></div>
     <div class="q-footer-bar">주식회사 비유니드 | 경기도 하남시 미사강변한강로 135 다동 4층 445호 | 031.8028.0464 | www.buneed.co.kr</div>
   </div>`;
+  _lastPreviewHtml = html;
   document.getElementById('preview-content').innerHTML = html;
   openModal('modal-preview');
 }
@@ -2340,10 +2342,14 @@ function printQuote() {
     const company = (document.getElementById('f-company')?.value.trim() || '').replace(/[\/\\:*?"<>|]/g, '_');
     const qNum = (currentQuoteNum || '').replace(/[\/\\:*?"<>|]/g, '_');
     const fileName = '구매견적서' + (company ? '_' + company : '') + (qNum ? '_' + qNum : '');
-    const origTitle = document.title;
-    document.title = fileName;
-    window.print();
-    document.title = origTitle;
+    const content = _lastPreviewHtml || document.getElementById('preview-content').innerHTML;
+    const css = document.querySelector('style') ? document.querySelector('style').textContent : '';
+    const fullHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${fileName}</title><style>${css}</style></head><body><div class="qdoc">${content}</div></body></html>`;
+    const blob = new Blob([fullHtml], {type:'text/html;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const w = window.open(url);
+    if (!w) { showToast('팝업이 차단되었습니다. 팝업 허용 후 다시 시도하세요.', 'error'); URL.revokeObjectURL(url); return; }
+    w.addEventListener('load', () => { w.print(); URL.revokeObjectURL(url); });
   };
   const modal = document.getElementById('modal-preview');
   if (!modal || !modal.classList.contains('open')) {
@@ -2994,6 +3000,7 @@ function rPreviewQuote() {
     <div class="q-spacer"></div>
     <div class="q-footer-bar">주식회사 비유니드 | 경기도 하남시 미사강변한강로 135 다동 4층 445호 | 031.8028.0464 | www.buneed.co.kr</div>
   </div>`;
+  _lastPreviewHtml = html;
   document.getElementById('r-preview-content').innerHTML = html;
   openModal('r-modal-preview');
 }
@@ -3003,10 +3010,14 @@ function rPrintQuote() {
     const company = (document.getElementById('r-company')?.value.trim() || '').replace(/[\/\\:*?"<>|]/g, '_');
     const qNum = (document.getElementById('r-quote-num')?.value || '').replace(/[\/\\:*?"<>|]/g, '_');
     const fileName = '렌탈견적서' + (company ? '_' + company : '') + (qNum ? '_' + qNum : '');
-    const origTitle = document.title;
-    document.title = fileName;
-    window.print();
-    document.title = origTitle;
+    const content = _lastPreviewHtml || document.getElementById('r-preview-content').innerHTML;
+    const css = document.querySelector('style') ? document.querySelector('style').textContent : '';
+    const fullHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${fileName}</title><style>${css}</style></head><body><div class="qdoc">${content}</div></body></html>`;
+    const blob = new Blob([fullHtml], {type:'text/html;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const w = window.open(url);
+    if (!w) { showToast('팝업이 차단되었습니다. 팝업 허용 후 다시 시도하세요.', 'error'); URL.revokeObjectURL(url); return; }
+    w.addEventListener('load', () => { w.print(); URL.revokeObjectURL(url); });
   };
   const modal = document.getElementById('r-modal-preview');
   if (!modal || !modal.classList.contains('open')) {
