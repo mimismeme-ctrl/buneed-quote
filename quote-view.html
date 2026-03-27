@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>구매 견적서 - 비유니드</title>
+<meta property="og:title" content="구매 견적서 - 비유니드">
+<meta property="og:description" content="여기를 눌러 견적서를 확인하세요.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://buneed-quote.vercel.app/og-image.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -54,6 +58,28 @@ tbody tr:nth-child(even){background:#f9fafc;}
   .qdoc{box-shadow:none;border-radius:0;padding:20px;}
   @page{margin:10mm;}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+}
+
+/* ── 모바일 반응형 (max-width: 768px) ── */
+@media (max-width: 768px) {
+  .page-wrap { padding: 12px 8px; }
+  .qdoc { padding: 20px 16px; border-radius: 8px; }
+  h1 { font-size: 17px; }
+  .q-parties { grid-template-columns: 1fr; gap: 10px; }
+  .q-info-grid { grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px 12px; }
+  .q-summary table { width: 100%; }
+  .top-bar { flex-wrap: wrap; gap: 8px; }
+  .print-btn { padding: 6px 14px; font-size: 11px; }
+  /* 테이블 가로 스크롤 처리 */
+  .q-section { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { min-width: 480px; }
+}
+@media (max-width: 480px) {
+  .qdoc { padding: 14px 10px; }
+  .q-info-grid { grid-template-columns: 1fr; }
+  .q-header { flex-direction: column; gap: 10px; }
+  .q-num { text-align: left; margin-top: 0; }
+  h1 { font-size: 15px; letter-spacing: 0; }
 }
 </style>
 </head>
@@ -133,6 +159,13 @@ async function loadQuote() {
   const discRow = discAmt > 0 ? `
     <tr class="discount-row"><td>할인</td><td class="text-right">- ${fmt(discAmt)} 원</td></tr>
   ` : '';
+
+  // 페이지 제목 업데이트 (PDF 저장 파일명 및 탭 제목)
+  const company = (q.company_name || '').replace(/[/\\:*?"<>|]/g, '_').trim();
+  const qnum = (q.quote_number || '').replace(/[/\\:*?"<>|]/g, '_').trim();
+  if (company || qnum) {
+    document.title = '구매견적서' + (company ? '_' + company : '') + (qnum ? '_' + qnum : '') + ' - 비유니드';
+  }
 
   document.getElementById('quote-doc').innerHTML = `
     <div class="q-header">

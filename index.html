@@ -9,8 +9,6 @@
 <meta property="og:type" content="website">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// 탭 title 복원: 카카오톡 크롤러(JS 미실행)는 <title> 읽고,
-// 일반 브라우저 접속 시엔 DOMContentLoaded에서 시스템명으로 복원
 document.addEventListener('DOMContentLoaded', function() {
   if (!location.search.includes('share=') && !location.search.includes('token=')) {
     document.title = '비유니드 견적시스템';
@@ -211,6 +209,7 @@ textarea.field-input{resize:vertical;min-height:52px;}
 .btn{padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:5px;font-family:inherit;}
 .btn-sm{padding:5px 10px;font-size:11px;}
 .btn-primary{background:var(--p-navy);color:#fff;}
+.btn-mobile-share{display:none;}
 .btn-primary:hover{background:var(--p-blue);}
 .btn-r-primary{background:var(--r-primary);color:#fff;}
 .btn-r-primary:hover{background:var(--r-blue);}
@@ -450,6 +449,10 @@ textarea.field-input{resize:vertical;min-height:52px;}
   .h-logo img {
     height:22px !important;
   }
+  /* 모바일: 인쇄 버튼 숨기고 공유 버튼 표시 */
+  #modal-preview .modal-footer .btn-primary,
+  #r-modal-preview .modal-footer .btn-r-primary { display:none !important; }
+  .btn-mobile-share { display:inline-flex !important; }
 }
 
 /* ===== 관리자 서브패널 ===== */
@@ -1239,6 +1242,7 @@ textarea.field-input{resize:vertical;min-height:52px;}
       <button class="btn btn-secondary" onclick="closeModal('modal-preview')">닫기</button>
       <button class="btn btn-success" id="btn-copy-link" onclick="copyShareLink()">링크복사</button>
       <button class="btn btn-primary" onclick="printQuote()">🖨️ 인쇄 / PDF 저장</button>
+      <button class="btn btn-success btn-mobile-share" onclick="mobileShareQuote()">📤 공유하기</button>
     </div>
   </div>
 </div>
@@ -1331,6 +1335,7 @@ textarea.field-input{resize:vertical;min-height:52px;}
       <button class="btn btn-r-secondary" onclick="closeModal('r-modal-preview')">닫기</button>
       <button class="btn btn-success" onclick="rCopyShareLink()">링크복사</button>
       <button class="btn btn-r-primary" onclick="rPrintQuote()">🖨️ 인쇄 / PDF 저장</button>
+      <button class="btn btn-r-primary btn-mobile-share" onclick="rMobileShareQuote()">📤 공유하기</button>
     </div>
   </div>
 </div>
@@ -2331,16 +2336,22 @@ function previewQuote() {
 }
 
 function printQuote() {
-  // @media print CSS가 #modal-preview.open 만 전체 출력하므로
-  // DOM을 교체하지 않고 그냥 window.print() 만 호출합니다.
+  const _doPrint = () => {
+    const company = (document.getElementById('f-company')?.value.trim() || '').replace(/[\/\\:*?"<>|]/g, '_');
+    const qNum = (currentQuoteNum || '').replace(/[\/\\:*?"<>|]/g, '_');
+    const fileName = '구매견적서' + (company ? '_' + company : '') + (qNum ? '_' + qNum : '');
+    const origTitle = document.title;
+    document.title = fileName;
+    window.print();
+    document.title = origTitle;
+  };
   const modal = document.getElementById('modal-preview');
   if (!modal || !modal.classList.contains('open')) {
-    // 모달이 열리지 않은 경우 미리보기를 먼저 연다
     previewQuote();
-    setTimeout(() => window.print(), 500);
+    setTimeout(_doPrint, 500);
     return;
   }
-  window.print();
+  _doPrint();
 }
 
 /* copyQuoteLink v1 removed – using async v2 */
@@ -2396,6 +2407,30 @@ async function copyShareLink() {
   await navigator.clipboard.writeText(url);
   showToast('공유 링크가 복사되었습니다 🔗','success');
 }
+async function mobileShareQuote() {
+  if (!editingQuoteId) { showToast('먼저 저장하세요','error'); return; }
+  const url = location.origin+'/quote-view.html?token='+currentShareToken;
+  if (navigator.share) {
+    try { await navigator.share({ title: '구매 견적서', text: '비유니드 구매 견적서를 확인하세요.', url }); }
+    catch(e) { if (e.name !== 'AbortError') showToast('공유 실패: '+e.message,'error'); }
+  } else {
+    await navigator.clipboard.writeText(url);
+    showToast('공유 링크가 복사되었습니다 🔗','success');
+  }
+}
+
+async function rMobileShareQuote() {
+  if (!rCurrentQuoteId) { showToast('먼저 저장하세요','error'); return; }
+  const url = location.origin+location.pathname+'?share='+rCurrentShareToken+'&type=rental';
+  if (navigator.share) {
+    try { await navigator.share({ title: '렌탈 견적서', text: '비유니드 렌탈 견적서를 확인하세요.', url }); }
+    catch(e) { if (e.name !== 'AbortError') showToast('공유 실패: '+e.message,'error'); }
+  } else {
+    await navigator.clipboard.writeText(url);
+    showToast('렌탈 공유 링크가 복사되었습니다 🔗','success');
+  }
+}
+
 
 async function loadHistory() {
   const body = document.getElementById('history-body');
@@ -2964,15 +2999,22 @@ function rPreviewQuote() {
 }
 
 function rPrintQuote() {
-  // @media print CSS가 #r-modal-preview.open 만 전체 출력하므로
-  // DOM을 교체하지 않고 그냥 window.print() 만 호출합니다.
+  const _doPrint = () => {
+    const company = (document.getElementById('r-company')?.value.trim() || '').replace(/[\/\\:*?"<>|]/g, '_');
+    const qNum = (document.getElementById('r-quote-num')?.value || '').replace(/[\/\\:*?"<>|]/g, '_');
+    const fileName = '렌탈견적서' + (company ? '_' + company : '') + (qNum ? '_' + qNum : '');
+    const origTitle = document.title;
+    document.title = fileName;
+    window.print();
+    document.title = origTitle;
+  };
   const modal = document.getElementById('r-modal-preview');
   if (!modal || !modal.classList.contains('open')) {
     rPreviewQuote();
-    setTimeout(() => window.print(), 500);
+    setTimeout(_doPrint, 500);
     return;
   }
-  window.print();
+  _doPrint();
 }
 
 
