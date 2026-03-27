@@ -3,8 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>비유니드 구매 · 렌탈 견적시스템</title>
+<title>렌탈 견적서 - 비유니드</title>
+<meta property="og:title" content="렌탈 견적서 - 비유니드">
+<meta property="og:description" content="여기를 눌러 링크를 확인하세요.">
+<meta property="og:type" content="website">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// 탭 title 복원: 카카오톡 크롤러(JS 미실행)는 <title> 읽고,
+// 일반 브라우저 접속 시엔 DOMContentLoaded에서 시스템명으로 복원
+document.addEventListener('DOMContentLoaded', function() {
+  if (!location.search.includes('share=') && !location.search.includes('token=')) {
+    document.title = '비유니드 견적시스템';
+  }
+});
+</script>
 <style>
 
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif;}
