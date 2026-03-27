@@ -53,6 +53,7 @@ tbody tr:nth-child(even){background:#f9fafc;}
 .error-box{text-align:center;padding:60px;color:#ef4444;}
 .error-box h2{font-size:18px;margin-bottom:12px;}
 .memo-box{background:#f5f7fc;border-radius:6px;padding:10px 14px;font-size:11px;color:#475569;}
+.q-intro-btn{display:inline-block;}
 @media print{
   .top-bar{display:none;}
   .q-intro-btn{display:none!important;}
@@ -152,9 +153,6 @@ async function loadQuote() {
     </tr>
   `).join('');
 
-  // 회사소개서 버튼
-  const introHtml = '<a href="https://drive.google.com/file/d/1IWM2oVFwf7BT5k9Cm8LZA9g3AK8FatYx/view?usp=sharing" target="_blank" class="q-intro-btn" style="display:inline-block;padding:3px 12px;border:1.5px solid #1B3A6B;border-radius:99px;font-size:11px;color:#1B3A6B;font-weight:600;text-decoration:none;background:#fff;margin-top:4px;">회사소개서</a>';
-
   // 납기/유효기간/메모 섹션
   const infoGrid = (q.delivery_date || q.valid_until || q.memo) ? `
     <div class="q-info-grid" style="margin-bottom:20px;">
@@ -175,6 +173,10 @@ async function loadQuote() {
   if (company || qnum) {
     document.title = '구매견적서' + (company ? '_' + company : '') + (qnum ? '_' + qnum : '') + ' - 비유니드';
   }
+
+  // 회사소개서 버튼
+  const introHtml = '<a href="https://drive.google.com/file/d/1IWM2oVFwf7BT5k9Cm8LZA9g3AK8FatYx/view?usp=sharing" target="_blank" class="q-intro-btn" style="display:inline-block;padding:3px 12px;border:1.5px solid #1B3A6B;border-radius:99px;font-size:11px;color:#1B3A6B;font-weight:600;text-decoration:none;background:#fff;margin-top:4px;">회사소개서</a>';
+
 
   document.getElementById('quote-doc').innerHTML = `
     <div class="q-header">
